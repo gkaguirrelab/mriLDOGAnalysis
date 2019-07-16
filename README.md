@@ -5,15 +5,15 @@ Analysis code for all projects under the LDOG protocol
 
 1 - Two MPRAGE images were registered using FSL's flirt Rigid Body transformation (6DOF) 
 
-"flirt -in <INPUT> -ref <REFERENCE> -out <OUTPUT> -omat <OUTPUT_MATRIX> -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6  -interp trilinear"
+"flirt -in |INPUT| -ref |REFERENCE| -out |OUTPUT| -omat |OUTPUT_MATRIX| -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6  -interp trilinear"
 
 2 - Registered T1 images were averaged using ANTs' AverageImages
 
-"AverageImages 3 <OUTPUT> 1 <IMAGE> <IMAGE>"
+"AverageImages 3 |OUTPUT| 1 |IMAGE| |IMAGE|"
 
 3 - Averaged T1-with-skull images were non-linearly registered (warped) to a canine template-without-skull (Datta et al., 2012) and a warp image and deformation matrix were obtained. ANTs is used for non-linear registration since it works better with non-brain-extracted volumes.
 
-"antsRegistrationSyN -d 3 -f <TEMPLATE> -m <T1> -o <OUTPUT_NAME>"
+"antsRegistrationSyN -d 3 -f |TEMPLATE| -m |T1| -o |OUTPUT_NAME|"
 
 4 - FSL's 1st level feat fmri analysis was performed on the individual EPIs. FSL does 1st level analysis in the native space. It creates a registration folder during this stage which will be applied during the group analysis. If you do not specify any registration in the 1st step, your group analysis will fail because it look for the registration files but won't be able to find them. Therefore, do a registration to a template in the first level by selecting any template. It does not really matter what you register to because the registration will not be applied until the second level. We just want to do this to trick fsl into creating registration files. Later we will replace those registration files with identity matrices so no registration will be performed.
 
@@ -29,4 +29,4 @@ Analysis code for all projects under the LDOG protocol
 
 7 - Transform the Z-stat maps into native space by applying the deformation fields we obtained after non-linear registration (Step 3).
 
-"antsApplyTransforms -d 3 -r <TEMPLATE> -i <ZSTAT_MAP> -t <XXX1Warp.nii.gz> -t <XXX0GenericAffine.mat> -o <out.nii.gz> -v 1"
+"antsApplyTransforms -d 3 -r |TEMPLATE| -i |ZSTAT_MAP| -t |XXX1Warp.nii.gz| -t |XXX0GenericAffine.mat| -o |out.nii.gz| -v 1"
