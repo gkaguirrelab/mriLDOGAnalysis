@@ -3,16 +3,23 @@ Analysis code for all projects under the LDOG protocol
 
 # Requirements
 
+- Python 2 (Python 3 should also work but not tested)
 - FSL for fmri analysis
 - ANTs for registrations
 
 # Analysis Instructions
 
-1 - For canine analysis download the design file which has the on>off and off>on event design templates saved inside. This template file is automatically modified by a loop in the preprocAndFirstLvl.py function according to the specific subject information.
+1 - Create an empty analysis folder where you will place your MRI images and the results will be placed.
 
-2 - Run preprocAndFirstLvl.py function and point it to T1, EPI, Canine Atlas, Design, Output and ANTs folders (don't use a slash at the end of the paths. e.g. /home/Desktop/T1). This function will do the first five steps mentioned under Analysis Details section. Separate folders for registration and 1st level results are created at the output path specified. 
+2 - Download the design folder which has the on>off and off>on event design templates saved inside and place it into the analysis folder you created in step 1. This template file is automatically modified by a loop by the preprocAndFirstLvl.py function according to the specific subject information.
 
-3 - Second-level analysis : Doing the second-level analysis manually is a better option for now. A lot of files need to be modified in order to automate it since the shape and length of the design matrix change depending on many factors (e.g. Size of the data). Might be automated in the future.
+2 - Download the Atlas folder which contains the canine atlases and in-vivo --> ex-vivo transformations. Place it in the main analysis folder.
+
+3 - Download your EPI and MPRAGE images and place them into two different subfolders inside the main analysis folder.
+
+2 - Run preprocAndFirstLvl.py function and point it to the T1, EPI, Canine Atlas, Design, Output and ANTs scripts folders (don't use a slash at the end of the paths. Use it like /home/Desktop/T1). This function will do the first five steps mentioned under Analysis Details section. Folders for registration and 1st level results will be created at the output path specified in the function. 
+
+3 - Second-level analysis : Second-level analysis should be done manually. A lot of files need to be modified in order to automate it since the shape and length of the design matrix change depending on many factors (e.g. Size of the data). Might be automated in the future.
 
 4 - Run the postprocess.py (Coming coon) function which (i) applies the deformations obtaied during the preprocAndFirstLvl.py function to the second-level z-score results in order to warp the maps to the volumetric standard canine space (ii) maps the results to canine surface maps.
 
