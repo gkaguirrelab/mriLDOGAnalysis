@@ -1,0 +1,165 @@
+/Users/bhejafry/Desktop/NewDogStuff/mri
+/Applications/freesurfer/bin/mri_nu_correct.mni
+--i orig.mgz --o nu.mgz --n 2
+nIters 2
+$Id: mri_nu_correct.mni,v 1.18 2011/03/02 20:16:39 nicks Exp $
+Darwin Ritobratos-MacBook-Pro.local 11.3.0 Darwin Kernel Version 11.3.0: Thu Jan 12 18:47:41 PST 2012; root:xnu-1699.24.23~1/RELEASE_X86_64 x86_64
+Sun Apr 29 11:22:44 EDT 2012
+Program nu_correct, built from:
+Package MNI N3, version 1.10, compiled by nschmans@W0084482 (i686-apple-darwin8.8.1) on 2006-10-03 at 21:43:56
+tmpdir is ./tmp.mri_nu_correct.mni.2529
+/Users/bhejafry/Desktop/NewDogStuff/mri
+mri_convert orig.mgz ./tmp.mri_nu_correct.mni.2529/nu0.mnc -odt float
+mri_convert orig.mgz ./tmp.mri_nu_correct.mni.2529/nu0.mnc -odt float 
+$Id: mri_convert.c,v 1.179.2.2 2011/05/16 20:53:47 greve Exp $
+reading from orig.mgz...
+TR=1000000.00, TE=0.00, TI=0.00, flip angle=0.00
+i_ras = (-1, 0, 0)
+j_ras = (0, 0, -1)
+k_ras = (0, 1, 0)
+writing to ./tmp.mri_nu_correct.mni.2529/nu0.mnc...
+ 
+--------------------------------------------------------
+Iteration 1 Sun Apr 29 11:22:49 EDT 2012
+nu_correct -clobber ./tmp.mri_nu_correct.mni.2529/nu0.mnc ./tmp.mri_nu_correct.mni.2529/nu1.mnc -tmpdir ./tmp.mri_nu_correct.mni.2529/0/
+[bhejafry@Ritobratos-MacBook-Pro.local:/Users/bhejafry/Desktop/NewDogStuff/mri/] [2012-04-29 11:22:49] running:
+  /Applications/freesurfer/mni/bin/nu_estimate_np_and_em -parzen -log -sharpen 0.15 0.01 -iterations 50 -stop 0.001 -shrink 4 -auto_mask -nonotify -b_spline 1 -distance 200 -quiet -execute -clobber -nokeeptmp -tmpdir ./tmp.mri_nu_correct.mni.2529/0/ ./tmp.mri_nu_correct.mni.2529/nu0.mnc ./tmp.mri_nu_correct.mni.2529/nu1.imp
+
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Number of iterations: 9 
+CV of field change: 0.000884261
+[bhejafry@Ritobratos-MacBook-Pro.local:/Users/bhejafry/Desktop/NewDogStuff/mri/] [2012-04-29 11:22:54] running:
+  /Applications/freesurfer/mni/bin/make_template -quiet -shrink 3 ./tmp.mri_nu_correct.mni.2529/nu0.mnc ./tmp.mri_nu_correct.mni.2529/0//template.mnc
+
+Transforming slices:......................................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Transforming slices:................................................................................................................................................................................................................................................................Done
+ 
+ 
+--------------------------------------------------------
+Iteration 2 Sun Apr 29 11:22:59 EDT 2012
+nu_correct -clobber ./tmp.mri_nu_correct.mni.2529/nu1.mnc ./tmp.mri_nu_correct.mni.2529/nu2.mnc -tmpdir ./tmp.mri_nu_correct.mni.2529/1/
+[bhejafry@Ritobratos-MacBook-Pro.local:/Users/bhejafry/Desktop/NewDogStuff/mri/] [2012-04-29 11:22:59] running:
+  /Applications/freesurfer/mni/bin/nu_estimate_np_and_em -parzen -log -sharpen 0.15 0.01 -iterations 50 -stop 0.001 -shrink 4 -auto_mask -nonotify -b_spline 1 -distance 200 -quiet -execute -clobber -nokeeptmp -tmpdir ./tmp.mri_nu_correct.mni.2529/1/ ./tmp.mri_nu_correct.mni.2529/nu1.mnc ./tmp.mri_nu_correct.mni.2529/nu2.imp
+
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Processing:.................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Number of iterations: 4 
+CV of field change: 0.000999399
+[bhejafry@Ritobratos-MacBook-Pro.local:/Users/bhejafry/Desktop/NewDogStuff/mri/] [2012-04-29 11:23:02] running:
+  /Applications/freesurfer/mni/bin/make_template -quiet -shrink 3 ./tmp.mri_nu_correct.mni.2529/nu1.mnc ./tmp.mri_nu_correct.mni.2529/1//template.mnc
+
+Transforming slices:......................................................................................Done
+Not implemented yet in cache_volume_range_has_changed()
+Transforming slices:................................................................................................................................................................................................................................................................Done
+ 
+ 
+ 
+mri_binarize --i ./tmp.mri_nu_correct.mni.2529/nu2.mnc --min -1 --o ./tmp.mri_nu_correct.mni.2529/ones.mgz
+
+$Id: mri_binarize.c,v 1.26.2.1 2011/04/08 15:40:50 greve Exp $
+cwd /Users/bhejafry/Desktop/NewDogStuff/mri
+cmdline mri_binarize --i ./tmp.mri_nu_correct.mni.2529/nu2.mnc --min -1 --o ./tmp.mri_nu_correct.mni.2529/ones.mgz 
+sysname  Darwin
+hostname Ritobratos-MacBook-Pro.local
+machine  x86_64
+user     bhejafry
+
+input      ./tmp.mri_nu_correct.mni.2529/nu2.mnc
+frame      0
+nErode3d   0
+nErode2d   0
+output     ./tmp.mri_nu_correct.mni.2529/ones.mgz
+Binarizing based on threshold
+min        -1
+max        +infinity
+binval        1
+binvalnot     0
+Found 16777216 values in range
+Counting number of voxels
+Found 16777216 voxels in final mask
+mri_binarize done
+mri_segstats --id 1 --seg ./tmp.mri_nu_correct.mni.2529/ones.mgz --i orig.mgz --sum ./tmp.mri_nu_correct.mni.2529/sum.junk --avgwf ./tmp.mri_nu_correct.mni.2529/input.mean.dat
+
+$Id: mri_segstats.c,v 1.75.2.2 2011/04/27 22:18:58 nicks Exp $
+cwd 
+cmdline mri_segstats --id 1 --seg ./tmp.mri_nu_correct.mni.2529/ones.mgz --i orig.mgz --sum ./tmp.mri_nu_correct.mni.2529/sum.junk --avgwf ./tmp.mri_nu_correct.mni.2529/input.mean.dat 
+sysname  Darwin
+hostname Ritobratos-MacBook-Pro.local
+machine  x86_64
+user     bhejafry
+Loading ./tmp.mri_nu_correct.mni.2529/ones.mgz
+Loading orig.mgz
+Voxel Volume is 1 mm^3
+Generating list of segmentation ids
+Found   1 segmentations
+Computing statistics for each segmentation
+  0     1   16777216  1.67772e+07
+
+Reporting on   1 segmentations
+Computing spatial average of each frame
+  0
+Writing to ./tmp.mri_nu_correct.mni.2529/input.mean.dat
+mri_segstats --id 1 --seg ./tmp.mri_nu_correct.mni.2529/ones.mgz --i ./tmp.mri_nu_correct.mni.2529/nu2.mnc --sum ./tmp.mri_nu_correct.mni.2529/sum.junk --avgwf ./tmp.mri_nu_correct.mni.2529/output.mean.dat
+
+$Id: mri_segstats.c,v 1.75.2.2 2011/04/27 22:18:58 nicks Exp $
+cwd 
+cmdline mri_segstats --id 1 --seg ./tmp.mri_nu_correct.mni.2529/ones.mgz --i ./tmp.mri_nu_correct.mni.2529/nu2.mnc --sum ./tmp.mri_nu_correct.mni.2529/sum.junk --avgwf ./tmp.mri_nu_correct.mni.2529/output.mean.dat 
+sysname  Darwin
+hostname Ritobratos-MacBook-Pro.local
+machine  x86_64
+user     bhejafry
+Loading ./tmp.mri_nu_correct.mni.2529/ones.mgz
+Loading ./tmp.mri_nu_correct.mni.2529/nu2.mnc
+Voxel Volume is 1 mm^3
+Generating list of segmentation ids
+Found   1 segmentations
+Computing statistics for each segmentation
+  0     1   16777216  1.67772e+07
+
+Reporting on   1 segmentations
+Computing spatial average of each frame
+  0
+Writing to ./tmp.mri_nu_correct.mni.2529/output.mean.dat
+mris_calc -o ./tmp.mri_nu_correct.mni.2529/nu2.mnc ./tmp.mri_nu_correct.mni.2529/nu2.mnc mul .96999433687473367178
+mri_convert ./tmp.mri_nu_correct.mni.2529/nu2.mnc nu.mgz --like orig.mgz --conform
+mri_convert ./tmp.mri_nu_correct.mni.2529/nu2.mnc nu.mgz --like orig.mgz --conform 
+$Id: mri_convert.c,v 1.179.2.2 2011/05/16 20:53:47 greve Exp $
+reading from ./tmp.mri_nu_correct.mni.2529/nu2.mnc...
+TR=0.00, TE=0.00, TI=0.00, flip angle=0.00
+i_ras = (-1, 0, 0)
+j_ras = (0, 0, -1)
+k_ras = (0, 1, 0)
+Original Data has (1, 1, 1) mm size and (256, 256, 256) voxels.
+Data is conformed to 1 mm size and 256 voxels for all directions
+INFO: transform src into the like-volume: orig.mgz
+changing data type from float to uchar (noscale = 0)...
+MRIchangeType: Building histogram 
+writing to nu.mgz...
+ 
+ 
+Sun Apr 29 11:23:37 EDT 2012
+mri_nu_correct.mni done

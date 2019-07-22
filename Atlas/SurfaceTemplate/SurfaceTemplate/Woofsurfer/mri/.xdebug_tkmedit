@@ -1,0 +1,15 @@
+tkmedit started: Mon Jun 25 14:58:30 2012
+
+	/Applications/freesurfer/tktools/tkmedit.bin Woofsurfer T1.mgz -aux filled.mgz 
+
+$Id: tkmedit.c,v 1.343 2011/03/01 01:41:22 nicks Exp $ $Name: stable5 $
+Set user home dir to /Applications/freesurfer/subjects/Woofsurfer/mri
+Set subject home dir to /Applications/freesurfer/subjects//Woofsurfer
+Using interface file /Applications/freesurfer/tktools/tkmedit.tcl
+Tcl: Successfully parsed tkmedit.tcl
+Tcl: Successfully parsed tkm_functional.tcl
+Error 8 in DspA_SetCursor(306,20,105): Invalid volume voxel.
+Error 8 in DspA_HandleMouseUp_: Invalid volume voxel.
+Error 8 in DspA_HandleEvent: Invalid volume voxel.
+Error 10 in MWin_Event: Error accessing display.
+Program terminated successfully.

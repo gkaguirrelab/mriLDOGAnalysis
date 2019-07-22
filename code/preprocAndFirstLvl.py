@@ -17,7 +17,7 @@ import os
 # Don't put a slash at the end of your path but put one at the beginning (e.g. /home/Desktop/files)
 
 # Example:
-# preprocAndFirstLvl('/home/ozzy/Desktop/July8Canine/T1', '/home/ozzy/Desktop/July8Canine/EPI', '/home/ozzy/Desktop/July8Canine/Atlas', '/home/ozzy/Desktop/July8Canine/design', '/home/ozzy/Desktop/July8Canine/results', '/home/ozzy/bin/ants/bin') 
+# preprocAndFirstLvl('/home/ozzy/Desktop/Canine/T1', '/home/ozzy/Desktop/Canine/EPI', '/home/ozzy/Desktop/Canine/Atlas', '/home/ozzy/Desktop/Canine/design', '/home/ozzy/Desktop/Canine/results', '/home/ozzy/bin/ants/bin') 
 
 
 def preprocAndFirstLvl(path_to_mprage, path_to_epi, path_to_inVivo_atlas, path_to_design_folder, output_folder, path_to_ants_scripts):
@@ -90,5 +90,6 @@ def preprocAndFirstLvl(path_to_mprage, path_to_epi, path_to_inVivo_atlas, path_t
         os.system("cp %s.feat/mean_func.nii.gz %s.feat/reg/standard.nii.gz"%(epi_output_folder, epi_output_folder))    
     
     
-    
+preprocAndFirstLvl('/home/ozzy/Desktop/Canine/T1', '/home/ozzy/Desktop/Canine/EPI', '/home/ozzy/Desktop/Canine/Atlas', '/home/ozzy/Desktop/Canine/design', '/home/ozzy/Desktop/Canine/results', '/home/ozzy/bin/ants/bin') 
+   
     

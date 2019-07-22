@@ -46,4 +46,8 @@ Notes: FSL does the 1st level analysis in the native space. It creates registrat
 
 "antsApplyTransforms -d 3 -r |TEMPLATE| -i |ZSTAT_MAP| -t |XXX1Warp.nii.gz| -t |XXX0GenericAffine.mat| -o |out.nii.gz| -v 1"
 
-8 - Generate surface maps (Work in progress)
+8 - Generating surface maps: In vivo deformed z-stats can be overlaid with the mgz converted ex-vivo atlas (lives in Woofsurfer/mri/orig/001.mgz) or with original and inflated surface images by using Freesurfer's freeview or tksurfer. Both of these methods can accept another registration matrix, which we prepared by registering invivo template to exvivo, as an input which will transform maps one more time to freesurface space. register.dat transformation matrix which lives in the Atlas/intoex/ folder can be selected as a transformation matrix during visualizations.
+
+Note: In-vivo to ex-vivo atlas transformation was performed by FSL's linear transfromation (FLIRT) with 12 DOF. Then, the transformation matrix created by FLIRT was converted to freesurfer .dat format by tkregister2 command:
+"tkregister2 --mov invivoTemplate.nii.gz --fsl intoex.mat --targ SurfaceTemplate/Woofsurfer/mri/orig/001.mgz --noedit --reg register.dat"
+
