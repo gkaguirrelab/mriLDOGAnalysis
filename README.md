@@ -9,19 +9,19 @@ Analysis code for all projects under the LDOG protocol
 
 # Analysis Instructions
 
-1 - Create an empty analysis folder where you will place your MRI images and the results will be placed.
+1 - Create an empty analysis folder where you will place your MRI images and where the results folder will be created.
 
-2 - Download the design folder which has the on>off and off>on event design templates saved inside and place it into the analysis folder you created in step 1. This template file is automatically modified by a loop by the preprocAndFirstLvl.py function according to the specific subject information.
+2 - Download the design folder which has the on>off and off>on event design templates saved inside and place it into the analysis folder you created in step 1. This template file is automatically modified by a loop by the python function according to the specific subject information.
 
 2 - Download the Atlas folder which contains the canine atlases and in-vivo --> ex-vivo transformations. Place it in the main analysis folder.
 
 3 - Download your EPI and MPRAGE images and place them into two different subfolders inside the main analysis folder.
 
-2 - Run preprocAndFirstLvl.py function and point it to the T1, EPI, Canine Atlas, Design, Output and ANTs scripts folders (don't use a slash at the end of the paths. Use it like /home/Desktop/T1). This function will do the first five steps mentioned under Analysis Details section. Folders for registration and 1st level results will be created at the output path specified in the function. 
+4 - If you want to do the full analysis also download the second_lvl_design folder and place it in the main analysis folder.
 
-3 - Second-level analysis : Second-level analysis should be done manually. A lot of files need to be modified in order to automate it since the shape and length of the design matrix change depending on many factors (e.g. Size of the data). Might be automated in the future.
+2 - Run fullAnalysis.py function and point it to the T1, EPI, Canine Atlas, Design, Second level design, Output and ANTs scripts folders (don't use a slash at the end of the paths. Use it like /home/Desktop/T1). This function will do the first seven steps mentioned under "Analysis Details" section. It creates a main results folder at the specified path. All of your results such as registrations, 1st and 2nd level outputs, and final in-vivo deformed maps will be saved into this folder.
 
-4 - Run the postprocess.py (Coming coon) function which (i) applies the deformations obtaied during the preprocAndFirstLvl.py function to the second-level z-score results in order to warp the maps to the volumetric standard canine space (ii) maps the results to canine surface maps.
+Warning: fullAnalysis.py performs second level analysis and takes a fixed effects single group average. If you want to compare right and left eyes or employ a different model, you need to do the second level analysis manually. In this case, you can first use onlyPreprocAndFirstLvl.py function to do preprocessing and 1st lvl analysis, then do your group analysis yourself, and finally run onlyPostprocess.py (coming soon) to map the data to in-vivo and surface templates.
 
 # Analysis Details
 
@@ -47,14 +47,15 @@ Notes: FSL does the 1st level analysis in the native space. It creates registrat
   	"cp mv mean_func.nii.gz reg/standard.nii.gz"
    . Check if everything looks alright. Voxel intensities between stats/cope#.nii.gz and reg_standard/stats/cope#.nii.gz should be exactly the same and data dimension and pixel size should be the same as mean_func
 
-6 - Do the 2nd level analysis for both left-right during off>on and left+right during off>on conditions. 
+6 - Do the 2nd level fixed effects averaging analysis for both off>on and on>off conditions. 
 
 7 - Transform the Z-stat maps into native space by applying the deformation fields we obtained after non-linear registration (Step 3).
 
 "antsApplyTransforms -d 3 -r |TEMPLATE| -i |ZSTAT_MAP| -t |XXX1Warp.nii.gz| -t |XXX0GenericAffine.mat| -o |out.nii.gz| -v 1"
 
-8 - Generating surface maps: In vivo deformed z-stats can be overlaid with the mgz converted ex-vivo atlas (lives in Woofsurfer/mri/orig/001.mgz) or with original and inflated surface images by using Freesurfer's freeview or tksurfer. Both of these methods can accept another registration matrix, which we prepared by registering invivo template to exvivo, as an input which will transform maps one more time to freesurface space. register.dat transformation matrix which lives in the Atlas/intoex/ folder can be selected as a transformation matrix during visualizations.
+8 - Generating surface maps: In vivo deformed z-stats can be overlaid with the mgz converted ex-vivo atlas (lives in Woofsurfer/mri/orig/001.mgz) or with original and inflated surface images by using Freesurfer's freeview or tksurfer. Both of these methods can accept another registration matrix, which we prepared by linearly registering the invivo template to exvivo, as an input which will transform maps one more time to freesurface space. register.dat transformation matrix which lives in the Atlas/intoex/ folder can be selected as a transformation matrix during visualizations.
 
 Note: In-vivo to ex-vivo atlas transformation was performed by FSL's linear transfromation (FLIRT) with 12 DOF. Then, the transformation matrix created by FLIRT was converted to freesurfer .dat format by tkregister2 command:
+
 "tkregister2 --mov invivoTemplate.nii.gz --fsl intoex.mat --targ SurfaceTemplate/Woofsurfer/mri/orig/001.mgz --noedit --reg register.dat"
 
