@@ -31,6 +31,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
     output_folder = output_folder + "/results"
     
     # Register two MPRAGEs
+    print("REGISTERING MPRAGE IMAGES")
     mprage_images = os.listdir(path_to_mprage)
     average_path = output_folder + "/mp_average" 
     if not os.path.exists(average_path):
@@ -39,12 +40,14 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
     os.system(flirt_call)
 
     #Average the registered MPRAGE with the target of that registration
+    print("AVERAGING MPRAGE IMAGES")
     first_image = path_to_mprage + "/" + mprage_images[1]
     second_image = average_path + "/" + os.listdir(average_path)[0]
     average_call = "AverageImages 3 %s/averaged_mprages.nii.gz 1 %s %s"%(average_path,first_image,second_image)
     os.system(average_call)
   
     # Warp to Canine Template (use 4 threads)
+    print("WARPING THE AVERAGED MPRAGE TO INVIVO ATLAS")
     warp_results_folder = output_folder + "/reg_avgmprage2atlas"
     if not os.path.exists(warp_results_folder):
         os.system("mkdir %s/reg_avgmprage2atlas"%output_folder)
@@ -53,9 +56,25 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
     warp_call = "%s/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s/dog -n 4"%(path_to_ants_scripts, template_path, averaged_mprage, warp_results_folder)
     os.system(warp_call)
 
-    ################################# FEAT ####################################
+    # Motion outlier finding/scrubbing
+    print("CREATING MOTION OUTLIERS")
+    for i in os.listdir(path_to_epi):
+        full_individual_epi_path = path_to_epi + '/' + i
+        confound_matrix_folder = output_folder + '/motion_covariates/' + i[:-7] + '_motion'
+        if not os.path.exists(output_folder + "/motion_covariates"):
+            os.system("mkdir %s/motion_covariates"%output_folder)
+        if not os.path.exists(confound_matrix_folder):
+            os.system("mkdir %s"%confound_matrix_folder)
+        os.system("fsl_motion_outliers -i %s -o %s/covariate.txt -s %s/values -p %s/plot --fd --thresh=0.9 -v"%(full_individual_epi_path,confound_matrix_folder,confound_matrix_folder,confound_matrix_folder))
     
+    ################################# FEAT ####################################
+    for i in os.listdir(path_to_epi):
+        check_the_confounds = "%s/results/motion_covariates/%s_motion/covariate.txt"%(output_folder,i[:-7])
+        if not os.path.exists(check_the_confounds):
+            os.system("touch %s"%check_the_confounds)
+   
     # Modify the fsf template for individual EPI and do the fMRI analysis
+    print("PERFORMING fMRI ANALYSIS: CHECK BROWSER REPORTS FOR DETAILS")
     first_lvl_res = output_folder + "/first_level_results"
     if not os.path.exists(first_lvl_res):
         os.system("mkdir %s"%first_lvl_res)
@@ -68,9 +87,11 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
             epi_output_folder = output_folder + "/first_level_results/%s"%i[:-4]
         epifullpath = path_to_epi + "/" + i
         ntime = os.popen("fslnvols %s"%epifullpath).read().rstrip()
+        motion_epi = "%s/results/motion_covariates/%s_motion/covariate.txt"%(output_folder,i[:-7])
         things_to_replace = {"SUBJECT_OUTPUT":epi_output_folder, "NTPTS":ntime, 
                              "STANDARD_IMAGE":template_path, "SUBJECT_EPI":epifullpath,
-                             "SUBJECTEV1":evonepath, "SUBJECTEVI2":evtwopath}
+                             "SUBJECTEV1":evonepath, "SUBJECTEVI2":evtwopath,
+                             "CONFOUND_FOR_MOTION_EPI":motion_epi}
         with open("%s/design_template.fsf"%path_to_design_folder, 'r') as infile:
             with open("%s/design.fsf"%path_to_design_folder,'w') as outfile:
                 for line in infile:
@@ -85,13 +106,14 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
     # mean functions so the registration and interpolation will not be effective. 
     # Note: This code is still a part of the laop above but placed under a 
     # different comment block since it's an important part of the analysis.
-        
+        print("TRICKING FSL SO NO REGISTRATION TAKES PLACE")
         os.system("rm -r %s.feat/reg/*mat"%epi_output_folder)
         os.system("rm -r %s.feat/reg/standard.nii.gz"%epi_output_folder)
         os.system("cp $FSLDIR/etc/flirtsch/ident.mat %s.feat/reg/example_func2standard.mat"%epi_output_folder)
         os.system("cp %s.feat/mean_func.nii.gz %s.feat/reg/standard.nii.gz"%(epi_output_folder, epi_output_folder))    
-#    
+   
     ########################## SECOND LEVEL ###################################
+    print("PERFORMING HIGHER LEVEL ANALYSIS")
     if len(os.listdir(first_lvl_res)) != len(os.listdir(path_to_epi)):
         sys.exit("The amount of the first level results are larger than the amount of the original EPI images. Group analysis failed")
     secondlvl_output = output_folder + "/second_level_results"
@@ -149,6 +171,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
     ########################### POST-PROCESSING ###############################
    
     # Invivo transform
+    print("MAPPING THE SECODN LEVEL FMRI RESULTS TO THE INVIVO TEMPLATE")
     os.system("mkdir %s/deformed_results"%output_folder)
     os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope2.feat/stats/zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/off>on -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
     os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope1.feat/stats/zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/on>off -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
