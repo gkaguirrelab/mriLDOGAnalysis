@@ -65,7 +65,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     warp_call = "%s/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s/dog -n 4"%(path_to_ants_scripts, template_path, averaged_mprage, warp_results_folder)
     os.system(warp_call)
     
-     Top-up 
+    # Top-up 
     direction_vector_AP = "0 -1 0 %s\n"%str(total_readout_time_AP)
     direction_vector_PA = "0 1 0 %s"%str(total_readout_time_PA)
     acparam_file = path_to_recon_fmris + "/acqparams.txt"
@@ -92,7 +92,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     os.system("topup --imain=%s/AP+PA.nii.gz --datain=%s --config=b02b0.cnf --out=%s/topup_results --iout=%s/b0_unwarped --fout=%s/fieldmap_Hz" %(top_up_res,acparam_file,top_up_res,top_up_res,top_up_res))
     applytopup --imain=blip_up,blip_down --inindex=1,2 --datatin=my_acq_param.txt --topup=my_topup_results --out=my_hifi_images 
 
-     Motion outlier finding/scrubbing
+    # Motion outlier finding/scrubbing
     print("CREATING MOTION OUTLIERS")
     for i in os.listdir(path_to_epi):
         full_individual_epi_path = path_to_epi + '/' + i
@@ -209,8 +209,8 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     # Invivo transform
     print("MAPPING THE SECOND LEVEL FMRI RESULTS TO THE INVIVO TEMPLATE")
     os.system("mkdir %s/deformed_results"%output_folder)
-    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope2.feat/stats/zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/off_on.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
-    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope1.feat/stats/zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/on_off.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
+    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope2.feat/thresh_zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/off_on.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
+    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope1.feat/thresh_zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/on_off.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
     
 fullAnalysis('/home/ozzy/Desktop/Canine/without_topup/T1', '/home/ozzy/Desktop/Canine/without_topup/EPI', '/home/ozzy/Desktop/Canine/without_topup/Atlas','/home/ozzy/Desktop/Canine/without_topup/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/Canine/without_topup/design','/home/ozzy/Desktop/Canine/without_topup/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/Canine/without_topup') 
 
