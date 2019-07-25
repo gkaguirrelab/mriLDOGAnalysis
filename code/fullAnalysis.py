@@ -3,25 +3,34 @@
 import os 
 import sys
 
-## path_to_mprage	     : Path to folder containing MPRAGE images
-## path_to_epi   	     : path to folder containing EPI images
-## path_to_atlas 	     : Path to folder containing canine atlas
-## path_to_design_folder : Path to folder containing design.fsf file which is 
-##                         the template specifying GLM and oher parameters for
-##                         FSL's FEAT analysis
-## path_to_ants_scripts  : antsResitrationSyN is a custom script prepared for 
-##                         registration. Specify a path to ants scripts folder 
-##                         so python can use it
+"""
 
-# WARNINGS:
-# Specify Folders not individual files
-# Don't put a slash at the end of your path but put one at the beginning (e.g. /home/Desktop/files)
+path_to_mprage	                : Path to folder containing MPRAGE images
+path_to_epi   	                : path to folder containing EPI images
+path_to_atlas 	                : Path to folder containing canine atlas
+path_to_design_folder           : Path to folder containing design.fsf file 
+                                  which is the template specifying GLM and oher 
+                                  parameters for FSL's 1st level FEAT analysis
+path_to_secondlvl_design_folder : Path to folder containing group.fsf template
+                                  for FSL's 2nd level FEAT analysis
+output_folder                   : Results folder is created at this path and
+                                  all outputs are placed in that folder
+path_to_ants_scripts            : antsResitrationSyN is a custom script 
+                                  prepared for registration. Specify a path to 
+                                  ants scripts folder so python can use it
 
-# Example:
-# preprocAndFirstLvl('/home/ozzy/Desktop/Canine/T1', '/home/ozzy/Desktop/Canine/EPI', '/home/ozzy/Desktop/Canine/Atlas', '/home/ozzy/Desktop/Canine/design', '/home/ozzy/Desktop/Canine/results', '/home/ozzy/bin/ants/bin') 
 
 
-def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_design_folder, path_to_secondlvl_design_folder, output_folder, path_to_ants_scripts):
+ WARNINGS:
+ Specify Folders not individual files
+ Don't put a slash at the end of your path but put one at the beginning (e.g. /home/Desktop/files)
+
+ Example:
+ preprocAndFirstLvl('/home/ozzy/Desktop/Canine/T1', '/home/ozzy/Desktop/Canine/EPI', '/home/ozzy/Desktop/Canine/Atlas', '/home/ozzy/Desktop/Canine/design','/home/ozzy/Desktop/Canine/group_design', '/home/ozzy/Desktop/Canine/results', '/home/ozzy/bin/ants/bin') 
+
+"""
+
+def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_recon_fmris, total_readout_time_AP, total_readout_time_PA, path_to_design_folder, path_to_secondlvl_design_folder, path_to_ants_scripts, output_folder):
  
     ############################ PREPROCESSING ################################
     
@@ -55,8 +64,35 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
     template_path = path_to_atlas_folder + '/invivo/invivoTemplate.nii.gz'
     warp_call = "%s/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s/dog -n 4"%(path_to_ants_scripts, template_path, averaged_mprage, warp_results_folder)
     os.system(warp_call)
+    
+     Top-up 
+    direction_vector_AP = "0 -1 0 %s\n"%str(total_readout_time_AP)
+    direction_vector_PA = "0 1 0 %s"%str(total_readout_time_PA)
+    acparam_file = path_to_recon_fmris + "/acqparams.txt"
+    os.system("touch %s"%acparam_file)
+    textfile = open(acparam_file, 'w')
+    textfile.write(direction_vector_AP)
+    textfile.write(direction_vector_PA)
+    textfile.close()
+    
+    for i in os.listdir(path_to_recon_fmris):
+        if "AP" in i:
+            print("found an AP recon fmri")
+            ap_image = path_to_recon_fmris + "/" + i
+        if "PA" in i:
+            print("found a PA recon fmri")
+            pa_image = path_to_recon_fmris + "/" + i
+    print("Full path to the AP recon is %s"%ap_image)
+    print("Full path to the PA recon is %s"%pa_image)
+    top_up_res = output_folder + "/results/top_up"
+    if not os.path.exists(top_up_res):
+        os.system("mkdir %s"%top_up_res)
+    os.system("fslmerge -a %s/AP+PA %s %s"%(top_up_res, ap_image, pa_image))
+    
+    os.system("topup --imain=%s/AP+PA.nii.gz --datain=%s --config=b02b0.cnf --out=%s/topup_results --iout=%s/b0_unwarped --fout=%s/fieldmap_Hz" %(top_up_res,acparam_file,top_up_res,top_up_res,top_up_res))
+    applytopup --imain=blip_up,blip_down --inindex=1,2 --datatin=my_acq_param.txt --topup=my_topup_results --out=my_hifi_images 
 
-    # Motion outlier finding/scrubbing
+     Motion outlier finding/scrubbing
     print("CREATING MOTION OUTLIERS")
     for i in os.listdir(path_to_epi):
         full_individual_epi_path = path_to_epi + '/' + i
@@ -67,9 +103,9 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
             os.system("mkdir %s"%confound_matrix_folder)
         os.system("fsl_motion_outliers -i %s -o %s/covariate.txt -s %s/values -p %s/plot --fd --thresh=0.9 -v"%(full_individual_epi_path,confound_matrix_folder,confound_matrix_folder,confound_matrix_folder))
     
-    ################################# FEAT ####################################
+    ################################ FEAT ####################################
     for i in os.listdir(path_to_epi):
-        check_the_confounds = "%s/results/motion_covariates/%s_motion/covariate.txt"%(output_folder,i[:-7])
+        check_the_confounds = "%s/motion_covariates/%s_motion/covariate.txt"%(output_folder,i[:-7])
         if not os.path.exists(check_the_confounds):
             os.system("touch %s"%check_the_confounds)
    
@@ -100,7 +136,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
                     outfile.write(line)
         os.system("feat %s"%path_to_design_folder+"/design.fsf")
         
-    ########################### TRICK FSL #####################################
+    ########################## TRICK FSL #####################################
         
     # Delete all mat files in each first-level, copy some identity matrices and
     # mean functions so the registration and interpolation will not be effective. 
@@ -112,7 +148,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
         os.system("cp $FSLDIR/etc/flirtsch/ident.mat %s.feat/reg/example_func2standard.mat"%epi_output_folder)
         os.system("cp %s.feat/mean_func.nii.gz %s.feat/reg/standard.nii.gz"%(epi_output_folder, epi_output_folder))    
    
-    ########################## SECOND LEVEL ###################################
+    ######################### SECOND LEVEL ###################################
     print("PERFORMING HIGHER LEVEL ANALYSIS")
     if len(os.listdir(first_lvl_res)) != len(os.listdir(path_to_epi)):
         sys.exit("The amount of the first level results are larger than the amount of the original EPI images. Group analysis failed")
@@ -168,13 +204,13 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_desi
 
     os.system("feat %s"%path_to_secondlvl_design_folder+"/group.fsf")
   
-    ########################### POST-PROCESSING ###############################
+    ########################## POST-PROCESSING ###############################
    
     # Invivo transform
-    print("MAPPING THE SECODN LEVEL FMRI RESULTS TO THE INVIVO TEMPLATE")
+    print("MAPPING THE SECOND LEVEL FMRI RESULTS TO THE INVIVO TEMPLATE")
     os.system("mkdir %s/deformed_results"%output_folder)
-    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope2.feat/stats/zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/off>on -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
-    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope1.feat/stats/zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/on>off -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
+    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope2.feat/stats/zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/off_on.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
+    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope1.feat/stats/zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/on_off.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
     
-fullAnalysis('/home/ozzy/Desktop/Canine/T1', '/home/ozzy/Desktop/Canine/EPI', '/home/ozzy/Desktop/Canine/Atlas', '/home/ozzy/Desktop/Canine/design','/home/ozzy/Desktop/Canine/second_lvl_design', '/home/ozzy/Desktop/Canine', '/home/ozzy/bin/ants/bin') 
+fullAnalysis('/home/ozzy/Desktop/Canine/without_topup/T1', '/home/ozzy/Desktop/Canine/without_topup/EPI', '/home/ozzy/Desktop/Canine/without_topup/Atlas','/home/ozzy/Desktop/Canine/without_topup/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/Canine/without_topup/design','/home/ozzy/Desktop/Canine/without_topup/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/Canine/without_topup') 
 
