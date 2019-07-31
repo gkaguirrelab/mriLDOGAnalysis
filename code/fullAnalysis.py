@@ -18,7 +18,8 @@ output_folder                   : Results folder is created at this path and
 path_to_ants_scripts            : antsResitrationSyN is a custom script 
                                   prepared for registration. Specify a path to 
                                   ants scripts folder so python can use it
-
+motion_correct_to_first_prime   : Motion correct EPI images using the prime as
+                                  the reference
 
 
  WARNINGS:
@@ -30,7 +31,7 @@ path_to_ants_scripts            : antsResitrationSyN is a custom script
 
 """
 
-def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_recon_fmris, total_readout_time_AP, total_readout_time_PA, path_to_design_folder, path_to_secondlvl_design_folder, path_to_ants_scripts, output_folder):
+def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_recon_fmris, total_readout_time_AP, total_readout_time_PA, path_to_design_folder, path_to_secondlvl_design_folder, path_to_ants_scripts, motion_correct_to_first_prime, output_folder):
  
     ############################ PREPROCESSING ################################
     
@@ -90,8 +91,8 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     os.system("fslmerge -a %s/AP+PA %s %s"%(top_up_res, ap_image, pa_image))
     os.system("topup --imain=%s/AP+PA.nii.gz --datain=%s --config=b02b0.cnf --out=%s/topup_results --iout=%s/b0_unwarped --fout=%s/fieldmap_Hz" %(top_up_res,acparam_file,top_up_res,top_up_res,top_up_res))
     
-    AP_images_temporary = path_to_epi + "/APimages"
-    PA_images_temporary = path_to_epi + "/PAimages"
+    AP_images_temporary = output_path + "/APimages"
+    PA_images_temporary = output_path + "/PAimages"
     if not os.path.exists(AP_images_temporary):
         system("mkdir %"%AP_images_temporary)
     if not os.path.exists(PA_images_temporary):
@@ -99,13 +100,13 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 
     for i in os.listdir(path_to_epi):
 	    if "AP" in i:  
-            os.system("mv %s/%s %s"%(path_to_epi,i, AP_images_temporary))
+            os.system("mv %s/%s %s/%s"%(path_to_epi,i, AP_images_temporary,i))
         elif "PA" in i:
-            os.system("mv %s/%s %s"%(path_to_epi,i, PA_images_temporary))
+            os.system("mv %s/%s %s/%s"%(path_to_epi,i, PA_images_temporary,i))
         else:
             raise ValueError('You did not rename and put AP or PA in one of your EPI images')	
 	
-    corrected_epi_data = path_to_epi + "/corrected"
+    corrected_epi_data = output_path + "/corrected"
     if not os.path.exists(corrected_epi_data):  
         system("mkdir %"%corrected_epi_data)
         
@@ -113,7 +114,14 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
         system("applytopup --imain=%s --inindex=1 --method=jac --datatin=%s --topup=%s/topup_results --out=%s/corrected_%s"%(AP_images_temporary,acparam_file,top_up_res,corrected_epi_data,i)
     for i in os.listdir(PA_images_temporary):
         system("applytopup --imain=%s --inindex=2 --method=jac --datatin=%s --topup=%s/topup_results --out=%s/corrected_%s"%(PA_images_temporary,acparam_file,top_up_res,corrected_epi_data,i)
-
+    
+    path_to_epi = corrected_epi_data
+    
+#    # Motion correct to the prime
+#    if motion_correct_to_first_prime == True:
+#        for i in os.listdir(path_to_epi):
+#            os.system("mcflirt -in %s/%s -out %s/%s -reffile %s -smooth 0"%(path_to_epi,i,path_to_epi,i,))            
+        
     # Motion outlier finding/scrubbing
     print("CREATING MOTION OUTLIERS")
     for i in os.listdir(path_to_epi):
@@ -234,5 +242,5 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope2.feat/thresh_zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/off_on.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
     os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope1.feat/thresh_zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/on_off.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
     
-fullAnalysis('/home/ozzy/Desktop/Canine/without_topup/T1', '/home/ozzy/Desktop/Canine/without_topup/EPI', '/home/ozzy/Desktop/Canine/without_topup/Atlas','/home/ozzy/Desktop/Canine/without_topup/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/Canine/without_topup/design','/home/ozzy/Desktop/Canine/without_topup/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/Canine/without_topup') 
+fullAnalysis('/home/ozzy/Desktop/Canine/without_topup/T1', '/home/ozzy/Desktop/Canine/without_topup/EPI', '/home/ozzy/Desktop/Canine/without_topup/Atlas','/home/ozzy/Desktop/Canine/without_topup/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/Canine/without_topup/design','/home/ozzy/Desktop/Canine/without_topup/second_lvl_design', '/home/ozzy/bin/ants/bin', False, '/home/ozzy/Desktop/Canine/without_topup') 
 
