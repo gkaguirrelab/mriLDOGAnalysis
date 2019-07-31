@@ -7,24 +7,27 @@ import sys
 
 path_to_mprage	                : Path to folder containing MPRAGE images
 path_to_epi   	                : path to folder containing EPI images
-path_to_atlas 	                : Path to folder containing canine atlas
+path_to_atlas_folder 	        : Path to folder containing canine atlas
+path_to_recon_fmris		: path to folder containing single-rep EPI images
+total_readout_time_AP		: Total readout time for AP images. Can be found in headers
+total_readout_time_PA		: Total readout time for PA condition. Can be found in headers
 path_to_design_folder           : Path to folder containing design.fsf file 
                                   which is the template specifying GLM and oher 
                                   parameters for FSL's 1st level FEAT analysis
 path_to_secondlvl_design_folder : Path to folder containing group.fsf template
                                   for FSL's 2nd level FEAT analysis
-output_folder                   : Results folder is created at this path and
-                                  all outputs are placed in that folder
 path_to_ants_scripts            : antsResitrationSyN is a custom script 
                                   prepared for registration. Specify a path to 
                                   ants scripts folder so python can use it
+output_folder                   : Results folder is created at this path and
+                                  all outputs are placed in that folder
 
  WARNINGS:
  Specify Folders not individual files
  Don't put a slash at the end of your path but put one at the beginning (e.g. /home/Desktop/files)
 
  Example:
- preprocAndFirstLvl('/home/ozzy/Desktop/Canine/T1', '/home/ozzy/Desktop/Canine/EPI', '/home/ozzy/Desktop/Canine/Atlas', '/home/ozzy/Desktop/Canine/design','/home/ozzy/Desktop/Canine/group_design', '/home/ozzy/Desktop/Canine/results', '/home/ozzy/bin/ants/bin') 
+ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_recon_fmris, total_readout_time_AP, total_readout_time_PA,   path_to_design_folder, path_to_secondlvl_design_folder, path_to_ants_scripts, output_folder):
 
 """
 
