@@ -46,15 +46,16 @@ Warning: fullAnalysis.py performs second level analysis and takes a fixed effect
     a) Two single-rep images are merged together
 	"fslmerge -a |AP+PA.nii.gz| |AP_image.nii.gz| |PA_image.nii.gz|
     b) Distortion map is calculated using the merged map and acquisition parameters text file:
-	topup --imain=|AP+PA.nii.gz| --datain=|Acqparams.txt| --config=b02b0.cnf --out=topup_results --iout=b0_unwarped --fout=fieldmap_Hz
+	"topup --imain=|AP+PA.nii.gz| --datain=|Acqparams.txt| --config=b02b0.cnf --out=topup_results --iout=b0_unwarped --fout=fieldmap_Hz"
     c) Correction is applied to each EPI image:
-	applytopup --imain=EPI_AP.nii.gz --inindex=1 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz
-	applytopup --imain=EPI_PA.nii.gz --inindex=2 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz
+	"applytopup --imain=EPI_AP.nii.gz --inindex=1 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz"
+	"applytopup --imain=EPI_PA.nii.gz --inindex=2 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz"
 
 5 - FSL's 1st level fmri analysis was performed on the individual EPIs. 
 Note: FSL does the 1st level analysis in the native space. It creates registration files in each 1st level output folder but does not apply the transformations until the 2nd level analysis. If you do not specify any registration in the 1st step, your 2nd level analysis will fail because FSL will look for a registration file during this stage and won't be able to find one. In order to be able to do the 2nd level analysis without any transformations we need to trick FSL. For this we need to do some registrations in the first level to have FSL create the necessary files (doesn't really matter what we register to since we are only after creating some files). Then, we replace those files with identity matrices so no transformation takes place.
    
 6 - Tricking FSL to do the group analysis without registration:
+
     a) Make sure the folder called reg_standard does not appear in your 1st level analysis directories. Delete if it appears. It usually appears when some registration is applied to the data which we don't want at this stage.
     b) Copy an identity matrix from FSL's main directory to the reg subfolder of each of your 1st level output folders and rename the matrices example_func2standard.mat. This will make transformations ineffective.
 	"cp $FSLDIR/etc/flirtsch/ident.mat reg/example_func2standard.mat"
