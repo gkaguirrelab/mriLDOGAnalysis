@@ -77,20 +77,42 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     
     for i in os.listdir(path_to_recon_fmris):
         if "AP" in i:
-            print("found an AP recon fmri")
+            print("found an AP single-rep fmri")
             ap_image = path_to_recon_fmris + "/" + i
         if "PA" in i:
-            print("found a PA recon fmri")
+            print("found a PA single-rep fmri")
             pa_image = path_to_recon_fmris + "/" + i
-    print("Full path to the AP recon is %s"%ap_image)
-    print("Full path to the PA recon is %s"%pa_image)
+    print("Full path to the single-rep AP: %s"%ap_image)
+    print("Full path to the single-rep PA: %s"%pa_image)
     top_up_res = output_folder + "/results/top_up"
     if not os.path.exists(top_up_res):
         os.system("mkdir %s"%top_up_res)
     os.system("fslmerge -a %s/AP+PA %s %s"%(top_up_res, ap_image, pa_image))
-    
     os.system("topup --imain=%s/AP+PA.nii.gz --datain=%s --config=b02b0.cnf --out=%s/topup_results --iout=%s/b0_unwarped --fout=%s/fieldmap_Hz" %(top_up_res,acparam_file,top_up_res,top_up_res,top_up_res))
-    applytopup --imain=blip_up,blip_down --inindex=1,2 --datatin=my_acq_param.txt --topup=my_topup_results --out=my_hifi_images 
+    
+    AP_images_temporary = path_to_epi + "/APimages"
+    PA_images_temporary = path_to_epi + "/PAimages"
+    if not os.path.exists(AP_images_temporary):
+        system("mkdir %"%AP_images_temporary)
+    if not os.path.exists(PA_images_temporary):
+        system("mkdir %"%PA_images_temporary)
+
+    for i in os.listdir(path_to_epi):
+	    if "AP" in i:  
+            os.system("mv %s/%s %s"%(path_to_epi,i, AP_images_temporary))
+        elif "PA" in i:
+            os.system("mv %s/%s %s"%(path_to_epi,i, PA_images_temporary))
+        else:
+            raise ValueError('You did not rename and put AP or PA in one of your EPI images')	
+	
+    corrected_epi_data = path_to_epi + "/corrected"
+    if not os.path.exists(corrected_epi_data):  
+        system("mkdir %"%corrected_epi_data)
+        
+    for i in os.listdir(AP_images_temporary):
+        system("applytopup --imain=%s --inindex=1 --method=jac --datatin=%s --topup=%s/topup_results --out=%s/corrected_%s"%(AP_images_temporary,acparam_file,top_up_res,corrected_epi_data,i)
+    for i in os.listdir(PA_images_temporary):
+        system("applytopup --imain=%s --inindex=2 --method=jac --datatin=%s --topup=%s/topup_results --out=%s/corrected_%s"%(PA_images_temporary,acparam_file,top_up_res,corrected_epi_data,i)
 
     # Motion outlier finding/scrubbing
     print("CREATING MOTION OUTLIERS")

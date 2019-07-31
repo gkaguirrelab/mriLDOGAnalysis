@@ -17,11 +17,13 @@ Analysis code for all projects under the LDOG protocol
 
 4 - Download your EPI and MPRAGE images and place them into two different subfolders inside the main analysis folder.
 
+5 - Rename your EPI images as you please but specify the direction of the images (AP or PA) by putting capital AP or PA somewhere in the name. The script needs to be able to identify which images are AP and which images are PA for topup process. If you do not put the capital letters AP or PA in the name of your EPI files, the script will throw an error. 
+
 5 - If you want to do the full analysis by using the fullAnalysis.py pipeline, also download the second_lvl_design folder and place it in the main analysis folder.
 
 6 - Create another subfolder and place the single-rep images in there for topup.
 
-6 - Run fullAnalysis.py function and point it to your T1, EPI, Canine Atlas, Single-rep images, Design, Second level design, Output and ANTs scripts folders (don't use a slash at the end of the paths. Use it like /home/Desktop/T1). This function will do the first seven steps mentioned under "Analysis Details" section. It creates a main results folder at the specified path. All of your results such as registrations, 1st and 2nd level outputs, and final in-vivo deformed maps will be saved in this folder.
+6 - Run fullAnalysis.py function and point it to your T1, EPI, Canine Atlas, Single-rep images, Design, Second level design, Output and ANTs scripts folders (don't use a slash at the end of the paths. Use it like /home/Desktop/T1). This function will do the first 8 steps mentioned under "Analysis Details" section. It creates a main results folder at the specified path. All of your results such as registrations, 1st and 2nd level outputs, and final in-vivo deformed maps will be saved in this folder.
 
 Warning: fullAnalysis.py performs second level analysis and takes a fixed effects single group average. If you want to compare right and left eyes with each other or employ an entirely different second level model, you need to do any higher level analysis manually. In this case, you can first use onlyPreprocAndFirstLvl.py function to do preprocessing and 1st lvl analysis, then do the rest of the analysis yourself. and finally run onlyPostprocess.py (coming soon) to map the data to in-vivo and surface templates.
 
@@ -46,8 +48,8 @@ Warning: fullAnalysis.py performs second level analysis and takes a fixed effect
     b) Distortion map is calculated using the merged map and acquisition parameters text file:
 	topup --imain=|AP+PA.nii.gz| --datain=|Acqparams.txt| --config=b02b0.cnf --out=topup_results --iout=b0_unwarped --fout=fieldmap_Hz
     c) Correction is applied to each EPI image:
-	applytopup --imain=EPI_AP.nii.gz --inindex=1 --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz
-	applytopup --imain=EPI_PA.nii.gz --inindex=2 --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz
+	applytopup --imain=EPI_AP.nii.gz --inindex=1 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz
+	applytopup --imain=EPI_PA.nii.gz --inindex=2 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz
 
 5 - FSL's 1st level fmri analysis was performed on the individual EPIs. 
 Note: FSL does the 1st level analysis in the native space. It creates registration files in each 1st level output folder but does not apply the transformations until the 2nd level analysis. If you do not specify any registration in the 1st step, your 2nd level analysis will fail because FSL will look for a registration file during this stage and won't be able to find one. In order to be able to do the 2nd level analysis without any transformations we need to trick FSL. For this we need to do some registrations in the first level to have FSL create the necessary files (doesn't really matter what we register to since we are only after creating some files). Then, we replace those files with identity matrices so no transformation takes place.
