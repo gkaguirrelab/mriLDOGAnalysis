@@ -55,12 +55,12 @@ Warning: fullAnalysis.py performs second level analysis and takes a fixed effect
 Note: FSL does the 1st level analysis in the native space. It creates registration files in each 1st level output folder but does not apply the transformations until the 2nd level analysis. If you do not specify any registration in the 1st step, your 2nd level analysis will fail because FSL will look for a registration file during this stage and won't be able to find one. In order to be able to do the 2nd level analysis without any transformations we need to trick FSL. For this we need to do some registrations in the first level to have FSL create the necessary files (doesn't really matter what we register to since we are only after creating some files). Then, we replace those files with identity matrices so no transformation takes place.
    
 6 - Tricking FSL to do the group analysis without registration:
-	. Make sure the folder called reg_standard does not appear in your 1st level analysis directories. Delete if it appears. It usually appears when some registration is applied to the data which we don't want at this stage.
-	. Copy an identity matrix from FSL's main directory to the reg subfolder of each of your 1st level output folders and rename the matrices example_func2standard.mat. This will make transformations ineffective.
-    		"cp $FSLDIR/etc/flirtsch/ident.mat reg/example_func2standard.mat"
-	. Overwrite the standard.nii.gz image which is located in the same reg directory with the mean_func.nii.gz image in your main 1st level directory so that no interpolation will take place either.
-  		"cp mv mean_func.nii.gz reg/standard.nii.gz"
-	. Check if everything looks alright. Voxel intensities between stats/cope#.nii.gz and reg_standard/stats/cope#.nii.gz should be exactly the same and data dimension and pixel size should be the same as mean_func
+    a) Make sure the folder called reg_standard does not appear in your 1st level analysis directories. Delete if it appears. It usually appears when some registration is applied to the data which we don't want at this stage.
+    b) Copy an identity matrix from FSL's main directory to the reg subfolder of each of your 1st level output folders and rename the matrices example_func2standard.mat. This will make transformations ineffective.
+	"cp $FSLDIR/etc/flirtsch/ident.mat reg/example_func2standard.mat"
+    c) Overwrite the standard.nii.gz image which is located in the same reg directory with the mean_func.nii.gz image in your main 1st level directory so that no interpolation will take place either.
+	"cp mv mean_func.nii.gz reg/standard.nii.gz"
+    d) Check if everything looks alright. Voxel intensities between stats/cope#.nii.gz and reg_standard/stats/cope#.nii.gz should be exactly the same and data dimension and pixel size should be the same as mean_func
 
 7 - Do the 2nd level fixed effects single group averaging for both off>on and on>off conditions. 
 
