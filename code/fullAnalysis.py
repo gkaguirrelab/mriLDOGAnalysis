@@ -233,9 +233,9 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     
     # Surface mapping
     os.system("mri_vol2surf --mov %s/off_on_invivo.nii.gz --out %s/off_on_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
-    os.system("mri_vol2surf --mov %s/off_on_invivo.nii.gz --out %s/off_on_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
-    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/off_on_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
-    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/off_on_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
+    os.system("mri_vol2surf --mov %s/off_on_invivo.nii.gz --out %s/off_on_LH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
+    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
+    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_LH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
 
-fullAnalysis('/home/ozzy/Desktop/Canine/without_topup/T1', '/home/ozzy/Desktop/Canine/without_topup/EPI', '/home/ozzy/Desktop/Canine/without_topup/Atlas','/home/ozzy/Desktop/Canine/without_topup/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/Canine/without_topup/design','/home/ozzy/Desktop/Canine/without_topup/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/Canine/without_topup') 
+fullAnalysis('/home/ozzy/Desktop/latest_canine/Canine3/T1', '/home/ozzy/Desktop/latest_canine/Canine3/EPI', '/home/ozzy/Desktop/latest_canine/Canine3/Atlas','/home/ozzy/Desktop/latest_canine/Canine3/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/latest_canine/Canine3/design','/home/ozzy/Desktop/latest_canine/Canine3/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/latest_canine/Canine3') 
 
