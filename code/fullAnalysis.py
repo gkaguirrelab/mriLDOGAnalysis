@@ -100,21 +100,15 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
         if "AP" in i:
             os.system("mv %s/%s %s/%s"%(path_to_epi,i,AP_images_temporary,i))
         elif "PA" in i:
-            os.system("mv %s%s %s%s"%(path_to_epi,i,PA_images_temporary,i))
+            os.system("mv %s/%s %s/%s"%(path_to_epi,i,PA_images_temporary,i))
         else:
             raise ValueError("You did not rename and put AP or PA in one of your EPI images")
 
-    corrected_epi_data = output_folder + "/corrected"
-    if not os.path.exists(corrected_epi_data):  
-        os.system("mkdir %"%corrected_epi_data)
-        
     for i in os.listdir(AP_images_temporary):
         os.system("applytopup --imain=%s/%s --inindex=1 --method=jac --datatin=%s --topup=%s/topup_results --out=%s/corrected_%s"%(AP_images_temporary,i,acparam_file,top_up_res,path_to_epi,i))
    
     for i in os.listdir(PA_images_temporary):
         os.system("applytopup --imain=%s/%s --inindex=2 --method=jac --datatin=%s --topup=%s/topup_results --out=%s/corrected_%s"%(PA_images_temporary,i,acparam_file,top_up_res,path_to_epi,i))
-    
-    path_to_epi = corrected_epi_data
     
     # Motion outlier finding/scrubbing
     print("CREATING MOTION OUTLIERS")
