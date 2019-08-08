@@ -279,7 +279,10 @@ set feat_files(1) "SUBJECT_EPI"
 set fmri(confoundevs) 1
 
 # Confound EVs text file for analysis 1
-set confoundev_files(1) CONFOUND_FOR_MOTION_EPI
+set confoundev_files(1) "CONFOUND_FOR_MOTION_EPI"
+
+# Session's alternate reference image for analysis 1
+set alt_ex_func(1) "CORRECT_TO_DIS"
 
 # EV 1 title
 set fmri(evtitle1) "on"
