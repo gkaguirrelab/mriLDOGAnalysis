@@ -38,32 +38,32 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
         os.system("mkdir %s/results"%output_folder)
     new_output_folder = output_folder + "/results"
     
-    # Register two MPRAGEs
-    print("REGISTERING MPRAGE IMAGES")
-    mprage_images = os.listdir(path_to_mprage)
-    average_path = new_output_folder + "/mp_average" 
-    if not os.path.exists(average_path):
-        os.system("mkdir %s"%average_path)
-    flirt_call = "flirt -in %s/%s -ref %s/%s -out %s/registered -omat %s/registered -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6 -interp trilinear"%(path_to_mprage,mprage_images[0],path_to_mprage, mprage_images[1],average_path,average_path)          
-    os.system(flirt_call)
-
-    #Average the registered MPRAGE with the target of that registration
-    print("AVERAGING MPRAGE IMAGES")
-    first_image = path_to_mprage + "/" + mprage_images[1]
-    second_image = average_path + "/" + os.listdir(average_path)[0]
-    average_call = "AverageImages 3 %s/averaged_mprages.nii.gz 1 %s %s"%(average_path,first_image,second_image)
-    os.system(average_call)
-  
-    # Warp to Canine Template (use 4 threads change -n flag in warp_call if you want more threads)
-    print("WARPING THE AVERAGED MPRAGE TO INVIVO ATLAS")
+#    # Register two MPRAGEs
+#    print("REGISTERING MPRAGE IMAGES")
+#    mprage_images = os.listdir(path_to_mprage)
+#    average_path = new_output_folder + "/mp_average" 
+#    if not os.path.exists(average_path):
+#        os.system("mkdir %s"%average_path)
+#    flirt_call = "flirt -in %s/%s -ref %s/%s -out %s/registered -omat %s/registered -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6 -interp trilinear"%(path_to_mprage,mprage_images[0],path_to_mprage, mprage_images[1],average_path,average_path)          
+#    os.system(flirt_call)
+#
+#    #Average the registered MPRAGE with the target of that registration
+#    print("AVERAGING MPRAGE IMAGES")
+#    first_image = path_to_mprage + "/" + mprage_images[1]
+#    second_image = average_path + "/" + os.listdir(average_path)[0]
+#    average_call = "AverageImages 3 %s/averaged_mprages.nii.gz 1 %s %s"%(average_path,first_image,second_image)
+#    os.system(average_call)
+#  
+#    # Warp to Canine Template (use 4 threads change -n flag in warp_call if you want more threads)
+#    print("WARPING THE AVERAGED MPRAGE TO INVIVO ATLAS")
     warp_results_folder = new_output_folder + "/reg_avgmprage2atlas"
-    if not os.path.exists(warp_results_folder):
-        os.system("mkdir %s/reg_avgmprage2atlas"%new_output_folder)
-    averaged_mprage = average_path + '/averaged_mprages.nii.gz'
+#    if not os.path.exists(warp_results_folder):
+#        os.system("mkdir %s/reg_avgmprage2atlas"%new_output_folder)
+#    averaged_mprage = average_path + '/averaged_mprages.nii.gz'
     template_path = path_to_atlas_folder + '/invivo/invivoTemplate.nii.gz'
-    warp_call = "%s/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s/dog -n 4"%(path_to_ants_scripts, template_path, averaged_mprage, warp_results_folder)
-    os.system(warp_call)
-    
+#    warp_call = "%s/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s/dog -n 4"%(path_to_ants_scripts, template_path, averaged_mprage, warp_results_folder)
+#    os.system(warp_call)
+#    
     # Top-up 
     direction_vector_AP = "0 -1 0 %s\n"%str(total_readout_time_AP)
     direction_vector_PA = "0 1 0 %s"%str(total_readout_time_PA)
@@ -83,7 +83,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
             pa_image = path_to_recon_fmris + "/" + i
     print("Full path to the single-rep AP: %s"%ap_image)
     print("Full path to the single-rep PA: %s"%pa_image)
-    top_up_res = new_output_folder + "/results/top_up"
+    top_up_res = new_output_folder + "/top_up"
     if not os.path.exists(top_up_res):
         os.system("mkdir %s"%top_up_res)
     os.system("fslmerge -a %s/AP+PA %s %s"%(top_up_res, ap_image, pa_image))
@@ -104,7 +104,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
         else:
             raise ValueError("You did not rename and put AP or PA in one of your EPI images")
     
-    os.system("applytopup --imain=%s/AP.nii.gz --inindex=1 --method=jac --datain=%s --topup=%s/topup_results --out=%s/register_to_this"%(top_up_res,acparam_file,top_up_res,top_up_res))
+    os.system("applytopup --imain=%s/AP.nii.gz --inindex=1 --method=jac --datain=%s --topup=%s/topup_results --out=%s/register_to_this"%(path_to_recon_fmris,acparam_file,top_up_res,top_up_res))
 
     for i in os.listdir(AP_images_temporary):
         os.system("applytopup --imain=%s/%s --inindex=1 --method=jac --datain=%s --topup=%s/topup_results --out=%s/corrected_%s"%(AP_images_temporary,i,acparam_file,top_up_res,path_to_epi,i))
@@ -144,7 +144,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
             epi_output_folder = new_output_folder + "/first_level_results/%s"%i[:-4]
         epifullpath = path_to_epi + "/" + i
         ntime = os.popen("fslnvols %s"%epifullpath).read().rstrip()
-        motion_epi = "%s/results/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
+        motion_epi = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
         things_to_replace = {"SUBJECT_OUTPUT":epi_output_folder, "NTPTS":ntime, 
                              "STANDARD_IMAGE":template_path, "SUBJECT_EPI":epifullpath,
                              "SUBJECTEV1":evonepath, "SUBJECTEVI2":evtwopath,
