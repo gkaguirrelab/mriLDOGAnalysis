@@ -38,32 +38,32 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
         os.system("mkdir %s/results"%output_folder)
     new_output_folder = output_folder + "/results"
     
-#    # Register two MPRAGEs
-#    print("REGISTERING MPRAGE IMAGES")
-#    mprage_images = os.listdir(path_to_mprage)
-#    average_path = new_output_folder + "/mp_average" 
-#    if not os.path.exists(average_path):
-#        os.system("mkdir %s"%average_path)
-#    flirt_call = "flirt -in %s/%s -ref %s/%s -out %s/registered -omat %s/registered -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6 -interp trilinear"%(path_to_mprage,mprage_images[0],path_to_mprage, mprage_images[1],average_path,average_path)          
-#    os.system(flirt_call)
-#
-#    #Average the registered MPRAGE with the target of that registration
-#    print("AVERAGING MPRAGE IMAGES")
-#    first_image = path_to_mprage + "/" + mprage_images[1]
-#    second_image = average_path + "/" + os.listdir(average_path)[0]
-#    average_call = "AverageImages 3 %s/averaged_mprages.nii.gz 1 %s %s"%(average_path,first_image,second_image)
-#    os.system(average_call)
-#  
-#    # Warp to Canine Template (use 4 threads change -n flag in warp_call if you want more threads)
-#    print("WARPING THE AVERAGED MPRAGE TO INVIVO ATLAS")
+    # Register two MPRAGEs
+    print("REGISTERING MPRAGE IMAGES")
+    mprage_images = os.listdir(path_to_mprage)
+    average_path = new_output_folder + "/mp_average" 
+    if not os.path.exists(average_path):
+        os.system("mkdir %s"%average_path)
+    flirt_call = "flirt -in %s/%s -ref %s/%s -out %s/registered -omat %s/registered -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6 -interp trilinear"%(path_to_mprage,mprage_images[0],path_to_mprage, mprage_images[1],average_path,average_path)          
+    os.system(flirt_call)
+
+    #Average the registered MPRAGE with the target of that registration
+    print("AVERAGING MPRAGE IMAGES")
+    first_image = path_to_mprage + "/" + mprage_images[1]
+    second_image = average_path + "/" + os.listdir(average_path)[0]
+    average_call = "AverageImages 3 %s/averaged_mprages.nii.gz 1 %s %s"%(average_path,first_image,second_image)
+    os.system(average_call)
+  
+    # Warp to Canine Template (use 4 threads change -n flag in warp_call if you want more threads)
+    print("WARPING THE AVERAGED MPRAGE TO INVIVO ATLAS")
     warp_results_folder = new_output_folder + "/reg_avgmprage2atlas"
-#    if not os.path.exists(warp_results_folder):
-#        os.system("mkdir %s/reg_avgmprage2atlas"%new_output_folder)
-#    averaged_mprage = average_path + '/averaged_mprages.nii.gz'
+    if not os.path.exists(warp_results_folder):
+        os.system("mkdir %s/reg_avgmprage2atlas"%new_output_folder)
+    averaged_mprage = average_path + '/averaged_mprages.nii.gz'
     template_path = path_to_atlas_folder + '/invivo/invivoTemplate.nii.gz'
-#    warp_call = "%s/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s/dog -n 4"%(path_to_ants_scripts, template_path, averaged_mprage, warp_results_folder)
-#    os.system(warp_call)
-#    
+    warp_call = "%s/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s/dog -n 4"%(path_to_ants_scripts, template_path, averaged_mprage, warp_results_folder)
+    os.system(warp_call)
+    
     # Top-up 
     direction_vector_AP = "0 -1 0 %s\n"%str(total_readout_time_AP)
     direction_vector_PA = "0 1 0 %s"%str(total_readout_time_PA)
@@ -98,24 +98,33 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 
     for i in os.listdir(path_to_epi):
         if "AP" in i:
-            os.system("mv %s/%s %s/%s"%(path_to_epi,i,AP_images_temporary,i))
+            os.system("cp %s/%s %s/%s"%(path_to_epi,i,AP_images_temporary,i))
         elif "PA" in i:
-            os.system("mv %s/%s %s/%s"%(path_to_epi,i,PA_images_temporary,i))
+            os.system("cp %s/%s %s/%s"%(path_to_epi,i,PA_images_temporary,i))
         else:
             raise ValueError("You did not rename and put AP or PA in one of your EPI images")
     
     os.system("applytopup --imain=%s/AP.nii.gz --inindex=1 --method=jac --datain=%s --topup=%s/topup_results --out=%s/register_to_this"%(path_to_recon_fmris,acparam_file,top_up_res,top_up_res))
 
+    corrected_epi = new_output_folder + "/corrected_epi"
+    if not os.path.exists(corrected_epi):
+        os.system("mkdir %s"%corrected_epi)    
     for i in os.listdir(AP_images_temporary):
-        os.system("applytopup --imain=%s/%s --inindex=1 --method=jac --datain=%s --topup=%s/topup_results --out=%s/corrected_%s"%(AP_images_temporary,i,acparam_file,top_up_res,path_to_epi,i))
+        os.system("applytopup --imain=%s/%s --inindex=1 --method=jac --datain=%s --topup=%s/topup_results --out=%s/corrected_%s"%(AP_images_temporary,i,acparam_file,top_up_res,corrected_epi,i))
    
     for i in os.listdir(PA_images_temporary):
-        os.system("applytopup --imain=%s/%s --inindex=2 --method=jac --datain=%s --topup=%s/topup_results --out=%s/corrected_%s"%(PA_images_temporary,i,acparam_file,top_up_res,path_to_epi,i))
+        os.system("applytopup --imain=%s/%s --inindex=2 --method=jac --datain=%s --topup=%s/topup_results --out=%s/corrected_%s"%(PA_images_temporary,i,acparam_file,top_up_res,corrected_epi,i))
+    
+    # Warp EPI images to invivo template
+    print("WARPING EPI IMAGES TO INVIVO TEMPLATE")
+    warped_epi = new_output_folder + "/warped_epi"
+    for i in os.listdir(corrected_epi):
+        os.system("antsApplyTransforms --float --default-value 0 --input %s/%s --input-image-type 3 --interpolation Linear --output %s/warped_%s --reference-image %s --transform [ %s/dog0GenericAffine.mat, 0 ] -v 1"%(corrected_epi,i,warped_epi,i,template_path,warp_results_folder))
     
     # Motion outlier finding/scrubbing
     print("CREATING MOTION OUTLIERS")
-    for i in os.listdir(path_to_epi):
-        full_individual_epi_path = path_to_epi + '/' + i
+    for i in os.listdir(warped_epi):
+        full_individual_epi_path = warped_epi + '/' + i
         confound_matrix_folder = new_output_folder + '/motion_covariates/' + i[:-7] + '_motion'
         if not os.path.exists(new_output_folder + "/motion_covariates"):
             os.system("mkdir %s/motion_covariates"%new_output_folder)
@@ -124,7 +133,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
         os.system("fsl_motion_outliers -i %s -o %s/covariate.txt -s %s/values -p %s/plot --fd --thresh=0.9 -v"%(full_individual_epi_path,confound_matrix_folder,confound_matrix_folder,confound_matrix_folder))
     
     ################################ FEAT ####################################
-    for i in os.listdir(path_to_epi):
+    for i in os.listdir(warped_epi):
         check_the_confounds = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
         if not os.path.exists(check_the_confounds):
             os.system("touch %s"%check_the_confounds)
@@ -137,12 +146,12 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     evonepath = path_to_design_folder + '/on'
     evtwopath = path_to_design_folder + '/off'
     mc_to_this = top_up_res + "/register_to_this.nii.gz"
-    for i in os.listdir(path_to_epi):
+    for i in os.listdir(warped_epi):
         if i[-3:] == ".gz":
             epi_output_folder = new_output_folder + "/first_level_results/%s"%i[:-7]
         else:
             epi_output_folder = new_output_folder + "/first_level_results/%s"%i[:-4]
-        epifullpath = path_to_epi + "/" + i
+        epifullpath = warped_epi + "/" + i
         ntime = os.popen("fslnvols %s"%epifullpath).read().rstrip()
         motion_epi = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
         things_to_replace = {"SUBJECT_OUTPUT":epi_output_folder, "NTPTS":ntime, 
@@ -171,7 +180,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
    
     ######################### SECOND LEVEL ###################################
     print("PERFORMING HIGHER LEVEL ANALYSIS")
-    if len(os.listdir(first_lvl_res)) != len(os.listdir(path_to_epi)):
+    if len(os.listdir(first_lvl_res)) != len(os.listdir(warped_epi)):
         raise ValueError ("The amount of the first level results are larger than the amount of the original EPI images. Group analysis failed")
     secondlvl_output = new_output_folder + "/second_level_results"
     
@@ -227,18 +236,18 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
   
     ########################## POST-PROCESSING ###############################
    
-    # Invivo transform
-    print("MAPPING THE SECOND LEVEL FMRI RESULTS TO THE INVIVO TEMPLATE")
-    os.system("mkdir %s/deformed_results"%new_output_folder)
-    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope2.feat/thresh_zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/off_on_invivo.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
-    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope1.feat/thresh_zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/on_off_invivo.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
-    deformed_results_folder = new_output_folder + "deformed_results"
-    
-    # Surface mapping
-    os.system("mri_vol2surf --mov %s/off_on_invivo.nii.gz --out %s/off_on_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
-    os.system("mri_vol2surf --mov %s/off_on_invivo.nii.gz --out %s/off_on_LH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
-    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
-    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_LH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
+#    # Invivo transform
+#    print("MAPPING THE SECOND LEVEL FMRI RESULTS TO THE INVIVO TEMPLATE")
+#    os.system("mkdir %s/deformed_results"%new_output_folder)
+#    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope2.feat/thresh_zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/off_on_invivo.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
+#    os.system("antsApplyTransforms -d 3 -r %s/invivo/invivoTemplate.nii.gz -i %s.gfeat/cope1.feat/thresh_zstat1.nii.gz -t %s/dog1Warp.nii.gz -t %s/dog0GenericAffine.mat -o %s/deformed_results/on_off_invivo.nii.gz -v 1"%(path_to_atlas_folder,secondlvl_output,warp_results_folder,warp_results_folder,output_folder))
+#    deformed_results_folder = new_output_folder + "deformed_results"
+#    
+#    # Surface mapping
+#    os.system("mri_vol2surf --mov %s/off_on_invivo.nii.gz --out %s/off_on_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
+#    os.system("mri_vol2surf --mov %s/off_on_invivo.nii.gz --out %s/off_on_LH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
+#    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
+#    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_LH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
 
 fullAnalysis('/home/ozzy/Desktop/latestCanine/Canine3/T1', '/home/ozzy/Desktop/latestCanine/Canine3/EPI', '/home/ozzy/Desktop/latestCanine/Canine3/Atlas','/home/ozzy/Desktop/latestCanine/Canine3/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/latestCanine/Canine3/design','/home/ozzy/Desktop/latestCanine/Canine3/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/latestCanine/Canine3') 
 
