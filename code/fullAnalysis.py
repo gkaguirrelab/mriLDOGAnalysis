@@ -114,30 +114,33 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
    
     for i in os.listdir(PA_images_temporary):
         os.system("applytopup --imain=%s/%s --inindex=2 --method=jac --datain=%s --topup=%s/topup_results --out=%s/corrected_%s"%(PA_images_temporary,i,acparam_file,top_up_res,corrected_epi,i))
-    
-    # Warp EPI images to invivo template
-    print("WARPING EPI IMAGES TO INVIVO TEMPLATE")
-    warped_epi = new_output_folder + "/warped_epi"
-    for i in os.listdir(corrected_epi):
-        os.system("antsApplyTransforms --float --default-value 0 --input %s/%s --input-image-type 3 --interpolation Linear --output %s/warped_%s --reference-image %s --transform [ %s/dog0GenericAffine.mat, 0 ] -v 1"%(corrected_epi,i,warped_epi,i,template_path,warp_results_folder))
-    
+  
     # Motion outlier finding/scrubbing
     print("CREATING MOTION OUTLIERS")
-    for i in os.listdir(warped_epi):
-        full_individual_epi_path = warped_epi + '/' + i
+    for i in os.listdir(corrected_epi):
+        full_individual_epi_path = corrected_epi + '/' + i
         confound_matrix_folder = new_output_folder + '/motion_covariates/' + i[:-7] + '_motion'
         if not os.path.exists(new_output_folder + "/motion_covariates"):
             os.system("mkdir %s/motion_covariates"%new_output_folder)
         if not os.path.exists(confound_matrix_folder):
             os.system("mkdir %s"%confound_matrix_folder)
         os.system("fsl_motion_outliers -i %s -o %s/covariate.txt -s %s/values -p %s/plot --fd --thresh=0.9 -v"%(full_individual_epi_path,confound_matrix_folder,confound_matrix_folder,confound_matrix_folder))
-    
-    ################################ FEAT ####################################
-    for i in os.listdir(warped_epi):
+    for i in os.listdir(corrected_epi):
         check_the_confounds = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
         if not os.path.exists(check_the_confounds):
             os.system("touch %s"%check_the_confounds)
-   
+           
+    # Warp EPI images to invivo template
+    print("WARPING EPI IMAGES TO INVIVO TEMPLATE")
+    warped_epi = new_output_folder + "/warped_epi"
+    if not os.path.exists(warped_epi):
+        os.system("mkdir %s"%warped_epi)        
+    for i in os.listdir(corrected_epi):
+        os.system("antsApplyTransforms --float --default-value 0 --input %s/%s --input-image-type 3 --interpolation Linear --output %s/warped_%s --reference-image %s --transform [ %s/dog0GenericAffine.mat, 0 ] -v 1"%(corrected_epi,i,warped_epi,i,template_path,warp_results_folder))
+    
+
+    ################################ FEAT ####################################
+
     # Modify the fsf template for individual EPI and do the fMRI analysis
     print("PERFORMING fMRI ANALYSIS: CHECK BROWSER REPORTS FOR DETAILS")
     first_lvl_res = new_output_folder + "/first_level_results"
@@ -249,5 +252,5 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 #    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
 #    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_LH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
 
-fullAnalysis('/home/ozzy/Desktop/latestCanine/Canine3/T1', '/home/ozzy/Desktop/latestCanine/Canine3/EPI', '/home/ozzy/Desktop/latestCanine/Canine3/Atlas','/home/ozzy/Desktop/latestCanine/Canine3/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/latestCanine/Canine3/design','/home/ozzy/Desktop/latestCanine/Canine3/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/latestCanine/Canine3') 
+fullAnalysis('/home/ozzy/Desktop/latestCanine/Canine_test/T1', '/home/ozzy/Desktop/latestCanine/Canine_test/EPI', '/home/ozzy/Desktop/latestCanine/Canine_test/Atlas','/home/ozzy/Desktop/latestCanine/Canine_test/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/latestCanine/Canine_test/design','/home/ozzy/Desktop/latestCanine/Canine_test/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/latestCanine/Canine_test') 
 
