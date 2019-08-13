@@ -44,7 +44,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     average_path = new_output_folder + "/mp_average" 
     if not os.path.exists(average_path):
         os.system("mkdir %s"%average_path)
-    flirt_call = "flirt -in %s/%s -ref %s/%s -out %s/registered -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6 -interp trilinear"%(path_to_mprage,mprage_images[0],path_to_mprage, mprage_images[1],average_path,average_path)          
+    flirt_call = "flirt -in %s/%s -ref %s/%s -out %s/registered -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6 -interp trilinear"%(path_to_mprage,mprage_images[0],path_to_mprage, mprage_images[1],average_path)          
     os.system(flirt_call)
 
     #Average the registered MPRAGE with the target of that registration
