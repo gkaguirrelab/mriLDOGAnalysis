@@ -76,6 +76,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     os.system(replication_temp)
     
     # Top-up 
+    print("STARTING TOPUP")
     direction_vector_AP = "0 -1 0 %s\n"%str(total_readout_time_AP)
     direction_vector_PA = "0 1 0 %s"%str(total_readout_time_PA)
     acparam_file = path_to_recon_fmris + "/acqparams.txt"
@@ -122,24 +123,35 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
         os.system("mkdir %s"%corrected_epi)    
     for i in os.listdir(AP_images_temporary):
         os.system("applytopup --imain=%s/%s --inindex=1 --method=jac --datain=%s --topup=%s/topup_results --out=%s/corrected_%s"%(AP_images_temporary,i,acparam_file,top_up_res,corrected_epi,i))
-
     for i in os.listdir(PA_images_temporary):
         os.system("applytopup --imain=%s/%s --inindex=2 --method=jac --datain=%s --topup=%s/topup_results --out=%s/corrected_%s"%(PA_images_temporary,i,acparam_file,top_up_res,corrected_epi,i))
   
-    # Motion outlier finding/scrubbing
-    print("CREATING MOTION OUTLIERS")
+#    # Motion outlier finding/scrubbing
+#    print("CREATING MOTION OUTLIERS")
+#    for i in os.listdir(corrected_epi):
+#        full_individual_epi_path = corrected_epi + '/' + i
+#        confound_matrix_folder = new_output_folder + '/motion_covariates/' + i[:-7] + '_motion'
+#        if not os.path.exists(new_output_folder + "/motion_covariates"):
+#            os.system("mkdir %s/motion_covariates"%new_output_folder)
+#        if not os.path.exists(confound_matrix_folder):
+#            os.system("mkdir %s"%confound_matrix_folder)
+#        os.system("fsl_motion_outliers -i %s -o %s/covariate.txt -s %s/values -p %s/plot --fd --thresh=0.9 -v"%(full_individual_epi_path,confound_matrix_folder,confound_matrix_folder,confound_matrix_folder))
+#    for i in os.listdir(corrected_epi):
+#        check_the_confounds = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
+#        if not os.path.exists(check_the_confounds):
+#            os.system("touch %s"%check_the_confounds)
+    
+    #MOTION CORRRECT HERE
+    moco_cov = new_output_folder + "/moco_covariates"
+    mc_to_this = top_up_res + "/register_to_this.nii.gz"
+    if not os.path.exists(moco_cov):
+        os.system("mkdir %s"%moco_cov)
     for i in os.listdir(corrected_epi):
-        full_individual_epi_path = corrected_epi + '/' + i
-        confound_matrix_folder = new_output_folder + '/motion_covariates/' + i[:-7] + '_motion'
-        if not os.path.exists(new_output_folder + "/motion_covariates"):
-            os.system("mkdir %s/motion_covariates"%new_output_folder)
-        if not os.path.exists(confound_matrix_folder):
-            os.system("mkdir %s"%confound_matrix_folder)
-        os.system("fsl_motion_outliers -i %s -o %s/covariate.txt -s %s/values -p %s/plot --fd --thresh=0.9 -v"%(full_individual_epi_path,confound_matrix_folder,confound_matrix_folder,confound_matrix_folder))
-    for i in os.listdir(corrected_epi):
-        check_the_confounds = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
-        if not os.path.exists(check_the_confounds):
-            os.system("touch %s"%check_the_confounds)
+        mcflirt_call = "mcflirt -in %s/%s -out %s/%s -reffile %s -dof 12 -plots %s/%s"%(corrected_epi,i,corrected_epi,i,mc_to_this,moco_cov,i[:-7])
+        os.system(mcflirt_call)
+        
+    
+    
     
     # Warp EPI images to invivo template
     print("WARPING EPI IMAGES TO INVIVO TEMPLATE")
@@ -147,30 +159,47 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     if not os.path.exists(warped_epi):
         os.system("mkdir %s"%warped_epi)        
     for i in os.listdir(corrected_epi):
-        os.system("antsApplyTransforms -d 4 -o %s/warped_%s -t %s/dog_diff4DCollapsedWarp.nii.gz -t %s/dog_diff1Warp.nii.gz -r %s/2mreplicated_invivo.nii.gz -i %s/%s"%(warped_epi,i,warp_results_folder,warp_results_folder,warp_results_folder,corrected_epi,i))
+        os.system("antsApplyTransforms -d 4 -o %s/warped_%s -t %s/dog_diff4DCollapsedWarp.nii.gz -r %s/2mreplicated_invivo.nii.gz -i %s/%s"%(warped_epi,i,warp_results_folder,warp_results_folder,warp_results_folder,corrected_epi,i))
+        #os.system("antsApplyTransforms -d 4 -o %s/warped_%s -t %s/dog_diff4DCollapsedWarp.nii.gz -t %s/dog_diff1Warp.nii.gz -r %s/2mreplicated_invivo.nii.gz -i %s/%s"%(warped_epi,i,warp_results_folder,warp_results_folder,warp_results_folder,corrected_epi,i))
     
+    # Flip hemispheres and average 
+    flipped_epi = new_output_folder + "/flipped_and_averaged"
+    if not os.path.exists(flipped_epi):
+        os.system("mkdir %s"%flipped_epi)
+    for i in os.listdir(warped_epi):
+        warped_imaj = warped_epi + '/' + i
+        flipped_imaj = warped_epi + "/flipped_" + i
+        flip_call = "mri_convert --in_orientation LAS %s %s"%(warped_imaj,flipped_imaj)   #This is freesurfer
+        os.system(flip_call)
+        # Average original and flipped save the results in the flipped folder
+        avgcall = "fslmaths %s -add %s -div 2 %s/flipped-avged_%s -odt float"%(warped_imaj, flipped_imaj, flipped_epi, i)
+        os.system(avgcall)
+        
     ################################ FEAT ####################################
+
+
+#######   GET RID OF MOTION CORRECTION HERE
 
     # Modify the fsf template for individual EPI and do the fMRI analysis
     print("PERFORMING fMRI ANALYSIS: CHECK BROWSER REPORTS FOR DETAILS")
     first_lvl_res = new_output_folder + "/first_level_results"
     if not os.path.exists(first_lvl_res):
         os.system("mkdir %s"%first_lvl_res)
-    evonepath = path_to_design_folder + '/on'
-    evtwopath = path_to_design_folder + '/off'
+    evonepath = path_to_design_folder + '/off'
     mc_to_this = top_up_res + "/register_to_this.nii.gz"
-    for i in os.listdir(warped_epi):
+    for i in os.listdir(flipped_epi):
         if i[-3:] == ".gz":
             epi_output_folder = new_output_folder + "/first_level_results/%s"%i[:-7]
         else:
             epi_output_folder = new_output_folder + "/first_level_results/%s"%i[:-4]
-        epifullpath = warped_epi + "/" + i
+        epifullpath = flipped_epi + "/" + i
         ntime = os.popen("fslnvols %s"%epifullpath).read().rstrip()
         motion_epi = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
         things_to_replace = {"SUBJECT_OUTPUT":epi_output_folder, "NTPTS":ntime, 
                              "STANDARD_IMAGE":template_path, "SUBJECT_EPI":epifullpath,
-                             "SUBJECTEV1":evonepath, "SUBJECTEVI2":evtwopath,
-                             "CONFOUND_FOR_MOTION_EPI":motion_epi, "CORRECT_TO_DIS":mc_to_this}
+                             "SUBJECTEV1":evonepath,
+                             "CONFOUND_FOR_MOTION_EPI":motion_epi, 
+                             "CORRECT_TO_DIS":mc_to_this}
         with open("%s/design_template.fsf"%path_to_design_folder, 'r') as infile:
             with open("%s/design.fsf"%path_to_design_folder,'w') as outfile:
                 for line in infile:
@@ -193,7 +222,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
    
     ######################### SECOND LEVEL ###################################
     print("PERFORMING HIGHER LEVEL ANALYSIS")
-    if len(os.listdir(first_lvl_res)) != len(os.listdir(warped_epi)):
+    if len(os.listdir(first_lvl_res)) != len(os.listdir(flipped_epi)):
         raise ValueError ("The amount of the first level results are larger than the amount of the original EPI images. Group analysis failed")
     secondlvl_output = new_output_folder + "/second_level_results"
     
