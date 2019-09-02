@@ -47,7 +47,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     flirt_call = "flirt -in %s/%s -ref %s/%s -out %s/registered -omat %s/registered -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6 -interp trilinear"%(path_to_mprage,mprage_images[0],path_to_mprage, mprage_images[1],average_path,average_path)          
     os.system(flirt_call)
 
-    #Average the registered MPRAGE with the target of that registration
+    # Average the registered MPRAGE with the target of that registration
     print("AVERAGING MPRAGE IMAGES")
     first_image = path_to_mprage + "/" + mprage_images[1]
     second_image = average_path + "/registered.nii.gz"
@@ -95,6 +95,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
             pa_image = path_to_recon_fmris + "/" + i
     print("Full path to the single-rep AP: %s"%ap_image)
     print("Full path to the single-rep PA: %s"%pa_image)
+    print("STARTING TOPUP")
     top_up_res = new_output_folder + "/top_up"
     if not os.path.exists(top_up_res):
         os.system("mkdir %s"%top_up_res)
@@ -126,32 +127,32 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     for i in os.listdir(PA_images_temporary):
         os.system("applytopup --imain=%s/%s --inindex=2 --method=jac --datain=%s --topup=%s/topup_results --out=%s/corrected_%s"%(PA_images_temporary,i,acparam_file,top_up_res,corrected_epi,i))
   
-#    # Motion outlier finding/scrubbing
-#    print("CREATING MOTION OUTLIERS")
-#    for i in os.listdir(corrected_epi):
-#        full_individual_epi_path = corrected_epi + '/' + i
-#        confound_matrix_folder = new_output_folder + '/motion_covariates/' + i[:-7] + '_motion'
-#        if not os.path.exists(new_output_folder + "/motion_covariates"):
-#            os.system("mkdir %s/motion_covariates"%new_output_folder)
-#        if not os.path.exists(confound_matrix_folder):
-#            os.system("mkdir %s"%confound_matrix_folder)
-#        os.system("fsl_motion_outliers -i %s -o %s/covariate.txt -s %s/values -p %s/plot --fd --thresh=0.9 -v"%(full_individual_epi_path,confound_matrix_folder,confound_matrix_folder,confound_matrix_folder))
-#    for i in os.listdir(corrected_epi):
-#        check_the_confounds = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
-#        if not os.path.exists(check_the_confounds):
-#            os.system("touch %s"%check_the_confounds)
+    # Motion outlier finding/scrubbing
+    print("CREATING MOTION OUTLIERS")
+    for i in os.listdir(corrected_epi):
+        full_individual_epi_path = corrected_epi + '/' + i
+        confound_matrix_folder = new_output_folder + '/motion_covariates/' + i[:-7] + '_motion'
+        if not os.path.exists(new_output_folder + "/motion_covariates"):
+            os.system("mkdir %s/motion_covariates"%new_output_folder)
+        if not os.path.exists(confound_matrix_folder):
+            os.system("mkdir %s"%confound_matrix_folder)
+        os.system("fsl_motion_outliers -i %s -o %s/covariate.txt -s %s/values -p %s/plot --fd --thresh=0.9 -v"%(full_individual_epi_path,confound_matrix_folder,confound_matrix_folder,confound_matrix_folder))
+    for i in os.listdir(corrected_epi):
+        check_the_confounds = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
+        if not os.path.exists(check_the_confounds):
+            os.system("touch %s"%check_the_confounds)
     
-    #MOTION CORRRECT HERE
+    # Motion Correction
+    print("STARTING MOTION CORRECTION")
     moco_cov = new_output_folder + "/moco_covariates"
     mc_to_this = top_up_res + "/register_to_this.nii.gz"
     if not os.path.exists(moco_cov):
         os.system("mkdir %s"%moco_cov)
     for i in os.listdir(corrected_epi):
-        mcflirt_call = "mcflirt -in %s/%s -out %s/%s -reffile %s -dof 12 -plots %s/%s"%(corrected_epi,i,corrected_epi,i,mc_to_this,moco_cov,i[:-7])
+        mcflirt_call = "mcflirt -in %s/%s -o %s/%s -reffile %s -dof 12 -plots"%(corrected_epi,i,corrected_epi,i,mc_to_this)
+        print(mcflirt_call)
         os.system(mcflirt_call)
-        
-    
-    
+    os.system("mv %s/*.par %s/"%(corrected_epi,moco_cov))     
     
     # Warp EPI images to invivo template
     print("WARPING EPI IMAGES TO INVIVO TEMPLATE")
@@ -293,5 +294,6 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 ##    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
 ##    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_LH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
 
-fullAnalysis('/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/T1', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/EPI', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Atlas','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/design','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme') 
+#fullAnalysis('/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/T1', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/EPI', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Atlas','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/design','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme') 
+fullAnalysis('/home/ozzy/Desktop/canine/T1', '/home/ozzy/Desktop/canine/EPI', '/home/ozzy/Desktop/canine/Atlas','/home/ozzy/Desktop/canine/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/canine/design','/home/ozzy/Desktop/canine/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/canine') 
 
