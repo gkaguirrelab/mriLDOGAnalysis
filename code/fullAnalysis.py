@@ -127,20 +127,20 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     for i in os.listdir(PA_images_temporary):
         os.system("applytopup --imain=%s/%s --inindex=2 --method=jac --datain=%s --topup=%s/topup_results --out=%s/corrected_%s"%(PA_images_temporary,i,acparam_file,top_up_res,corrected_epi,i))
   
-    # Motion outlier finding/scrubbing
-    print("CREATING MOTION OUTLIERS")
-    for i in os.listdir(corrected_epi):
-        full_individual_epi_path = corrected_epi + '/' + i
-        confound_matrix_folder = new_output_folder + '/motion_covariates/' + i[:-7] + '_motion'
-        if not os.path.exists(new_output_folder + "/motion_covariates"):
-            os.system("mkdir %s/motion_covariates"%new_output_folder)
-        if not os.path.exists(confound_matrix_folder):
-            os.system("mkdir %s"%confound_matrix_folder)
-        os.system("fsl_motion_outliers -i %s -o %s/covariate.txt -s %s/values -p %s/plot --fd --thresh=0.9 -v"%(full_individual_epi_path,confound_matrix_folder,confound_matrix_folder,confound_matrix_folder))
-    for i in os.listdir(corrected_epi):
-        check_the_confounds = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
-        if not os.path.exists(check_the_confounds):
-            os.system("touch %s"%check_the_confounds)
+#    # Motion outlier finding/scrubbing
+#    print("CREATING MOTION OUTLIERS")
+#    for i in os.listdir(corrected_epi):
+#        full_individual_epi_path = corrected_epi + '/' + i
+#        confound_matrix_folder = new_output_folder + '/motion_covariates/' + i[:-7] + '_motion'
+#        if not os.path.exists(new_output_folder + "/motion_covariates"):
+#            os.system("mkdir %s/motion_covariates"%new_output_folder)
+#        if not os.path.exists(confound_matrix_folder):
+#            os.system("mkdir %s"%confound_matrix_folder)
+#        os.system("fsl_motion_outliers -i %s -o %s/covariate.txt -s %s/values -p %s/plot --fd --thresh=0.9 -v"%(full_individual_epi_path,confound_matrix_folder,confound_matrix_folder,confound_matrix_folder))
+#    for i in os.listdir(corrected_epi):
+#        check_the_confounds = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
+#        if not os.path.exists(check_the_confounds):
+#            os.system("touch %s"%check_the_confounds)
     
     # Motion Correction
     print("STARTING MOTION CORRECTION")
