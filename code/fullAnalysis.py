@@ -154,6 +154,18 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
         os.system(mcflirt_call)
     os.system("mv %s/*.par %s/"%(corrected_epi,moco_cov))     
     
+    #####STARTING THE MOTION DERRIVATIVE TEXT CREATING TASK HERE ### DRAFT
+    original_par = '/home/ozzy/Desktop/corrected_left4_PA.nii.gz.par'
+    string_to_add = 'Do the calculations here'
+    with open(original_par, 'r') as f:  
+        file_lines = [''.join([x.strip(),string_to_add,'\n']) for x in f.readlines()]
+    with open(original_par,'w') as f:
+        f.writelines(file_lines)
+        
+    
+    
+    
+    
     # Warp EPI images to invivo template
     print("WARPING EPI IMAGES TO INVIVO TEMPLATE")
     warped_epi = new_output_folder + "/warped_epi"
