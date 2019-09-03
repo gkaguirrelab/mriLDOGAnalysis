@@ -155,17 +155,42 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     os.system("mv %s/*.par %s/"%(corrected_epi,moco_cov))     
     
     #####STARTING THE MOTION DERRIVATIVE TEXT CREATING TASK HERE ### DRAFT
-    original_par = '/home/ozzy/Desktop/corrected_left4_PA.nii.gz.par'
+    original_par = '/home/ozzy/Desktop/corrected_left5_AP.nii.gz.par'
+    time_derivative = '/home/ozzy/Desktop/time_corrected_left5_AP.nii.gz.par'
     string_to_add = 'Do the calculations here'
     with open(original_par, 'r') as f:  
-        file_lines = [''.join([x.strip(),string_to_add,'\n']) for x in f.readlines()]
-    with open(original_par,'w') as f:
-        f.writelines(file_lines)
+        file_lines = [''.join([x.strip(), '  ' + string_to_add,'\n']) for x in f.readlines()]
+        for i in file_lines:
+            line_parsed = i.split()
+            if 'val_one' in locals():
+                val_one = val_one - float(line_parsed[0]) 
+            else:                
+                val_one= float(line_parsed[0])
+            if 'val_two' in locals():
+                val_two = val_two - float(line_parsed[1]) 
+            else:                                
+                val_two= float(line_parsed[1])
+            if 'val_three' in locals():
+                val_three = val_three - float(line_parsed[2]) 
+            else:                
+                val_three= float(line_parsed[2])           
+            if 'val_four' in locals():
+                val_four = val_four - float(line_parsed[3]) 
+            else:                
+                val_four= float(line_parsed[3])
+            if 'val_five' in locals():
+                val_five = val_five - float(line_parsed[4]) 
+            else:                
+                val_five= float(line_parsed[4])
+            if 'val_six' in locals():
+                val_six = val_six - float(line_parsed[5]) 
+            else:                
+                val_six= float(line_parsed[5])
+            final_val = '  %s %s %s %s %s %s'%(val_one,val_two,val_three,val_four,val_five,val_six)
+            
+            with open(time_derivative,'w') as t:
+                t.writelines(final_val)
         
-    
-    
-    
-    
     # Warp EPI images to invivo template
     print("WARPING EPI IMAGES TO INVIVO TEMPLATE")
     warped_epi = new_output_folder + "/warped_epi"
