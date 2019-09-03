@@ -210,8 +210,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
             epi_output_folder = new_output_folder + "/first_level_results/%s"%i[:-4]
         epifullpath = flipped_epi + "/" + i
         ntime = os.popen("fslnvols %s"%epifullpath).read().rstrip()
-        motion_epi = "/flipped-avged_"
-        motion_epi = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
+        motion_epi = "%s/%s.par"%(moco_cov,i[21:])
         things_to_replace = {"SUBJECT_OUTPUT":epi_output_folder, "NTPTS":ntime, 
                              "STANDARD_IMAGE":template_path, "SUBJECT_EPI":epifullpath,
                              "SUBJECTEV1":evonepath,
