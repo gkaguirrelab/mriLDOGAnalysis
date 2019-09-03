@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import os 
+import pandas as pd 
+import numpy as np
 """
 
 path_to_mprage	                : Path to folder containing MPRAGE images
@@ -32,7 +34,7 @@ output_folder                   : Results folder is created at this path and
 def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_recon_fmris, total_readout_time_AP, total_readout_time_PA, path_to_design_folder, path_to_secondlvl_design_folder, path_to_ants_scripts, output_folder):
  
     ############################ PREPROCESSING ################################
-    
+#    
     # Create a results/processing output folder if doesn't already exist (add)
     if not os.path.exists(output_folder+"/results"):
         os.system("mkdir %s/results"%output_folder)
@@ -141,7 +143,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 #        check_the_confounds = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
 #        if not os.path.exists(check_the_confounds):
 #            os.system("touch %s"%check_the_confounds)
-    
+   
     # Motion Correction
     print("STARTING MOTION CORRECTION")
     moco_cov = new_output_folder + "/moco_covariates"
@@ -154,50 +156,26 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
         os.system(mcflirt_call)
     os.system("mv %s/*.par %s/"%(corrected_epi,moco_cov))     
     
-    #####STARTING THE MOTION DERRIVATIVE TEXT CREATING TASK HERE ### DRAFT
-    original_par = '/home/ozzy/Desktop/corrected_left5_AP.nii.gz.par'
-    time_derivative = '/home/ozzy/Desktop/time_corrected_left5_AP.nii.gz.par'
-    string_to_add = 'Do the calculations here'
-    with open(original_par, 'r') as f:  
-        file_lines = [''.join([x.strip(), '  ' + string_to_add,'\n']) for x in f.readlines()]
-        for i in file_lines:
-            line_parsed = i.split()
-            if 'val_one' in locals():
-                val_one = val_one - float(line_parsed[0]) 
-            else:                
-                val_one= float(line_parsed[0])
-            if 'val_two' in locals():
-                val_two = val_two - float(line_parsed[1]) 
-            else:                                
-                val_two= float(line_parsed[1])
-            if 'val_three' in locals():
-                val_three = val_three - float(line_parsed[2]) 
-            else:                
-                val_three= float(line_parsed[2])           
-            if 'val_four' in locals():
-                val_four = val_four - float(line_parsed[3]) 
-            else:                
-                val_four= float(line_parsed[3])
-            if 'val_five' in locals():
-                val_five = val_five - float(line_parsed[4]) 
-            else:                
-                val_five= float(line_parsed[4])
-            if 'val_six' in locals():
-                val_six = val_six - float(line_parsed[5]) 
-            else:                
-                val_six= float(line_parsed[5])
-            final_val = '  %s %s %s %s %s %s'%(val_one,val_two,val_three,val_four,val_five,val_six)
-            
-            with open(time_derivative,'w') as t:
-                t.writelines(final_val)
-        
+    # Motion derivatives
+    for i in os.listdir(moco_cov):
+        original_par = moco_cov + '/' + i
+        print(original_par)
+        pd.set_option("display.precision", 8)
+        data = pd.read_csv(original_par, sep = '  ', header = None, engine='python')
+        data_sqrted = data ** 2
+        data_diffed = data.diff(periods=1, axis=0)
+        data_diffed = data_diffed.fillna(0)
+        data_diffed_sqrt = data_diffed ** 2 
+        data_concatted = pd.concat([data, data_sqrted, data_diffed, data_diffed_sqrt], axis=1)
+        np.savetxt(original_par, data_concatted, delimiter='  ')
+    
     # Warp EPI images to invivo template
     print("WARPING EPI IMAGES TO INVIVO TEMPLATE")
     warped_epi = new_output_folder + "/warped_epi"
     if not os.path.exists(warped_epi):
         os.system("mkdir %s"%warped_epi)        
     for i in os.listdir(corrected_epi):
-        os.system("antsApplyTransforms -d 4 -o %s/warped_%s -t %s/dog_diff4DCollapsedWarp.nii.gz -r %s/2mreplicated_invivo.nii.gz -i %s/%s"%(warped_epi,i,warp_results_folder,warp_results_folder,warp_results_folder,corrected_epi,i))
+        os.system("antsApplyTransforms -d 4 -o %s/warped_%s -t %s/dog_diff4DCollapsedWarp.nii.gz -r %s/2mreplicated_invivo.nii.gz -i %s/%s"%(warped_epi,i,warp_results_folder,warp_results_folder,corrected_epi,i))
         #os.system("antsApplyTransforms -d 4 -o %s/warped_%s -t %s/dog_diff4DCollapsedWarp.nii.gz -t %s/dog_diff1Warp.nii.gz -r %s/2mreplicated_invivo.nii.gz -i %s/%s"%(warped_epi,i,warp_results_folder,warp_results_folder,warp_results_folder,corrected_epi,i))
     
     # Flip hemispheres and average 
@@ -232,6 +210,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
             epi_output_folder = new_output_folder + "/first_level_results/%s"%i[:-4]
         epifullpath = flipped_epi + "/" + i
         ntime = os.popen("fslnvols %s"%epifullpath).read().rstrip()
+        motion_epi = "/flipped-avged_"
         motion_epi = "%s/motion_covariates/%s_motion/covariate.txt"%(new_output_folder,i[:-7])
         things_to_replace = {"SUBJECT_OUTPUT":epi_output_folder, "NTPTS":ntime, 
                              "STANDARD_IMAGE":template_path, "SUBJECT_EPI":epifullpath,
@@ -331,6 +310,6 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 ##    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
 ##    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_LH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
 
-#fullAnalysis('/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/T1', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/EPI', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Atlas','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/design','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme') 
-fullAnalysis('/home/ozzy/Desktop/canine/T1', '/home/ozzy/Desktop/canine/EPI', '/home/ozzy/Desktop/canine/Atlas','/home/ozzy/Desktop/canine/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/canine/design','/home/ozzy/Desktop/canine/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/canine') 
+fullAnalysis('/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/T1', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/EPI', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Atlas','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/design','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme') 
+#fullAnalysis('/home/ozzy/Desktop/canine/T1', '/home/ozzy/Desktop/canine/EPI', '/home/ozzy/Desktop/canine/Atlas','/home/ozzy/Desktop/canine/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/canine/design','/home/ozzy/Desktop/canine/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/canine') 
 
