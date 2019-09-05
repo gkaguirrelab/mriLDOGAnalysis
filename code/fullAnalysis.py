@@ -55,6 +55,15 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     second_image = average_path + "/registered.nii.gz"
     average_call = "AverageImages 3 %s/averaged_mprages.nii.gz 1 %s %s"%(average_path,first_image,second_image)
     os.system(average_call)
+    
+    # Flip mprage and average 
+    warped_imaj = average_path + "/averaged_mprages.nii.gz"
+    flipped_imaj = average_path + "/flipped_averaged_mprages.nii.gz"
+    flip_call = "mri_convert --in_orientation LAS %s %s"%(warped_imaj,flipped_imaj)   #This is freesurfer
+    os.system(flip_call)
+    # Average original and flipped mprage
+    avgcall = "fslmaths %s -add %s -div 2 %s -odt float"%(warped_imaj, flipped_imaj, warped_imaj)
+    os.system(avgcall)
   
     # Warp to Canine Template (use 4 threads change -n flag in warp_call if you want more threads)
     print("WARPING THE AVERAGED MPRAGE TO INVIVO ATLAS")
