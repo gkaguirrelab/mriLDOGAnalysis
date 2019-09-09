@@ -4,7 +4,6 @@ import os
 import pandas as pd 
 import numpy as np
 """
-
 path_to_mprage	                : Path to folder containing MPRAGE images
 path_to_epi   	                : path to folder containing EPI images
 path_to_atlas_folder 	        : Path to folder containing canine atlas
@@ -21,14 +20,11 @@ path_to_ants_scripts            : antsResitrationSyN is a custom script
                                   ants scripts folder so python can use it
 output_folder                   : Results folder is created at this path and
                                   all outputs are placed in that folder
-
  WARNINGS:
  Specify Folders not individual files
  Don't put a slash at the end of your path but put one at the beginning (e.g. /home/Desktop/files)
-
  Example:
  def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_recon_fmris, total_readout_time_AP, total_readout_time_PA,   path_to_design_folder, path_to_secondlvl_design_folder, path_to_ants_scripts, output_folder):
-
 """
 
 def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_recon_fmris, total_readout_time_AP, total_readout_time_PA, path_to_design_folder, path_to_secondlvl_design_folder, path_to_ants_scripts, output_folder):
@@ -43,7 +39,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 #    # Register two MPRAGEs
 #    print("REGISTERING MPRAGE IMAGES")
 #    mprage_images = os.listdir(path_to_mprage)
-#    average_path = new_output_folder + "/mp_average" 
+    average_path = new_output_folder + "/mp_average" 
 #    if not os.path.exists(average_path):
 #        os.system("mkdir %s"%average_path)
 #    flirt_call = "flirt -in %s/%s -ref %s/%s -out %s/registered -omat %s/registered -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6 -interp trilinear"%(path_to_mprage,mprage_images[0],path_to_mprage, mprage_images[1],average_path,average_path)          
@@ -58,16 +54,17 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 #    averaged_mprage = average_path + "/averaged_mprages.nii.gz"
 #   
 #    # Flip averaged mprage
-#    flipped_averaged_mprage = average_path + "/flipped_average.nii.gz"
-#    flip_call = "mri_convert --in_orientation LAS %s %s"%(averaged_mprage,flipped_averaged_mprage)   #This is freesurfer
+    flipped_averaged_mprage = average_path + "/flipped_average.nii.gz"
+#    flip_call = "fslswapdim %s x -y z %s"%(averaged_mprage,flipped_averaged_mprage)
+#    #flip_call = "mri_convert --in_orientation LAS %s %s"%(averaged_mprage,flipped_averaged_mprage)   #This is freesurfer
 #    os.system(flip_call)
-#        
+##        
 ##    # Register two flipped MPRAGEs
 ##    print("REGISTERING FLIPPED MPRAGE IMAGES")
 ##    flipped_mprage_images = os.listdir(flipped_mprage_folder)
 ##    flirt_call = "flirt -in %s/%s -ref %s/%s -out %s/flipped_registered -omat %s/flipped_registered -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6 -interp trilinear"%(flipped_mprage_folder,flipped_mprage_images[0],flipped_mprage_folder, flipped_mprage_images[1],average_path,average_path)          
 ##    os.system(flirt_call)
-##        
+#        
 ##    # Average the flipped registered MPRAGE with the target of that registration
 ##    print("AVERAGING FLIPPED MPRAGE IMAGES")
 ##    first_image = flipped_mprage_folder + "/" + flipped_mprage_images[1]
@@ -76,12 +73,12 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 ##    os.system(average_call)
 ##    flipped_averaged_mprage = average_path + "/flipped_averaged_mprages.nii.gz"
 #
-#    # Warp to Canine Template (use 5 threads change -n flag in warp_call if you want more threads)
+#     # Warp to Canine Template (use 5 threads change -n flag in warp_call if you want more threads)
 #    print("WARPING THE AVERAGED MPRAGE TO INVIVO ATLAS")
     warp_results_folder = new_output_folder + "/reg_avgmprage2atlas"
 #    if not os.path.exists(warp_results_folder):
 #        os.system("mkdir %s/reg_avgmprage2atlas"%new_output_folder)
-#    template_path = path_to_atlas_folder + '/invivo/0.76x0.76x0.76resampled_invivoTemplate.nii.gz'
+    template_path = path_to_atlas_folder + '/invivo/invivoTemplate.nii.gz'
 #    warp_call = "%s/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s/dog_diff -n 5"%(path_to_ants_scripts, template_path, averaged_mprage, warp_results_folder)
 #    os.system(warp_call)
 #    
@@ -89,24 +86,24 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 #    warp_call2= "%s/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s/flipped_dog_diff -n 5"%(path_to_ants_scripts, template_path, flipped_averaged_mprage, warp_results_folder)
 #    os.system(warp_call2)
 #    
-#    # Create the deformation field for averaged 
-#    print("CREATING A DEFORMATION FIELD FOR AVERAGED WARP")
-#    deff_call = "antsApplyTransforms -d 3 -o [%s/dog_diffCollapsedWarp.nii.gz,1] -t %s/dog_diff1Warp.nii.gz -t %s/dog_diff0GenericAffine.mat -r %s"%(warp_results_folder,warp_results_folder,warp_results_folder,template_path)
-#    os.system(deff_call)
-#    print("REPLICATING WARP FILE")
-#    replication = "ImageMath 3 %s/dog_diff4DCollapsedWarp.nii.gz ReplicateDisplacement %s/dog_diffCollapsedWarp.nii.gz 112 3 0"%(warp_results_folder,warp_results_folder)
-#    os.system(replication)
-#    print("REPLICATING INVIVO TEMPLATE FOR REGISTRATION")
-#    replication_temp = "ImageMath 3 %s/replicated_invivo.nii.gz ReplicateDisplacement %s/invivo/2x2x2resampled_invivoTemplate.nii.gz 112 3 0"%(warp_results_folder,path_to_atlas_folder)
-#    os.system(replication_temp)
+##    # Create the deformation field for averaged 
+##    print("CREATING A DEFORMATION FIELD FOR AVERAGED WARP")
+##    deff_call = "antsApplyTransforms -d 3 -o [%s/dog_diffCollapsedWarp.nii.gz,1] -t %s/dog_diff1Warp.nii.gz -t %s/dog_diff0GenericAffine.mat -r %s"%(warp_results_folder,warp_results_folder,warp_results_folder,template_path)
+##    os.system(deff_call)
+##    print("REPLICATING WARP FILE")
+##    replication = "ImageMath 3 %s/dog_diff4DCollapsedWarp.nii.gz ReplicateDisplacement %s/dog_diffCollapsedWarp.nii.gz 112 3 0"%(warp_results_folder,warp_results_folder)
+##    os.system(replication)
+##    print("REPLICATING INVIVO TEMPLATE FOR REGISTRATION")
+##    replication_temp = "ImageMath 3 %s/replicated_invivo.nii.gz ReplicateDisplacement %s/invivo/2x2x2resampled_invivoTemplate.nii.gz 112 3 0"%(warp_results_folder,path_to_atlas_folder)
+##    os.system(replication_temp)
 #
-#    # Create the deformation field for flipped and averaged mprage 
-#    print("CREATING A DEFORMATION FIELD FOR FLIPPED WARP")
-#    deff_call = "antsApplyTransforms -d 3 -o [%s/flipped_dog_diffCollapsedWarp.nii.gz,1] -t %s/flipped_dog_diff1Warp.nii.gz -t %s/flipped_dog_diff0GenericAffine.mat -r %s"%(warp_results_folder,warp_results_folder,warp_results_folder,template_path)
-#    os.system(deff_call)
-#    print("REPLICATING WARP FILE")
-#    replication = "ImageMath 3 %s/flipped_dog_diff4DCollapsedWarp.nii.gz ReplicateDisplacement %s/flipped_dog_diffCollapsedWarp.nii.gz 112 3 0"%(warp_results_folder,warp_results_folder)
-#    os.system(replication)
+##    # Create the deformation field for flipped and averaged mprage 
+##    print("CREATING A DEFORMATION FIELD FOR FLIPPED WARP")
+##    deff_call = "antsApplyTransforms -d 3 -o [%s/flipped_dog_diffCollapsedWarp.nii.gz,1] -t %s/flipped_dog_diff1Warp.nii.gz -t %s/flipped_dog_diff0GenericAffine.mat -r %s"%(warp_results_folder,warp_results_folder,warp_results_folder,template_path)
+##    os.system(deff_call)
+##    print("REPLICATING WARP FILE")
+##    replication = "ImageMath 3 %s/flipped_dog_diff4DCollapsedWarp.nii.gz ReplicateDisplacement %s/flipped_dog_diffCollapsedWarp.nii.gz 112 3 0"%(warp_results_folder,warp_results_folder)
+##    os.system(replication)
 #
 #    # Top-up 
 #    print("STARTING TOPUP")
@@ -129,7 +126,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 #    print("Full path to the single-rep AP: %s"%ap_image)
 #    print("Full path to the single-rep PA: %s"%pa_image)
 #    print("STARTING TOPUP")
-#    top_up_res = new_output_folder + "/top_up"
+    top_up_res = new_output_folder + "/top_up"
 #    if not os.path.exists(top_up_res):
 #        os.system("mkdir %s"%top_up_res)
 #    os.system("fslmerge -a %s/AP+PA %s %s"%(top_up_res, ap_image, pa_image))
@@ -177,7 +174,7 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 #   
 #    # Motion Correction
 #    print("STARTING MOTION CORRECTION")
-#    moco_cov = new_output_folder + "/moco_covariates"
+    moco_cov = new_output_folder + "/moco_covariates"
 #    mc_to_this = top_up_res + "/register_to_this.nii.gz"
 #    if not os.path.exists(moco_cov):
 #        os.system("mkdir %s"%moco_cov)
@@ -202,26 +199,39 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 #    
 #    # Warp EPI images to invivo template
 #    print("WARPING EPI IMAGES TO INVIVO TEMPLATE")
-#    warped_epi = new_output_folder + "/warped_epi"
+    warped_epi = new_output_folder + "/warped_epi"
 #    if not os.path.exists(warped_epi):
 #        os.system("mkdir %s"%warped_epi)        
 #    for i in os.listdir(corrected_epi):
-#        os.system("antsApplyTransforms -d 4 -o %s/warped_%s -t %s/dog_diff4DCollapsedWarp.nii.gz -r %s/replicated_invivo.nii.gz -i %s/%s"%(warped_epi,i,warp_results_folder,warp_results_folder,corrected_epi,i))
+#        os.system("antsApplyTransforms --float --default-value 0 --input %s/%s --input-image-type 3 --interpolation Linear --output %s/warped_%s --reference-image %s/invivo/2x2x2resampled_invivoTemplate.nii.gz --transform [ %s/dog_diff0GenericAffine.mat, 0 ] -v 1"%(corrected_epi,i,warped_epi,i,path_to_atlas_folder,warp_results_folder))
 #        #os.system("antsApplyTransforms -d 4 -o %s/warped_%s -t %s/dog_diff4DCollapsedWarp.nii.gz -t %s/dog_diff1Warp.nii.gz -r %s/2mreplicated_invivo.nii.gz -i %s/%s"%(warped_epi,i,warp_results_folder,warp_results_folder,warp_results_folder,corrected_epi,i))
 #    
-    # Flip hemispheres 
-    flipped_epi = new_output_folder + "/flipped_and_averaged"
+     # Flip 4D hemispheres 
+    flipped_epi = new_output_folder + "/flipped"
     if not os.path.exists(flipped_epi):
         os.system("mkdir %s"%flipped_epi)
     for i in os.listdir(corrected_epi):
         corrected_imaj = corrected_epi + '/' + i
         flipped_imaj = flipped_epi + "/flipped_" + i
-        flip_call = "mri_convert --in_orientation RAS %s %s"%(corrected_imaj,flipped_imaj)   #This is freesurfer
+        flip_call = "fslswapdim %s x -y z %s"%(corrected_imaj,flipped_imaj)
+        #flip_call = "mri_convert --in_orientation RAS %s %s"%(corrected_imaj,flipped_imaj)
         os.system(flip_call)
-        
-    for i in os.listdir(flipped_epi):
-        os.system("antsApplyTransforms -d 4 -o %s/%s -t %s/flipped_dog_diff4DCollapsedWarp.nii.gz -r %s/replicated_invivo.nii.gz -i %s/%s"%(flipped_epi,i,warp_results_folder,warp_results_folder,flipped_epi,i))
+  
+    # Calculate the warp to flipped mprage with the first volume of flipped
+    first_flipped_epi = flipped_epi + '/' + os.listdir(flipped_epi)[0]
+    os.system("fslroi %s %s/first_volume_of_first_flipped.nii.gz 0 1"%(first_flipped_epi,top_up_res))
+    first_vol_first_flip = top_up_res + "/first_volume_of_first_flipped.nii.gz"
+    os.system("antsRegistrationSyN.sh -d 3 -f %s -t r -m %s -o %s/corrector -n 4"%(flipped_averaged_mprage, first_vol_first_flip, top_up_res))
+    corrector = top_up_res + "/correctorWarped.nii.gz"        
 
+    # Warp to invivo in two steps
+    for+ i in os.listdir(flipped_epi):
+        os.system("antsApplyTransforms --float --default-value 0 --input %s/%s --input-image-type 3 --interpolation Linear --output %s/%s --reference-image %s --transform [ %s/corrector0GenericAffine.mat, 0 ] -v 1"%(flipped_epi,i,flipped_epi,i,corrector,top_up_res))             
+        #os.system("antsApplyTransforms -d 4 -o %s/%s -t %s/flipped_dog_diff4DCollapsedWarp.nii.gz -r %s/replicated_invivo.nii.gz -i %s/%s"%(flipped_epi,i,warp_results_folder,warp_results_folder,flipped_epi,i))
+    for i in os.listdir(flipped_epi):
+        os.system("antsApplyTransforms --float --default-value 0 --input %s/%s --input-image-type 3 --interpolation Linear --output %s/%s --reference-image %s/invivo/2x2x2resampled_invivoTemplate.nii.gz --transform [ %s/flipped_dog_diff0GenericAffine.mat, 0 ] -v 1"%(flipped_epi,i,flipped_epi,i,path_to_atlas_folder,warp_results_folder))
+
+  
     # Average original and flipped save the results in the flipped folder
     final_epi = new_output_folder + "/final_preprocessed_fmri"
     if not os.path.exists(final_epi):
@@ -229,13 +239,12 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     for i in os.listdir(warped_epi):
         avgcall = "fslmaths %s/%s -add %s/flipped_%s -div 2 %s/final_%s -odt float"%(warped_epi, i, flipped_epi, i[7:], final_epi, i[7:])
         os.system(avgcall)        
-        
-        
-#    # Downsample to 2mm isotropic 
-#    print("DOWNSAMPLING %s TO 2MM ISO"%i)
-#    for i in os.listdir(final_epi):
-#        os.system("antsApplyTransforms -d 4 -o %s/%s -t %s/invivo/invivoToinvivo2/in2in1Warp.nii.gz -t %s/invivo/invivoToinvivo2/in2in0GenericAffine.mat -r %s/invivo/2x2x2resampled_invivoTemplate.nii.gz -i %s/%s"%(final_epi,i,path_to_atlas_folder,path_to_atlas_folder,path_to_atlas_folder,final_epi,i))
-# 
+             
+    # Downsample to 2mm isotropic 
+    print("DOWNSAMPLING %s TO 2MM ISO"%i)
+    for i in os.listdir(final_epi):
+        os.system("antsApplyTransforms --float --default-value 0 --input %s/%s --input-image-type 3 --interpolation Linear --output %s/%s --reference-image %s/invivo/2x2x2resampled_invivoTemplate.nii.gz --transform [ %s/invivo/invivoToinvivo2/in2in0GenericAffine.mat, 0 ] -v 1"%(final_epi,i,final_epi,i,path_to_atlas_folder,path_to_atlas_folder))
+ 
     ################################ FEAT ####################################
 
     # Modify the fsf template for individual EPI and do the fMRI analysis
@@ -244,7 +253,6 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
     if not os.path.exists(first_lvl_res):
         os.system("mkdir %s"%first_lvl_res)
     evonepath = path_to_design_folder + '/off'
-    mc_to_this = top_up_res + "/register_to_this.nii.gz"
     for i in os.listdir(final_epi):
         if i[-3:] == ".gz":
             epi_output_folder = new_output_folder + "/first_level_results/%s"%i[:-7]
@@ -252,12 +260,11 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
             epi_output_folder = new_output_folder + "/first_level_results/%s"%i[:-4]
         epifullpath = final_epi + "/" + i
         ntime = os.popen("fslnvols %s"%epifullpath).read().rstrip()
-        motion_epi = "%s/%s.par"%(moco_cov,i[21:])
+        motion_epi = "%s/%s.par"%(moco_cov,i[15:])
         things_to_replace = {"SUBJECT_OUTPUT":epi_output_folder, "NTPTS":ntime, 
                              "STANDARD_IMAGE":template_path, "SUBJECT_EPI":epifullpath,
                              "SUBJECTEV1":evonepath,
-                             "CONFOUND_FOR_MOTION_EPI":motion_epi, 
-                             "CORRECT_TO_DIS":mc_to_this}
+                             "CONFOUND_FOR_MOTION_EPI":motion_epi}
         with open("%s/design_template.fsf"%path_to_design_folder, 'r') as infile:
             with open("%s/design.fsf"%path_to_design_folder,'w') as outfile:
                 for line in infile:
@@ -351,6 +358,6 @@ def fullAnalysis(path_to_mprage, path_to_epi, path_to_atlas_folder, path_to_reco
 ##    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_RH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi rh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
 ##    os.system("mri_vol2surf --mov %s/on_off_invivo.nii.gz --out %s/on_off_LH_surface_overlay.mgz --srcreg %s/invivo2exvivo/register.dat --hemi lh"%(deformed_results_folder,deformed_results_folder,path_to_atlas_folder))
 
-fullAnalysis('/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/T1', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/EPI', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Atlas','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/design','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme') 
-#fullAnalysis('/home/ozzy/Desktop/canine/T1', '/home/ozzy/Desktop/canine/EPI', '/home/ozzy/Desktop/canine/Atlas','/home/ozzy/Desktop/canine/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/canine/design','/home/ozzy/Desktop/canine/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/canine') 
+#fullAnalysis('/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/T1', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/EPI', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Atlas','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/design','/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/latestCanine/Canine3_correct_deneme') 
+fullAnalysis('/home/ozzy/Desktop/canine/canine3/T1', '/home/ozzy/Desktop/canine/canine3/EPI', '/home/ozzy/Desktop/canine/canine3/Atlas','/home/ozzy/Desktop/canine/canine3/Recon', 0.0217349, 0.0217349, '/home/ozzy/Desktop/canine/canine3/design','/home/ozzy/Desktop/canine/canine3/second_lvl_design', '/home/ozzy/bin/ants/bin', '/home/ozzy/Desktop/canine/canine3') 
 
