@@ -13,4 +13,4 @@ def flip_epi(epi_folder, output_folder):
         #flip_call = 'mri_convert --in_orientation RAS %s %s' % (corrected_imaj,flipped_imaj)
         os.system(flip_call)
         
-    return flipped_epi
+    return (flipped_epi)

@@ -1,6 +1,6 @@
 import os
 
-def warp_to_invivo(mprage_image, template_path, flipped=False, output_folder): 
+def warp_to_invivo(mprage_image, template_path, output_folder, flipped=False): 
     
     if flipped == False:
         convention = 'dog_diff'
@@ -11,11 +11,11 @@ def warp_to_invivo(mprage_image, template_path, flipped=False, output_folder):
     print('WARPING THE AVERAGED MPRAGE TO INVIVO ATLAS')
     warp_results_folder = os.path.join(output_folder, 'reg_avgmprage2atlas')
     if not os.path.exists(warp_results_folder):
-        os.system('mkdir %s' % os.path.join(output_folder, 'reg_avgmprage2atlas'))
+        os.system('mkdir %s' % warp_results_folder)
         
-    warp_call = 'antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s -n 4' % (template_path,
+    warp_call = 'antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s -n 6' % (template_path,
                                                                         mprage_image,
                                                                         os.path.join(warp_results_folder, convention))
     os.system(warp_call)
     
-    return warp_results_folder
+    return (warp_results_folder)

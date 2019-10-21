@@ -73,5 +73,4 @@ def topup(total_readout_time_AP, total_readout_time_PA, path_to_recon_fmris, pat
                                                                     acparam_file,
                                                                     os.path.join(top_up_folder, 'topup_results'),
                                                                     corrected_epi, i))
-    return top_up_folder
-    return corrected_epi
+    return (top_up_folder, corrected_epi)

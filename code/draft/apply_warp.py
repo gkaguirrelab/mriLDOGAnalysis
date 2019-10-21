@@ -20,4 +20,4 @@ def apply_warp(epi_folder, template_path, output_folder, path_to_generic_affine)
     
         #os.system('antsApplyTransforms -d 4 -o %s/warped_%s -t %s/dog_diff4DCollapsedWarp.nii.gz -t %s/dog_diff1Warp.nii.gz -r %s/2mreplicated_invivo.nii.gz -i %s/%s'%(warped_epi,i,warp_results_folder,warp_results_folder,warp_results_folder,corrected_epi,i))
     
-    return warped_epi
+    return (warped_epi)

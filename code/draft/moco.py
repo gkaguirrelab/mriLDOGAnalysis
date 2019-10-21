@@ -30,5 +30,5 @@ def moco(epi_folder, top_up_folder, output_folder):
         data_concatted = pd.concat([data, data_sqrted, data_diffed, data_diffed_sqrt], axis=1)
         np.savetxt(original_par, data_concatted, delimiter='  ')
         
-        return moco_cov
+        return (moco_cov)
         
