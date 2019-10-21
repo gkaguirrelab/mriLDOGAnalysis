@@ -6,6 +6,7 @@ from topup import topup
 from moco import moco
 from apply_warp import apply_warp
 from flip_epi import flip_epi
+from average_org_and_flipped import average_org_and_flipped
 
 
 # Set some paths
@@ -24,7 +25,7 @@ centre_of_gravity = [94, 41, 92]
 if not os.path.exists(output_folder):
     os.system('mkdir %s' % output_folder)
 
-####################### Structure processing ################################## 
+####################### Structure prerocessing ################################
             
 # Prepare the mprage images and save averaged mprages path
 average_path, averaged_mprage, flipped_averaged_mprage, extracted_mprage = prepare_mprage(path_to_mprage, binary_template, centre_of_gravity, output_folder)
@@ -35,7 +36,7 @@ warp_results_folder = warp_to_invivo(averaged_mprage, template_path, output_fold
 # Warp the flipped and average mprage
 warp_to_invivo(flipped_averaged_mprage, template_path, output_folder, True)
 
-########################  EPI Processing ######################################
+########################  EPI prerocessing ####################################
 
 # Perform topup and save the path to corrected results 
 top_up_folder, corrected_epi = topup(total_readout_time_AP, total_readout_time_PA, path_to_recon_fmris, path_to_epi, output_folder)
@@ -47,10 +48,14 @@ moco_cov = moco(corrected_epi, top_up_folder, output_folder)
 # Flip EPI images 
 flipped_epi = flip_epi(corrected_epi, output_folder)
 
-# Apply warps to the standard and flipped EPI images
+# Apply warps to the standard and flipped EPI images downsample to 2mm using 
+# the downsampled image as the template.
 standard_generic = os.path.join(warp_results_folder, 'dog_diff0GenericAffine.mat')
 flipped_generic = os.path.join(warp_results_folder, 'flipped_dog_diff0GenericAffine.mat')
-warped_epi = apply_warp(corrected_epi, resampled_template_path, output_folder, standard_generic)
-apply_warp(flipped_epi, resampled_template_path, output_folder, flipped_generic)
+warped_epi = apply_warp(corrected_epi, resampled_template_path, output_folder, standard_generic, False)
+flipped_warped_epi = apply_warp(flipped_epi, resampled_template_path, output_folder, flipped_generic, True)
 
+# Average flipped and unflipped EPI images
+final_epi = average_org_and_flipped(warped_epi, flipped_warped_epi)
 
+############################  FEAT ############################################
