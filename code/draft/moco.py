@@ -1,5 +1,5 @@
 import os
-import pandas
+import pandas as pd
 
 def moco(epi_folder, top_up_folder, output_folder): 
     

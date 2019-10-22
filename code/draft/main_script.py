@@ -58,4 +58,4 @@ flipped_warped_epi = apply_warp(flipped_epi, resampled_template_path, output_fol
 # Average flipped and unflipped EPI images
 final_epi = average_org_and_flipped(warped_epi, flipped_warped_epi)
 
-############################  FEAT ############################################
+############################# FEAT ############################################

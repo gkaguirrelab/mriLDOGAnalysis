@@ -13,9 +13,10 @@ def warp_to_invivo(mprage_image, template_path, output_folder, flipped=False):
     if not os.path.exists(warp_results_folder):
         os.system('mkdir %s' % warp_results_folder)
         
-    warp_call = 'antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s -n 6' % (template_path,
-                                                                        mprage_image,
-                                                                        os.path.join(warp_results_folder, convention))
+    warp_call = 'antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s -x %s/binaryTemplate.nii.gz -n 6' % (template_path,
+                                                                                                    mprage_image,
+                                                                                                    os.path.join(warp_results_folder, convention),
+                                                                                                    template_path)
     os.system(warp_call)
     
     return (warp_results_folder)
