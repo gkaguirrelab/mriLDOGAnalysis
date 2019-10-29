@@ -7,7 +7,8 @@ from moco import moco
 from apply_warp import apply_warp
 from flip_epi import flip_epi
 from average_org_and_flipped import average_org_and_flipped
-
+from first_level_feat import first_level_feat
+from trick_fsl import trick_fsl
 
 # Set some paths
 output_folder = '/home/ozzy/Desktop/canine4/results'
@@ -17,6 +18,7 @@ binary_template = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/in
 resampled_template_path = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/2x2x2resampled_invivoTemplate.nii.gz'
 path_to_recon_fmris = '/home/ozzy/Desktop/canine4/Recon'
 path_to_epi = '/home/ozzy/Desktop/canine4/EPI'
+first_level_design_folder = '/home/ozzy/Desktop/canine4/design'
 
 # Set some variables
 total_readout_time_AP = 0.0217349 # total readout time for AP (can be found in nifti header)
@@ -61,3 +63,10 @@ flipped_warped_epi = apply_warp(flipped_epi, resampled_template_path, output_fol
 final_epi = average_org_and_flipped(warped_epi, flipped_warped_epi, output_folder)
 
 ############################# FEAT ############################################
+
+# Do the first level analyses
+first_lvl_res = first_level_feat(path_to_epi, first_level_design_folder, resampled_template_path, moco_cov, output_folder)
+
+# Trick FSL
+trick_fsl(first_lvl_res)
+
