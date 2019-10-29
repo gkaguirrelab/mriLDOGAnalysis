@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 
 def moco(epi_folder, top_up_folder, output_folder): 
     
