@@ -39,18 +39,27 @@ def prepare_mprage(path_to_mprage, binary_template, centre_of_gravity, output_fo
     # Brain extraction
     print('PERFORMING A BRAIN EXTRACTION WITH THE SPECIFIED VOXELS')
     extracted_mprage = os.path.join(average_path, 'brain_averaged_mprages.nii.gz')
-    call = 'bet %s %s -f 0.1 -c %s %s %s' % (averaged_mprage, extracted_mprage,
+    extracted_mask = os.path.join(average_path, 'brain_averaged_mprages_mask.nii.gz')
+    call = 'bet %s %s -f 0.1 -c %s %s %s -m' % (averaged_mprage, extracted_mprage,
                                          centre_of_gravity[0],
                                          centre_of_gravity[1], 
                                          centre_of_gravity[2])
     os.system(call)
-
+    
+    print('PERFORMING SEGMENTATION FOR THE BRAIN EXTRACTION')
+    
+    call2 = 'brainExtractionSegmentation.pl --input %s --initial-brain-mask %s --bias-correct 0 --output-root %s' % (averaged_mprage,
+                                                                                                                     extracted_mask,
+                                                                                                                     os.path.join(average_path, 'final')) 
+    os.system(call2)
+    extracted_brain = os.path.join(average_path, 'finalExtractedBrain.nii.gz')
+    
     # Flip averaged skull stripped mprage
     print('FLIPPING THE IMAGE')
-    flipped_averaged_mprage = os.path.join(average_path, 'flipped_average.nii.gz')
-    flip_call = 'fslswapdim %s x -y z %s' % (extracted_mprage, flipped_averaged_mprage)
+    flipped_extracted_brain = os.path.join(average_path, 'flipped_finalExtractedBrain.nii.gz')
+    flip_call = 'fslswapdim %s x -y z %s' % (extracted_mprage, flipped_extracted_brain)
     #flip_call = 'mri_convert --in_orientation LAS %s %s'%(averaged_mprage,flipped_averaged_mprage)  #This is freesurfer
     os.system(flip_call)
     
-    return (average_path,averaged_mprage,flipped_averaged_mprage,extracted_mprage)
+    return (average_path,extracted_brain,flipped_extracted_brain)
 

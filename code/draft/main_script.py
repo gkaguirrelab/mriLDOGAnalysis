@@ -17,9 +17,11 @@ binary_template = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/in
 resampled_template_path = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/2x2x2resampled_invivoTemplate.nii.gz'
 path_to_recon_fmris = '/home/ozzy/Desktop/canine4/Recon'
 path_to_epi = '/home/ozzy/Desktop/canine4/EPI'
-total_readout_time_AP = 0.0217349
-total_readout_time_PA = 0.0217349
-centre_of_gravity = [94, 41, 92]
+
+# Set some variables
+total_readout_time_AP = 0.0217349 # total readout time for AP (can be found in nifti header)
+total_readout_time_PA = 0.0217349 # total readout time for PA (can be found in nifti header)
+centre_of_gravity = [94, 41, 92] # center of the T1 image. Doesn't have to be exact
 
 # Create the output folder if it does not exist
 if not os.path.exists(output_folder):
@@ -28,13 +30,13 @@ if not os.path.exists(output_folder):
 ####################### Structure prerocessing ################################
             
 # Prepare the mprage images and save averaged mprages path
-average_path, averaged_mprage, flipped_averaged_mprage, extracted_mprage = prepare_mprage(path_to_mprage, binary_template, centre_of_gravity, output_folder)
+average_path, extracted_brain, flipped_extracted_brain = prepare_mprage(path_to_mprage, binary_template, centre_of_gravity, output_folder)
 
 # Warp the averaged mprage and save the file path to a variable 
-warp_results_folder = warp_to_invivo(averaged_mprage, template_path, output_folder, False )
+warp_results_folder = warp_to_invivo(extracted_brain, template_path, output_folder, 6, False)
 
 # Warp the flipped and average mprage
-warp_to_invivo(flipped_averaged_mprage, template_path, output_folder, True)
+warp_to_invivo(flipped_extracted_brain, template_path, output_folder, 6, True)
 
 ########################  EPI prerocessing ####################################
 
@@ -56,6 +58,6 @@ warped_epi = apply_warp(corrected_epi, resampled_template_path, output_folder, s
 flipped_warped_epi = apply_warp(flipped_epi, resampled_template_path, output_folder, flipped_generic, True)
 
 # Average flipped and unflipped EPI images
-final_epi = average_org_and_flipped(warped_epi, flipped_warped_epi)
+final_epi = average_org_and_flipped(warped_epi, flipped_warped_epi, output_folder)
 
 ############################# FEAT ############################################

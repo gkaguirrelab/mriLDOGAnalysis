@@ -22,7 +22,6 @@ def topup(total_readout_time_AP, total_readout_time_PA, path_to_recon_fmris, pat
             pa_image = os.path.join(path_to_recon_fmris, i)
             print('Full path to the single-rep PA: %s' % pa_image)
 
-    print('STARTING TOPUP')
     top_up_folder = os.path.join(output_folder, 'top_up')
     if not os.path.exists(top_up_folder):
         os.system('mkdir %s' % top_up_folder)
