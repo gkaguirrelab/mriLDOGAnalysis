@@ -17,6 +17,7 @@ def first_level_feat(path_to_epi, first_level_design_folder, template_path, moco
             epi_output_folder = os.path.join(output_folder, 'first_level_results', i[:-4])
             
         epifullpath = os.path.join(path_to_epi, i)
+        print(epifullpath)
         ntime = os.popen('fslnvols %s' % epifullpath).read().rstrip()
         motion_epi = '%s.par' % os.path.join(moco_cov, i[13:])
         things_to_replace = {'SUBJECT_OUTPUT': epi_output_folder, 'NTPTS': ntime,                             
@@ -32,4 +33,4 @@ def first_level_feat(path_to_epi, first_level_design_folder, template_path, moco
                     outfile.write(line)
         os.system('feat %s' % os.path.join(first_level_design_folder, 'design.fsf'))
         
-        return (first_lvl_res)
+    return (first_lvl_res)

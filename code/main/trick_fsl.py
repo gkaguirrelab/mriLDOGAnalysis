@@ -9,8 +9,8 @@ def trick_fsl(first_lvl_results_folder):
     print('TRICKING FSL SO NO REGISTRATION TAKES PLACE')
     
     for folder in os.listdir(first_lvl_results_folder):
-        os.system('rm -r %s.feat/reg/*mat' % folder)
-        os.system('rm -r %s.feat/reg/standard.nii.gz' % folder)
-        os.system('cp $FSLDIR/etc/flirtsch/ident.mat %s.feat/reg/example_func2standard.mat' % folder)
-        os.system('cp %s.feat/mean_func.nii.gz %s.feat/reg/standard.nii.gz' % (folder, folder))
+        os.system('rm -r %s/reg/*mat' % os.path.join(first_lvl_results_folder, folder))
+        os.system('rm -r %s/reg/standard.nii.gz' % os.path.join(first_lvl_results_folder, folder))
+        os.system('cp $FSLDIR/etc/flirtsch/ident.mat %s/reg/example_func2standard.mat' % os.path.join(first_lvl_results_folder, folder))
+        os.system('cp %s/mean_func.nii.gz %s/reg/standard.nii.gz' % (os.path.join(first_lvl_results_folder, folder), os.path.join(first_lvl_results_folder, folder)))
         

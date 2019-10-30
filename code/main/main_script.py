@@ -10,20 +10,22 @@ from average_org_and_flipped import average_org_and_flipped
 from first_level_feat import first_level_feat
 from trick_fsl import trick_fsl
 
+
 # Set some paths
-output_folder = '/home/ozzy/Desktop/canine4/results'
-path_to_mprage = '/home/ozzy/Desktop/canine4/T1'
+output_folder = '/home/ozzy/Desktop/canine2/results'
+path_to_mprage = '/home/ozzy/Desktop/canine2/T1'
 template_path = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/invivoTemplate.nii.gz'
 binary_template = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/binaryTemplate.nii.gz'
 resampled_template_path = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/2x2x2resampled_invivoTemplate.nii.gz'
-path_to_recon_fmris = '/home/ozzy/Desktop/canine4/Recon'
-path_to_epi = '/home/ozzy/Desktop/canine4/EPI'
-first_level_design_folder = '/home/ozzy/Desktop/canine4/design'
+path_to_recon_fmris = '/home/ozzy/Desktop/canine2/Recon'
+path_to_epi = '/home/ozzy/Desktop/canine2/EPI'
+first_level_design_folder = '/home/ozzy/Desktop/canine2/design'
+number_of_threads = 6
 
 # Set some variables
 total_readout_time_AP = 0.0217349 # total readout time for AP (can be found in nifti header)
 total_readout_time_PA = 0.0217349 # total readout time for PA (can be found in nifti header)
-centre_of_gravity = [94, 41, 92] # center of the T1 image. Doesn't have to be exact
+centre_of_gravity = [95, 62, 87] # center of the T1 image. Doesn't have to be exact
 
 # Create the output folder if it does not exist
 if not os.path.exists(output_folder):
@@ -35,10 +37,10 @@ if not os.path.exists(output_folder):
 average_path, extracted_brain, flipped_extracted_brain = prepare_mprage(path_to_mprage, binary_template, centre_of_gravity, output_folder)
 
 # Warp the averaged mprage and save the file path to a variable 
-warp_results_folder = warp_to_invivo(extracted_brain, template_path, output_folder, 6, False)
+warp_results_folder = warp_to_invivo(extracted_brain, template_path, output_folder, number_of_threads, False)
 
 # Warp the flipped and average mprage
-warp_to_invivo(flipped_extracted_brain, template_path, output_folder, 6, True)
+warp_to_invivo(flipped_extracted_brain, template_path, output_folder, number_of_threads, True)
 
 ########################  EPI prerocessing ####################################
 
@@ -66,7 +68,7 @@ final_epi = average_org_and_flipped(warped_epi, flipped_warped_epi, output_folde
 
 # Do the first level analyses
 first_lvl_res = first_level_feat(path_to_epi, first_level_design_folder, resampled_template_path, moco_cov, output_folder)
-
+    
 # Trick FSL
 trick_fsl(first_lvl_res)
 
