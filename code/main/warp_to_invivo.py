@@ -1,11 +1,8 @@
 import os
 
-def warp_to_invivo(mprage_image, template_path, output_folder, num_threads, flipped=False): 
+def warp_to_invivo(mprage_image, template_path, output_folder, num_threads, convention): 
     
-    if flipped == False:
-        convention = 'dog_diff'
-    else:
-        convention = 'flipped_dog_diff'
+    # This function is a wrapper around ANTs SyN registration. 
         
     # Warp to Canine Template (use 5 threads change -n flag in warp_call if you want more threads)
     print('WARPING THE AVERAGED MPRAGE TO INVIVO ATLAS')
@@ -19,5 +16,7 @@ def warp_to_invivo(mprage_image, template_path, output_folder, num_threads, flip
                                                                                                     template_path,
                                                                                                     str(num_threads))
     os.system(warp_call)
+    warped_mprage = os.path.join(warp_results_folder, convention + 'Warped.nii.gz')
+    generic_affine = os.path.join(warp_results_folder, convention + '0GenericAffine.mat')
     
-    return (warp_results_folder)
+    return (warp_results_folder, warped_mprage, generic_affine)

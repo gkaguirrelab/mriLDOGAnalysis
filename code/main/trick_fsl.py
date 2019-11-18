@@ -2,10 +2,10 @@ import os
 
 def trick_fsl(first_lvl_results_folder):
     
-    # Delete all mat files in each first-level, copy some identity matrices and
-    # mean functions so the registration and interpolation will not be effective. 
-    # Note: This code is still a part of the laop above but placed under a 
-    # different comment block since it's an important part of the analysis.
+    # This function loops through the first level analysis results and deletes
+    # and replaces some files so that FSL will not do it's on registration once
+    # the data is fed through the second level analysis
+    
     print('TRICKING FSL SO NO REGISTRATION TAKES PLACE')
     
     for folder in os.listdir(first_lvl_results_folder):

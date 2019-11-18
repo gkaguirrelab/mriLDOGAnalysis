@@ -2,6 +2,9 @@ import os
 
 def first_level_feat(path_to_epi, first_level_design_folder, template_path, moco_cov, output_folder):
     
+    # This function automates the FEAT first level analysis. Requires a design
+    # template
+    
     print('PERFORMING fMRI ANALYSIS: CHECK BROWSER REPORTS FOR DETAILS')
           
     first_lvl_res = os.path.join(output_folder, 'first_level_results')

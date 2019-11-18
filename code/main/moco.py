@@ -4,6 +4,9 @@ import numpy as np
 
 def moco(epi_folder, top_up_folder, output_folder): 
     
+    # This function does motion correction and calculates time derivatives of
+    # the output motion covariates
+    
     # Motion Correction
     print('STARTING MOTION CORRECTION')
     moco_cov = os.path.join(output_folder, 'moco_covariates')

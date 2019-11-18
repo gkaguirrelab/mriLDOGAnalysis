@@ -1,7 +1,11 @@
 import os
 
 def topup(total_readout_time_AP, total_readout_time_PA, path_to_recon_fmris, path_to_epi, output_folder):
-     
+    
+    # This script calculates topup and applies it on the EPI images. The AP and
+    # PA readout times should be used. This information can be found in the 
+    # nifti header.
+    
     print('STARTING TOPUP')
     direction_vector_AP = '0 -1 0 %s\n' % str(total_readout_time_AP)
     direction_vector_PA = '0 1 0 %s' % str(total_readout_time_PA)
