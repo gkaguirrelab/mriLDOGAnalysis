@@ -1,0 +1,73 @@
+{
+	"name": "preprocess_canine",
+	"label": "preprocess_canine: Preprocessing pipeline for the canine MRI data",
+	"description": "This gear performs preprocessing of the canine data for the LDOG project.",
+	"author": "Ozenc Taskin",
+	"maintainer": "Ozenc Taskin <huseyinozenc.taskin@pennmedicine.upenn.edu>",
+	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
+	"url": "https://github.com/gkaguirrelab/forwardmodel",
+	"version": "0.1.0",
+	"custom": {
+		"flywheel": {
+			"suite": "GKAguirreLab"
+		},
+		"docker-image": ""
+	},
+	"license": "Other",
+	"config": {
+		"centre_of_gravity_x":  {
+  			"description": "x position of the center voxel",
+  			"type": "number"
+		},
+		"centre_of_gravity_y":  {
+  			"description": "y position of the center voxel",
+  			"type": "number"
+		},
+		"centre_of_gravity_z":  {
+  			"description": "z position of the center voxel",
+  			"type": "number"
+		},
+		"extraction_threshold":  {
+			"default":"0.2",
+  			"description": "Brain extraction threshold",
+  			"type": "number"
+		},
+		"number_of_threads": {
+			"default":"2",
+			"description": "Number of threads to use for registrations",
+			"type": "number"
+		}
+	},
+	"inputs": {
+		"MPRAGE_01": {
+			"description": "First MPRAGE image",
+			"base": "file",
+			"optional": false,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_02": {
+			"description": "Second MPRAGE image",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"Template": {
+			"description": "Template image",
+			"base": "file",
+			"optional": false,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		}
+	}
+}
