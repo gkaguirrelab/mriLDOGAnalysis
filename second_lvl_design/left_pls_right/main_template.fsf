@@ -30,13 +30,13 @@ set fmri(featwatcher_yn) 1
 set fmri(sscleanup_yn) 0
 
 # Output directory
-set fmri(outputdir) "/home/ozzy/Desktop/Canine/results/second_level_results"
+set fmri(outputdir) "GROUP_OUTPUT"
 
 # TR(s)
 set fmri(tr) 3
 
 # Total volumes
-set fmri(npts) 15
+set fmri(npts) TOTAL_VOLUME
 
 # Delete volumes
 set fmri(ndelete) 0
@@ -45,7 +45,7 @@ set fmri(ndelete) 0
 set fmri(tagfirst) 1
 
 # Number of first-level analyses
-set fmri(multiple) 15
+set fmri(multiple) TOTAL_FIRST_LEVEL
 
 # Higher-level input type
 # 1 : Inputs are lower-level FEAT directories
@@ -245,7 +245,7 @@ set fmri(regstandard_yn) 1
 set fmri(alternateReference_yn) 0
 
 # Standard image
-set fmri(regstandard) "/home/ozzy/Desktop/Canine/Atlas/invivoTemplate.nii.gz"
+set fmri(regstandard) "STANDARD_IMAGE"
 
 # Search space for registration to standard space
 # 0   : No search
@@ -266,60 +266,12 @@ set fmri(regstandard_nonlinear_warpres) 10
 set fmri(paradigm_hp) 100
 
 # Number of lower-level copes feeding into higher-level analysis
-set fmri(ncopeinputs) 2
+set fmri(ncopeinputs) 1
 
 # Use lower-level cope 1 for higher-level analysis
 set fmri(copeinput.1) 1
 
-# Use lower-level cope 2 for higher-level analysis
-set fmri(copeinput.2) 1
-
-# AVW data or FEAT directory (1) 
-set feat_files(1) "/home/ozzy/Desktop/Canine/results/first_level_results/left1.feat" 
-
-# AVW data or FEAT directory (2) 
-set feat_files(2) "/home/ozzy/Desktop/Canine/results/first_level_results/left2.feat" 
-
-# AVW data or FEAT directory (3) 
-set feat_files(3) "/home/ozzy/Desktop/Canine/results/first_level_results/left3.feat" 
-
-# AVW data or FEAT directory (4) 
-set feat_files(4) "/home/ozzy/Desktop/Canine/results/first_level_results/left4.feat" 
-
-# AVW data or FEAT directory (5) 
-set feat_files(5) "/home/ozzy/Desktop/Canine/results/first_level_results/left5.feat" 
-
-# AVW data or FEAT directory (6) 
-set feat_files(6) "/home/ozzy/Desktop/Canine/results/first_level_results/left6.feat" 
-
-# AVW data or FEAT directory (7) 
-set feat_files(7) "/home/ozzy/Desktop/Canine/results/first_level_results/left7.feat" 
-
-# AVW data or FEAT directory (8) 
-set feat_files(8) "/home/ozzy/Desktop/Canine/results/first_level_results/left8.feat" 
-
-# AVW data or FEAT directory (9) 
-set feat_files(9) "/home/ozzy/Desktop/Canine/results/first_level_results/right1.feat" 
-
-# AVW data or FEAT directory (10) 
-set feat_files(10) "/home/ozzy/Desktop/Canine/results/first_level_results/right2.feat" 
-
-# AVW data or FEAT directory (11) 
-set feat_files(11) "/home/ozzy/Desktop/Canine/results/first_level_results/right3.feat" 
-
-# AVW data or FEAT directory (12) 
-set feat_files(12) "/home/ozzy/Desktop/Canine/results/first_level_results/right4.feat" 
-
-# AVW data or FEAT directory (13) 
-set feat_files(13) "/home/ozzy/Desktop/Canine/results/first_level_results/right5.feat" 
-
-# AVW data or FEAT directory (14) 
-set feat_files(14) "/home/ozzy/Desktop/Canine/results/first_level_results/right6.feat" 
-
-# AVW data or FEAT directory (15) 
-set feat_files(15) "/home/ozzy/Desktop/Canine/results/first_level_results/right7.feat" 
-
-
+FMRI_DATA_DIRECTORY
 # Add confound EVs text file
 set fmri(confoundevs) 0
 
@@ -364,98 +316,8 @@ set fmri(ortho1.0) 0
 # Orthogonalise EV 1 wrt EV 1
 set fmri(ortho1.1) 0
 
-# Higher-level EV value for EV 1 and input 1 
-set fmri(evg1.1) 1 
-
-# Higher-level EV value for EV 1 and input 2 
-set fmri(evg2.1) 1 
-
-# Higher-level EV value for EV 1 and input 3 
-set fmri(evg3.1) 1 
-
-# Higher-level EV value for EV 1 and input 4 
-set fmri(evg4.1) 1 
-
-# Higher-level EV value for EV 1 and input 5 
-set fmri(evg5.1) 1 
-
-# Higher-level EV value for EV 1 and input 6 
-set fmri(evg6.1) 1 
-
-# Higher-level EV value for EV 1 and input 7 
-set fmri(evg7.1) 1 
-
-# Higher-level EV value for EV 1 and input 8 
-set fmri(evg8.1) 1 
-
-# Higher-level EV value for EV 1 and input 9 
-set fmri(evg9.1) 1 
-
-# Higher-level EV value for EV 1 and input 10 
-set fmri(evg10.1) 1 
-
-# Higher-level EV value for EV 1 and input 11 
-set fmri(evg11.1) 1 
-
-# Higher-level EV value for EV 1 and input 12 
-set fmri(evg12.1) 1 
-
-# Higher-level EV value for EV 1 and input 13 
-set fmri(evg13.1) 1 
-
-# Higher-level EV value for EV 1 and input 14 
-set fmri(evg14.1) 1 
-
-# Higher-level EV value for EV 1 and input 15 
-set fmri(evg15.1) 1 
-
-
-# Group membership for input 1 
-set fmri(groupmem.1) 1 
-
-# Group membership for input 2 
-set fmri(groupmem.2) 1 
-
-# Group membership for input 3 
-set fmri(groupmem.3) 1 
-
-# Group membership for input 4 
-set fmri(groupmem.4) 1 
-
-# Group membership for input 5 
-set fmri(groupmem.5) 1 
-
-# Group membership for input 6 
-set fmri(groupmem.6) 1 
-
-# Group membership for input 7 
-set fmri(groupmem.7) 1 
-
-# Group membership for input 8 
-set fmri(groupmem.8) 1 
-
-# Group membership for input 9 
-set fmri(groupmem.9) 1 
-
-# Group membership for input 10 
-set fmri(groupmem.10) 1 
-
-# Group membership for input 11 
-set fmri(groupmem.11) 1 
-
-# Group membership for input 12 
-set fmri(groupmem.12) 1 
-
-# Group membership for input 13 
-set fmri(groupmem.13) 1 
-
-# Group membership for input 14 
-set fmri(groupmem.14) 1 
-
-# Group membership for input 15 
-set fmri(groupmem.15) 1 
-
-
+HIGH_LEVEL_EV
+GROUP_MEMBER
 # Contrast & F-tests mode
 # real : control real EVs
 # orig : control original EVs
