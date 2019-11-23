@@ -1,12 +1,12 @@
 {
-	"name": "preprocess_canine",
-	"label": "preprocess_canine: Preprocessing pipeline for the canine MRI data",
-	"description": "This gear performs preprocessing of the canine data for the LDOG project.",
+	"name": "preprocesscanine",
+	"label": "ldogStruct: anatomical pre-processing for the LDOG project",
+	"description": "This gear performs preprocessing for the LDOG project.",
 	"author": "Ozenc Taskin",
 	"maintainer": "Ozenc Taskin <huseyinozenc.taskin@pennmedicine.upenn.edu>",
 	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
-	"url": "https://github.com/gkaguirrelab/forwardmodel",
-	"version": "0.1.0",
+	"url": "",
+	"version": "0.1.1",
 	"custom": {
 		"flywheel": {
 			"suite": "GKAguirreLab"
