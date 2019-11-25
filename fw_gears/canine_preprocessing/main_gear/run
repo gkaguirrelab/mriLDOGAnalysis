@@ -97,7 +97,7 @@ def warp_to_invivo(mprage_image, template_path, output_folder, num_threads, conv
     
     return (warp_results_folder, warped_mprage, generic_affine)
 
-def make_overlay_plot(base_image, overlay, title, filename, output_folder):
+def make_overlay_plot(base_image, overlay, title, filename, x, y, z, output_folder):
     
     # This function simply gets two MRI images as inputs and overlays them 
     #using different colors for each image. Used as a diagnostic method.
@@ -111,21 +111,15 @@ def make_overlay_plot(base_image, overlay, title, filename, output_folder):
 
     epi_img = nib.load(base_image)
     epi_img_data = epi_img.get_fdata()
-    voxel1 = int(epi_img_data.shape[0]//2)
-    voxel2 = int(epi_img_data.shape[1]//2)
-    voxel3 = int(epi_img_data.shape[2]//2)
-    ax1.imshow(epi_img_data[voxel1,:,:], cmap="gray")
-    ax2.imshow(epi_img_data[:,voxel2,:], cmap="gray")
-    ax3.imshow(epi_img_data[:,:,voxel3], cmap="gray")
+    ax1.imshow(epi_img_data[x,:,:], cmap="gray")
+    ax2.imshow(epi_img_data[:,y,:], cmap="gray")
+    ax3.imshow(epi_img_data[:,:,z], cmap="gray")
     
     epi_img = nib.load(overlay)
     epi_img_data = epi_img.get_fdata()
-    voxel1 = int(epi_img_data.shape[0]//2)
-    voxel2 = int(epi_img_data.shape[1]//2)
-    voxel3 = int(epi_img_data.shape[2]//2)
-    ax1.imshow(epi_img_data[voxel1,:,:], cmap="hot", alpha=0.4)
-    ax2.imshow(epi_img_data[:,voxel2,:], cmap="hot", alpha=0.4)
-    ax3.imshow(epi_img_data[:,:,voxel3], cmap="hot", alpha=0.4)
+    ax1.imshow(epi_img_data[x,:,:], cmap="hot", alpha=0.4)
+    ax2.imshow(epi_img_data[:,y,:], cmap="hot", alpha=0.4)
+    ax3.imshow(epi_img_data[:,:,z], cmap="hot", alpha=0.4)
 
     plt.savefig(os.path.join(diagnostic_images, filename))    
     
@@ -183,13 +177,13 @@ centre_of_gravity = [centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity
 preprocessed_mprage_folder, averaged_mprage, extracted_brain, flipped_extracted_brain = prepare_mprage(T1folder, centre_of_gravity, extraction_threshold, first_output_dir)
     
 # Saves a brain extraction diagnostic image
-make_overlay_plot(averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', first_output_dir)
+make_overlay_plot(averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, first_output_dir)
     
 # Warps the averaged mprage to the template 
 warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(extracted_brain, Template, first_output_dir, number_of_threads, 'dog_diff')
     
 # Saves some more diagnostic images for standard and flipped registrations
-make_overlay_plot(Template, warped_mprage, 'Warp results', 'mprage2template_qa.png', first_output_dir)
+make_overlay_plot(Template, warped_mprage, 'Warp results', 'mprage2template_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, first_output_dir)
 
 ################## Zip everything and output ##################################
 
