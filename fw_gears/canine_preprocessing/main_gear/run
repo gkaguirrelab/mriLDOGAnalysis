@@ -14,7 +14,6 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
         # 2 - Registering MPRAGES if there is more than one
         # 3 - Averaging the registered and target MPRAGE if there is more than one
         # 4 - Skull stripping the MPRAGE
-        # 5 - x-y flipping the skull stripped MPRAGE
     
     # Create the output folder
     preprocessed_mprage_folder = os.path.join(output_folder, subject_id + '_preprocessed_mprage')

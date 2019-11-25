@@ -1,8 +1,8 @@
 {
 	"name": "preprocesscanine",
 	"label": "ldogStruct: anatomical pre-processing for the LDOG project",
-	"description": "This gear performs preprocessing for the LDOG project.",
-	"version": "0.1.2",
+	"description": "This gear performs preprocessing for the LDOG project. Steps: Bias correction (N4), mprage registration and averaging (If two images used), brain extraction, and SyN warp to the template",
+	"version": "0.1.3",
 	"inputs": {
 		"MPRAGE_01": {
 			"base": "file",
