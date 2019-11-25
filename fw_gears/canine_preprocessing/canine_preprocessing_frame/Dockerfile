@@ -8,6 +8,7 @@ MAINTAINER Ozzy(ozenctaskin@hotmail.com)
 ENV FLYWHEEL /flywheel/v0/
 RUN mkdir -p ${FLYWHEEL}
 COPY manifest.json run ${FLYWHEEL}
+COPY invivoTemplate.nii.gz /opt/invivoTemplate.nii.gz
 RUN chmod +x /flywheel/v0/run
     
 # Set the entrypoint  

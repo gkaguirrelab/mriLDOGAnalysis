@@ -2,7 +2,7 @@
 	"name": "preprocesscanine",
 	"label": "ldogStruct: anatomical pre-processing for the LDOG project",
 	"description": "This gear performs preprocessing for the LDOG project.",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"inputs": {
 		"MPRAGE_01": {
 			"base": "file",
@@ -26,8 +26,8 @@
 		},
 		"Template": {
 			"base": "file",
-			"description": "Template image",
-			"optional": false,
+			"description": "Template image to use for warping. This is optional. If left empty, the gear uses the invivoTemplate",
+			"optional": true,
 			"type": {
 				"enum": [
 					"nifti"
@@ -37,26 +37,30 @@
 	},
 	"config": {
 		"centre_of_gravity_x": {
-			"description": "x position of the center voxel",
+			"description": "x position of the center voxel. If two structurals are used, obtain the coordinates from the second structural input (MPRAGE_02)",
 			"type": "number"
 		},
 		"centre_of_gravity_y": {
-			"description": "y position of the center voxel",
+			"description": "y position of the center voxel. If two structurals are used, obtain the coordinates from the second structural input (MPRAGE_02)",
 			"type": "number"
 		},
 		"centre_of_gravity_z": {
-			"description": "z position of the center voxel",
+			"description": "z position of the center voxel. If two structurals are used, obtain the coordinates from the second structural input (MPRAGE_02)",
 			"type": "number"
 		},
 		"extraction_threshold": {
-			"default": "0.2",
-			"description": "Brain extraction threshold",
+			"default": 0.2,
+			"description": "Functional intensity threshold (BET).",
 			"type": "number"
 		},
 		"number_of_threads": {
-			"default": "2",
+			"default": 2,
 			"description": "Number of threads to use for registrations",
 			"type": "number"
+		},
+		"subject_id": {
+			"description": "Subject ID",
+			"type": "string"
 		}
 	},
 	"author": "Ozenc Taskin",
@@ -70,7 +74,7 @@
 		},
 		"gear-builder": {
 			"category": "analysis",
-			"image": "gkaguirrelab/process_ldog:0.1.1"
+			"image": "gkaguirrelab/process_ldog:0.1.2"
 		}
 	}
 }

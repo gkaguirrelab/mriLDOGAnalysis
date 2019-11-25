@@ -6,7 +6,7 @@
 	"maintainer": "Ozenc Taskin <huseyinozenc.taskin@pennmedicine.upenn.edu>",
 	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
 	"url": "",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"custom": {
 		"flywheel": {
 			"suite": "GKAguirreLab"
@@ -16,24 +16,28 @@
 	"license": "Other",
 	"config": {
 		"centre_of_gravity_x":  {
-  			"description": "x position of the center voxel",
+  			"description": "x position of the center voxel. If two structurals are used, obtain the coordinates from the second structural input (MPRAGE_02)",
   			"type": "number"
 		},
 		"centre_of_gravity_y":  {
-  			"description": "y position of the center voxel",
+  			"description": "y position of the center voxel. If two structurals are used, obtain the coordinates from the second structural input (MPRAGE_02)",
   			"type": "number"
 		},
 		"centre_of_gravity_z":  {
-  			"description": "z position of the center voxel",
+  			"description": "z position of the center voxel. If two structurals are used, obtain the coordinates from the second structural input (MPRAGE_02)",
   			"type": "number"
 		},
+		"subject_id":  {
+  			"description": "Subject ID",
+  			"type": "string"
+		},
 		"extraction_threshold":  {
-			"default":"0.2",
-  			"description": "Brain extraction threshold",
+			"default":0.2,
+  			"description": "Functional intensity threshold (BET).",
   			"type": "number"
 		},
 		"number_of_threads": {
-			"default":"2",
+			"default":2,
 			"description": "Number of threads to use for registrations",
 			"type": "number"
 		}
@@ -60,9 +64,9 @@
 			}
 		},
 		"Template": {
-			"description": "Template image",
+			"description": "Template image to use for warping. This is optional. If left empty, the gear uses the invivoTemplate",
 			"base": "file",
-			"optional": false,
+			"optional": true,
 			"type": {
 				"enum": [
 					"nifti"
