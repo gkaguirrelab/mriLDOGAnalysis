@@ -1,0 +1,120 @@
+{
+	"name": "preprocesscanine",
+	"label": "ldogStruct: anatomical pre-processing for the LDOG project",
+	"description": "This gear performs preprocessing for the LDOG project.",
+	"version": "0.1.5",
+	"inputs": {
+		"MPRAGE_01": {
+			"base": "file",
+			"description": "MPRAGE image",
+			"optional": false,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_02": {
+			"base": "file",
+			"description": "MPRAGE image",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_03": {
+			"base": "file",
+			"description": "MPRAGE image",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_04": {
+			"base": "file",
+			"description": "MPRAGE image",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_05": {
+			"base": "file",
+			"description": "MPRAGE image",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"Template": {
+			"base": "file",
+			"description": "Template image to use for warping. This is optional. If left empty, the gear uses the invivoTemplate",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		}
+	},
+	"config": {
+		"centre_of_gravity_x": {
+			"description": "x position of the center voxel. If two structurals are used, obtain the coordinates from the first structural input (MPRAGE_01)",
+			"type": "number"
+		},
+		"centre_of_gravity_y": {
+			"description": "y position of the center voxel. If two structurals are used, obtain the coordinates from the first structural input (MPRAGE_01)",
+			"type": "number"
+		},
+		"centre_of_gravity_z": {
+			"description": "z position of the center voxel. If two structurals are used, obtain the coordinates from the first structural input (MPRAGE_01)",
+			"type": "number"
+		},
+		"extraction_threshold": {
+			"default": 0.2,
+			"description": "Functional intensity threshold (BET).",
+			"type": "number"
+		},
+		"number_of_threads": {
+			"default": 2,
+			"description": "Number of threads to use for registrations",
+			"type": "number"
+		},
+		"struct_to_struct_transform": {
+			"default": "SyN",
+			"description": "This is the transformation method to use for registering MPRAGE images together before averaging. If a single image is used as input, this config option will not be obtained by the gear as no registration will take place. SyN deformation is used as the default method, but rigid and affine transformations are also available for registering within subject structurals ",
+			"enum": [
+				"SyN",
+				"Rigid",
+				"Affine"
+			],
+			"type": "string"
+		},
+		"subject_id": {
+			"description": "Subject ID",
+			"type": "string"
+		}
+	},
+	"author": "Ozenc Taskin",
+	"maintainer": "Ozenc Taskin",
+	"license": "Other",
+	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
+	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
+	"custom": {
+		"flywheel": {
+			"suite": "GKAguirreLab"
+		},
+		"gear-builder": {
+			"category": "analysis",
+			"image": "gkaguirrelab/process_ldog:0.1.3"
+		}
+	}
+}

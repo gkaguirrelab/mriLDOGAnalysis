@@ -7,13 +7,14 @@ import matplotlib.pyplot as plt
 
 ###################################### Define Fucntions #####################################
 
-def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, extraction_threshold, output_folder):
+def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, output_folder):
     
     # This script prepares the MPRAGE image(s) for the analysis. Pipeline:  
         # 1 - Bias correcting each MPRAGE images
         # 2 - Registering MPRAGES if there is more than one
         # 3 - Averaging the registered and target MPRAGE if there is more than one
         # 4 - Skull stripping the MPRAGE
+        # 5 - x-y flipping the skull stripped MPRAGE
     
     # Create the output folder
     preprocessed_mprage_folder = os.path.join(output_folder, subject_id + '_preprocessed_mprage')
@@ -29,27 +30,43 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
                                                                                   os.path.join(path_to_mprage, i))
         os.system(call)
     
-    # Register MPRAGEs if there are two of them 
+    registered_mprages = os.path.join(preprocessed_mprage_folder, 'registered')
+    if not os.path.exists(registered_mprages):
+        os.system('mkdir %s' % registered_mprages) 
+        
+    # Register MPRAGEs if there are more than one of them
     if len(mprage_images) > 1: 
-        first_mprage = mprage_images[0]
-        second_mprage = mprage_images[1]
-       
-        register_call = 'export ANTSPATH=/usr/local/ANTs/bin/;export PATH=${ANTSPATH}:$PATH;/usr/local/ANTs/bin/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s -t r -n 6' % (os.path.join(path_to_mprage, second_mprage),
-                                                                                                                                                                            os.path.join(path_to_mprage, first_mprage),
-                                                                                                                                                                            os.path.join(preprocessed_mprage_folder, subject_id + '_registered'))
-        os.system(register_call)
-        registered_image = os.path.join(preprocessed_mprage_folder, subject_id + '_registeredWarped.nii.gz')
-         
+        os.system('mv %s %s/' % (os.path.join(path_to_mprage, mprage_images[0]), registered_mprages))
+        fixed = os.path.join(registered_mprages, os.listdir(registered_mprages)[0])
+        
+        if struct_to_struct_transform == 'Rigid':
+            transform = 'r'
+        elif struct_to_struct_transform == 'Affine':
+            transform = 'a'
+        elif struct_to_struct_transform == 'SyN':
+            transform = 's'
+        count = 0
+        for i in os.listdir(path_to_mprage):
+            count += 1
+            moving = os.path.join(path_to_mprage, i)
+            print('Registering %s to %s' % (moving, fixed))
+            register_call = 'export ANTSPATH=/usr/local/ANTs/bin/;export PATH=${ANTSPATH}:$PATH;/usr/local/ANTs/bin/antsRegistrationSyN.sh -d 3 -t %s -f %s -m %s -o %s -n 6' % (transform,
+                                                                                                                                                                                 fixed,
+                                                                                                                                                                                 moving,
+                                                                                                                                                                                 os.path.join(registered_mprages, subject_id + '_%sregistered' % count))
+            os.system(register_call)
+        
+        os.system('cd %s; rm *InverseWarped.nii.gz' % registered_mprages)         
+        
         # Average the registered MPRAGE with the target
-        average_call = '/usr/local/ANTs/bin/AverageImages 3 %s 1 %s %s' % (os.path.join(preprocessed_mprage_folder, subject_id + '_averaged_mprages.nii.gz'),
-                                                                           os.path.join(path_to_mprage, second_mprage),
-                                                                           registered_image)
+        average_call = '/usr/local/ANTs/bin/AverageImages 3 %s 1 %s' % (os.path.join(preprocessed_mprage_folder, subject_id + '_averaged_mprages.nii.gz'),
+                                                                        os.path.join(registered_mprages, '*.nii.gz'))
         os.system(average_call)
         averaged_mprage = os.path.join(preprocessed_mprage_folder, subject_id + '_averaged_mprages.nii.gz')
    
     else:
         averaged_mprage = os.path.join(mprage_images[0])        
-       
+    
     # Brain extraction mask (created by fsl BET)
     extracted_mprage = os.path.join(preprocessed_mprage_folder, subject_id + '_brain_averaged_mprages.nii.gz')
     extracted_mask = os.path.join(preprocessed_mprage_folder, subject_id + '_brain_averaged_mprages_mask.nii.gz')
@@ -134,34 +151,45 @@ def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, output_
 
 # os.system('cat /proc/cpuinfo')
 
-# Flywheel path
+# Set paths and create some folders
 flywheel_base ='/flywheel/v0/'
+first_output_dir = '/firstOutput'
+final_output_dir = os.path.join(flywheel_base, 'output')
+manifest_file = os.path.join(flywheel_base, 'manifest.json')
+config_path = os.path.join(flywheel_base, 'config.json')
+os.system('mkdir %s'%first_output_dir)
+T1folder = os.path.join(first_output_dir, 'T1')
+os.system('mkdir %s' % T1folder)
 
-# Path to input folder 
 MPRAGE_01_folder = os.path.join(flywheel_base, 'input/MPRAGE_01')
-MPRAGE_02_folder = os.path.join(flywheel_base, 'input/MPRAGE_02')
-Template_folder = os.path.join(flywheel_base, 'input/Template')
-
-# Set path to required inputs
 MPRAGE_01 = os.path.join(MPRAGE_01_folder, os.listdir(MPRAGE_01_folder)[0])
-MPRAGE_02 = os.path.join(MPRAGE_02_folder, os.listdir(MPRAGE_02_folder)[0])
-if os.path.isdir(Template_folder):
+os.system('cp %s %s' % (MPRAGE_01, T1folder))
+
+MPRAGE_02_folder = os.path.join(flywheel_base, 'input/MPRAGE_02')
+if os.path.exists(MPRAGE_02_folder):
+    MPRAGE_02 = os.path.join(MPRAGE_02_folder, os.listdir(MPRAGE_02_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_02, T1folder))
+
+MPRAGE_03_folder = os.path.join(flywheel_base, 'input/MPRAGE_03')
+if os.path.exists(MPRAGE_03_folder):
+    MPRAGE_03 = os.path.join(MPRAGE_03_folder, os.listdir(MPRAGE_03_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_03, T1folder))
+
+MPRAGE_04_folder = os.path.join(flywheel_base, 'input/MPRAGE_04')
+if os.path.exists(MPRAGE_04_folder):
+    MPRAGE_04 = os.path.join(MPRAGE_04_folder, os.listdir(MPRAGE_04_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_04, T1folder))
+
+MPRAGE_05_folder = os.path.join(flywheel_base, 'input/MPRAGE_05')
+if os.path.exists(MPRAGE_05_folder):
+    MPRAGE_05 = os.path.join(MPRAGE_05_folder, os.listdir(MPRAGE_05_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_05, T1folder))
+
+Template_folder = os.path.join(flywheel_base, 'input/Template')
+if os.path.exists(Template_folder):
     Template = os.path.join(Template_folder, os.listdir(Template_folder)[0])
 else:
     Template = '/opt/invivoTemplate.nii.gz'
-
-# Set other paths
-manifest_file = os.path.join(flywheel_base, 'manifest.json')
-config_path = os.path.join(flywheel_base, 'config.json')
-
-first_output_dir = '/firstOutput'
-final_output_dir = os.path.join(flywheel_base, 'output')
-os.system('mkdir %s'%first_output_dir)
-
-T1folder = os.path.join(first_output_dir, 'T1')
-os.system('mkdir %s' % T1folder)
-os.system('cp %s %s' % (MPRAGE_01, T1folder))
-os.system('cp %s %s' % (MPRAGE_02, T1folder))
 
 ###################Parse Config Here############################
 
@@ -175,11 +203,12 @@ centre_of_gravity_z = config['centre_of_gravity_z']
 subject_id = config['subject_id']
 extraction_threshold = config['extraction_threshold']
 number_of_threads = config['number_of_threads']
+struct_to_struct_transform = config['struct_to_struct_transform']
 
 ###################Run Algorithm################################
    
 # Bias corrects mprage images, registers, averages (normalized), skull strips and flips
-preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(subject_id, T1folder, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, extraction_threshold, first_output_dir)
+preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(subject_id, T1folder, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, first_output_dir)
 
 # Plot averaged structural
 make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, first_output_dir)
