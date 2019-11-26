@@ -1,0 +1,229 @@
+#!/usr/bin/python3
+
+import os
+import json
+import nibabel as nib
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+###################################### Define Fucntions #####################################
+
+def topup(total_readout_time_AP, total_readout_time_PA, path_to_recon_fmris, path_to_epi, output_folder):
+    
+    # This script calculates topup and applies it on the EPI images. The AP and
+    # PA readout times should be used. This information can be found in the 
+    # nifti header.
+    
+    print('STARTING TOPUP')
+    direction_vector_AP = '0 -1 0 %s\n' % str(total_readout_time_AP)
+    direction_vector_PA = '0 1 0 %s' % str(total_readout_time_PA)
+    acparam_file = os.path.join(path_to_recon_fmris, 'acqparams.txt')
+    os.system('touch %s' % acparam_file)
+    textfile = open(acparam_file, 'w')
+    textfile.write(direction_vector_AP)
+    textfile.write(direction_vector_PA)
+    textfile.close()
+    
+    for i in os.listdir(path_to_recon_fmris):
+        if 'AP' in i:
+            print('found the AP single-rep fmri')
+            ap_image = os.path.join(path_to_recon_fmris, i)
+            print('Full path to the single-rep AP: %s' % ap_image)
+        if 'PA' in i:
+            print('found the PA single-rep fmri')
+            pa_image = os.path.join(path_to_recon_fmris, i)
+            print('Full path to the single-rep PA: %s' % pa_image)
+
+    top_up_folder = os.path.join(output_folder, 'top_up')
+    if not os.path.exists(top_up_folder):
+        os.system('mkdir %s' % top_up_folder)
+    os.system('fslmerge -a %s %s %s' % (os.path.join(top_up_folder, 'AP+PA'),
+                                        ap_image,
+                                        pa_image))
+    
+    os.system('topup --imain=%s --datain=%s '
+              '--config=b02b0.cnf --out=%s --iout=%s --fout=%s' % (os.path.join(top_up_folder, 'AP+PA.nii.gz'),
+                                                                   acparam_file,
+                                                                   os.path.join(top_up_folder, 'topup_results'),
+                                                                   os.path.join(top_up_folder, 'b0_unwarped'),
+                                                                   os.path.join(top_up_folder, 'fieldmap_Hz')))
+
+    AP_images_temporary = os.path.join(output_folder, 'APimages')
+    PA_images_temporary = os.path.join(output_folder, 'PAimages')
+    if not os.path.exists(AP_images_temporary):
+        os.system('mkdir %s' % AP_images_temporary)
+    if not os.path.exists(PA_images_temporary):
+        os.system('mkdir %s' % PA_images_temporary)
+
+    for i in os.listdir(path_to_epi):
+        if 'AP' in i:
+            os.system('cp %s %s' % (os.path.join(path_to_epi, i), os.path.join(AP_images_temporary, i)))
+        elif 'PA' in i:
+            os.system('cp %s %s' % (os.path.join(path_to_epi, i), os.path.join(PA_images_temporary, i)))
+        else:
+            raise ValueError('You did not rename and put AP or PA in one of your EPI images')
+    
+    os.system('applytopup --imain=%s --inindex=1 '
+              '--method=jac --datain=%s --topup=%s --out=%s' % (os.path.join(path_to_recon_fmris, 'AP.nii.gz'),
+                                                                acparam_file,
+                                                                os.path.join(top_up_folder, 'topup_results'),
+                                                                os.path.join(top_up_folder, 'register_to_this')))
+
+    corrected_epi = os.path.join(output_folder, 'corrected_epi')
+    if not os.path.exists(corrected_epi):
+        os.system('mkdir %s' % corrected_epi)
+    for i in os.listdir(AP_images_temporary):
+        os.system('applytopup --imain=%s --inindex=1 '
+                  '--method=jac --datain=%s --topup=%s --out=%s/corrected_%s' % (os.path.join(AP_images_temporary, i),
+                                                                    acparam_file,
+                                                                    os.path.join(top_up_folder, 'topup_results'),
+                                                                    corrected_epi, i))
+    for i in os.listdir(PA_images_temporary):
+        os.system('applytopup --imain=%s --inindex=2 '
+                  '--method=jac --datain=%s --topup=%s --out=%s/corrected_%s' % (os.path.join(PA_images_temporary, i),
+                                                                    acparam_file,
+                                                                    os.path.join(top_up_folder, 'topup_results'),
+                                                                    corrected_epi, i))
+    return (top_up_folder, corrected_epi)
+
+def moco(epi_folder, top_up_folder, output_folder): 
+    
+    # This function does motion correction and calculates time derivatives of
+    # the output motion covariates
+    
+    # Motion Correction
+    print('STARTING MOTION CORRECTION')
+    moco_cov = os.path.join(output_folder, 'moco_covariates')
+    mc_to_this = os.path.join(top_up_folder, 'register_to_this.nii.gz')
+    if not os.path.exists(moco_cov):
+        os.system('mkdir %s' % moco_cov)
+    for i in os.listdir(epi_folder):
+        mcflirt_call = 'mcflirt -in %s -o %s -reffile %s -dof 12 -plots' % (os.path.join(epi_folder, i),
+                                                                            os.path.join(epi_folder, i),
+                                                                            mc_to_this)
+        print(mcflirt_call)
+        os.system(mcflirt_call)
+    os.system('mv %s/*.par %s/' % (epi_folder, moco_cov))
+    
+    # Motion derivatives
+    for i in os.listdir(moco_cov):
+        original_par = os.path.join(moco_cov, i)
+        print(original_par)
+        pd.set_option('display.precision', 8)
+        data = pd.read_csv(original_par, sep='  ', header=None, engine='python')
+        data_sqrted = data ** 2
+        data_diffed = data.diff(periods=1, axis=0)
+        data_diffed = data_diffed.fillna(0)
+        data_diffed_sqrt = data_diffed ** 2 
+        data_concatted = pd.concat([data, data_sqrted, data_diffed, data_diffed_sqrt], axis=1)
+        np.savetxt(original_par, data_concatted, delimiter='  ')
+        
+    return (moco_cov)
+
+def apply_warp(epi_folder, template_path, output_folder, path_to_generic_affine, flipped=False):
+    
+    # This function applies the pre-calculated warps using the GenericAffine.mat
+    
+    # Warp EPI images to invivo template
+    print('WARPING EPI IMAGES TO INVIVO TEMPLATE')
+    if flipped == False:
+        warped_epi = os.path.join(output_folder, 'warped_epi')
+        conv = 'warped'
+    else:
+        warped_epi = os.path.join(output_folder, 'flipped_warped_epi')
+        conv = 'flipped_warped'      
+    if not os.path.exists(warped_epi):
+        os.system('mkdir %s' % warped_epi)
+        
+    for i in os.listdir(epi_folder):
+        os.system('antsApplyTransforms --float --default-value 0 '
+                  '--input %s --input-image-type 3 '
+                  '--interpolation Linear --output %s/%s_%s '
+                  '--reference-image %s '
+                  '--transform [ %s, 0 ] '
+                  '-v 1' % (os.path.join(epi_folder, i),
+                            warped_epi, conv, i,
+                            template_path,
+                            path_to_generic_affine))
+              
+    return (warped_epi)
+
+###################### Define the Paths and parameters ###########################
+
+# os.system('cat /proc/cpuinfo')
+
+# Set paths and create some folders
+flywheel_base ='/flywheel/v0/'
+first_output_dir = '/firstOutput'
+final_output_dir = os.path.join(flywheel_base, 'output')
+manifest_file = os.path.join(flywheel_base, 'manifest.json')
+config_path = os.path.join(flywheel_base, 'config.json')
+os.system('mkdir %s'%first_output_dir)
+T1folder = os.path.join(first_output_dir, 'T1')
+os.system('mkdir %s' % T1folder)
+
+MPRAGE_01_folder = os.path.join(flywheel_base, 'input/MPRAGE_01')
+MPRAGE_01 = os.path.join(MPRAGE_01_folder, os.listdir(MPRAGE_01_folder)[0])
+os.system('cp %s %s' % (MPRAGE_01, T1folder))
+
+MPRAGE_02_folder = os.path.join(flywheel_base, 'input/MPRAGE_02')
+if os.path.exists(MPRAGE_02_folder):
+    MPRAGE_02 = os.path.join(MPRAGE_02_folder, os.listdir(MPRAGE_02_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_02, T1folder))
+
+MPRAGE_03_folder = os.path.join(flywheel_base, 'input/MPRAGE_03')
+if os.path.exists(MPRAGE_03_folder):
+    MPRAGE_03 = os.path.join(MPRAGE_03_folder, os.listdir(MPRAGE_03_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_03, T1folder))
+
+MPRAGE_04_folder = os.path.join(flywheel_base, 'input/MPRAGE_04')
+if os.path.exists(MPRAGE_04_folder):
+    MPRAGE_04 = os.path.join(MPRAGE_04_folder, os.listdir(MPRAGE_04_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_04, T1folder))
+
+MPRAGE_05_folder = os.path.join(flywheel_base, 'input/MPRAGE_05')
+if os.path.exists(MPRAGE_05_folder):
+    MPRAGE_05 = os.path.join(MPRAGE_05_folder, os.listdir(MPRAGE_05_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_05, T1folder))
+
+Template_folder = os.path.join(flywheel_base, 'input/Template')
+if os.path.exists(Template_folder):
+    Template = os.path.join(Template_folder, os.listdir(Template_folder)[0])
+else:
+    Template = '/opt/invivoTemplate.nii.gz'
+
+###################Parse Config Here############################
+
+with open(config_path) as config_file:
+    job_config = json.load(config_file)
+config = job_config['config']
+
+total_readout_time_AP = config['total_readout_time_AP']
+total_readout_time_PA = config['total_readout_time_PA']
+
+###################Run Algorithm################################
+   
+# Bias corrects mprage images, registers, averages (normalized), skull strips and flips
+preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(subject_id, T1folder, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, first_output_dir)
+
+# Plot averaged structural
+make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, first_output_dir)
+   
+# Saves a brain extraction diagnostic image
+make_plot(subject_id, averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, first_output_dir)
+    
+# Warps the averaged mprage to the template 
+warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, extracted_brain, Template, first_output_dir, number_of_threads)
+    
+# Saves some more diagnostic images for registrations
+make_plot(subject_id, Template, warped_mprage, 'Warp results', 'mprage2template_qa.png', 131, 105, 45, first_output_dir)
+
+################## Zip everything and output ##################################
+
+# Move mat, pdf and png files to the final output folder
+os.system('cd %s; mv %s %s/' % (os.path.join(first_output_dir, 'diagnostic_images'), '*.png', final_output_dir)) 
+os.system('cd %s; rm -r %s' % (first_output_dir, 'diagnostic_images'))
+
+# Zip and move the maps
+os.system('cd %s; zip -q -r %s *'%(first_output_dir, os.path.join(final_output_dir, subject_id + '_preprocessed.zip')))
