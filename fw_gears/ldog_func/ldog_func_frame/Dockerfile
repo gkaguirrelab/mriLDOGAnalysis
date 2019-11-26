@@ -10,6 +10,7 @@ RUN mkdir -p ${FLYWHEEL}
 COPY manifest.json run ${FLYWHEEL}
 COPY invivoTemplate.nii.gz /opt/invivoTemplate.nii.gz
 RUN chmod +x /flywheel/v0/run
+RUN pip3 install pandas
     
 # Set the entrypoint  
 ENTRYPOINT /flywheel/v0/run

@@ -15,46 +15,28 @@
 	},
 	"license": "Other",
 	"config": {
-		"centre_of_gravity_x":  {
-  			"description": "x position of the center voxel. If two structurals are used, obtain the coordinates from the first structural input (MPRAGE_01)",
+		"total_readout_time_AP":  {
+  			"description": "Required for topup. Can be found in nifti header",
   			"type": "number"
 		},
-		"centre_of_gravity_y":  {
-  			"description": "y position of the center voxel. If two structurals are used, obtain the coordinates from the first structural input (MPRAGE_01)",
+		"total_readout_time_PA":  {
+  			"description": "Required for topup. Can be found in nifti header",
   			"type": "number"
 		},
-		"centre_of_gravity_z":  {
-  			"description": "z position of the center voxel. If two structurals are used, obtain the coordinates from the first structural input (MPRAGE_01)",
-  			"type": "number"
+		"epi_2_struct":  {
+			"default": true,
+  			"description": "Register the EPI image to the structural before the template warp",
+  			"type": "boolean"
 		},
-		"subject_id":  {
-  			"description": "Subject ID",
-  			"type": "string"
-		},
-		"extraction_threshold":  {
-			"default":0.2,
-  			"description": "Functional intensity threshold (BET).",
-  			"type": "number"
-		},
-		"number_of_threads": {
-			"default":2,
-			"description": "Number of threads to use for registrations",
-			"type": "number"
-		},
-		"struct_to_struct_transform": {
-			"default":"SyN",
-			"description": "This is the transformation method to use for registering MPRAGE images together before averaging. If a single image is used as input, this config option will not be obtained by the gear as no registration will take place. SyN deformation is used as the default method, but rigid and affine transformations are also available for registering within subject structurals ",
-			"type": "string",
-			"enum": [
-				"SyN",
-				"Rigid",
-				"Affine"
-			]
+		"create_pseudohemi":  {
+			"default": false,
+  			"description": "Flip and average the EPI images to create symmetrical pseudo-hemispheres",
+  			"type": "boolean"
 		}
 	},
 	"inputs": {
-		"MPRAGE_01": {
-			"description": "MPRAGE image",
+		"fMRITimeSeries": {
+			"description": "fMRI Time Series images",
 			"base": "file",
 			"optional": false,
 			"type": {
@@ -63,8 +45,18 @@
 				]
 			}
 		},
-		"MPRAGE_02": {
-			"description": "MPRAGE image",
+		"PreprocessedStruct": {
+			"description": "Output of ldogStruct gear",
+			"base": "file",
+			"optional": false,
+			"type": {
+				"enum": [
+					"archieve"
+				]
+			}
+		},
+		"fMRIScoutAP": {
+			"description": "Scout EPI with AP encoding direction",
 			"base": "file",
 			"optional": true,
 			"type": {
@@ -73,38 +65,8 @@
 				]
 			}
 		},
-		"MPRAGE_03": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_04": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_05": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"Template": {
-			"description": "Template image to use for warping. This is optional. If left empty, the gear uses the invivoTemplate",
+		"fMRIScoutPA": {
+			"description": "Scout EPI with PA encoding direction",
 			"base": "file",
 			"optional": true,
 			"type": {

@@ -149,6 +149,40 @@ def apply_warp(epi_folder, template_path, output_folder, path_to_generic_affine,
               
     return (warped_epi)
 
+def flip_epi(epi_folder, output_folder):
+    
+    # This function x-y flips the EPI images.
+
+    # Flip 4D hemispheres 
+    flipped_epi = os.path.join(output_folder, 'flipped')
+    if not os.path.exists(flipped_epi):
+        os.system('mkdir %s' % flipped_epi)
+    for i in os.listdir(epi_folder):
+        corrected_imaj = os.path.join(epi_folder, i)
+        flipped_imaj = os.path.join(flipped_epi, i)
+        flip_call = 'fslswapdim %s x -y z %s' % (corrected_imaj, flipped_imaj)
+        os.system(flip_call)
+        
+    return (flipped_epi)
+
+def average_org_and_flipped(original_epi_path, flipped_epi_path, output_folder):   
+    
+    # This function averages the processed original and processed flipped epi images
+    
+    final_epi = os.path.join(output_folder, 'final_preprocessed_fmri')
+    if not os.path.exists(final_epi):
+        os.system('mkdir %s' % final_epi)
+    for i in os.listdir(original_epi_path):
+        avgcall = 'AverageImages 4 %s 0 %s %s' % (os.path.join(final_epi, 'final_' + i),
+                                                  os.path.join(original_epi_path, i),
+                                                  os.path.join(flipped_epi_path, 'flipped_' + i))
+        #avgcall = 'fslmaths %s -add %s -div 2 %s -odt float' % (os.path.join(original_epi_path, i),
+        #                                                        os.path.join(flipped_epi_path, 'flipped_' + i),
+        #                                                        os.path.join(final_epi, 'final_' + i))
+        os.system(avgcall)        
+    
+    return (final_epi)    
+
 ###################### Define the Paths and parameters ###########################
 
 # os.system('cat /proc/cpuinfo')
@@ -160,38 +194,25 @@ final_output_dir = os.path.join(flywheel_base, 'output')
 manifest_file = os.path.join(flywheel_base, 'manifest.json')
 config_path = os.path.join(flywheel_base, 'config.json')
 os.system('mkdir %s'%first_output_dir)
-T1folder = os.path.join(first_output_dir, 'T1')
-os.system('mkdir %s' % T1folder)
 
-MPRAGE_01_folder = os.path.join(flywheel_base, 'input/MPRAGE_01')
-MPRAGE_01 = os.path.join(MPRAGE_01_folder, os.listdir(MPRAGE_01_folder)[0])
-os.system('cp %s %s' % (MPRAGE_01, T1folder))
+fMRITimeSeries_folder = os.path.join(flywheel_base, 'input/fMRITimeSeries')
+fMRITimeSeries_zip = os.path.join(fMRITimeSeries_folder, os.listdir(fMRITimeSeries_folder)[0])
 
-MPRAGE_02_folder = os.path.join(flywheel_base, 'input/MPRAGE_02')
-if os.path.exists(MPRAGE_02_folder):
-    MPRAGE_02 = os.path.join(MPRAGE_02_folder, os.listdir(MPRAGE_02_folder)[0])
-    os.system('cp %s %s' % (MPRAGE_02, T1folder))
 
-MPRAGE_03_folder = os.path.join(flywheel_base, 'input/MPRAGE_03')
-if os.path.exists(MPRAGE_03_folder):
-    MPRAGE_03 = os.path.join(MPRAGE_03_folder, os.listdir(MPRAGE_03_folder)[0])
-    os.system('cp %s %s' % (MPRAGE_03, T1folder))
+PreprocessedStruct_folder = os.path.join(flywheel_base, 'input/PreprocessedStruct')
+PreprocessedStruct = os.path.join(PreprocessedStruct_folder, os.listdir(PreprocessedStruct_folder)[0]) 
+# Get the subject name and unzip here
 
-MPRAGE_04_folder = os.path.join(flywheel_base, 'input/MPRAGE_04')
-if os.path.exists(MPRAGE_04_folder):
-    MPRAGE_04 = os.path.join(MPRAGE_04_folder, os.listdir(MPRAGE_04_folder)[0])
-    os.system('cp %s %s' % (MPRAGE_04, T1folder))
+# Create the scout folder
+scout_folder = '/opt/scout'
 
-MPRAGE_05_folder = os.path.join(flywheel_base, 'input/MPRAGE_05')
-if os.path.exists(MPRAGE_05_folder):
-    MPRAGE_05 = os.path.join(MPRAGE_05_folder, os.listdir(MPRAGE_05_folder)[0])
-    os.system('cp %s %s' % (MPRAGE_05, T1folder))
+fMRIScoutAP_folder = os.path.join(flywheel_base, 'input/fMRIScoutAP')
+fMRIScoutAP = os.path.join(fMRIScoutAP_folder, os.listdir(fMRIScoutAP_folder)[0])
+os.system('cp %s %s' % (fMRIScoutAP, scout_folder))
 
-Template_folder = os.path.join(flywheel_base, 'input/Template')
-if os.path.exists(Template_folder):
-    Template = os.path.join(Template_folder, os.listdir(Template_folder)[0])
-else:
-    Template = '/opt/invivoTemplate.nii.gz'
+fMRIScoutPA_folder = os.path.join(flywheel_base, 'input/fMRIScoutPA')
+fMRIScoutPA = os.path.join(fMRIScoutPA_folder, os.listdir(fMRIScoutPA_folder)[0])
+os.system('cp %s %s' % (fMRIScoutPA, scout_folder))
 
 ###################Parse Config Here############################
 
@@ -201,23 +222,31 @@ config = job_config['config']
 
 total_readout_time_AP = config['total_readout_time_AP']
 total_readout_time_PA = config['total_readout_time_PA']
+epi_2_struct = config['epi_2_struct']
+create_pseudohemi = config['create_pseudohemi']
 
 ###################Run Algorithm################################
    
-# Bias corrects mprage images, registers, averages (normalized), skull strips and flips
-preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(subject_id, T1folder, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, first_output_dir)
+# Calculate and apply topup
+top_up_folder, corrected_epi = topup(total_readout_time_AP, total_readout_time_PA, scout_folder, fMRITimeSeries_folder, first_output_dir)
 
-# Plot averaged structural
-make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, first_output_dir)
-   
-# Saves a brain extraction diagnostic image
-make_plot(subject_id, averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, first_output_dir)
-    
-# Warps the averaged mprage to the template 
-warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, extracted_brain, Template, first_output_dir, number_of_threads)
-    
-# Saves some more diagnostic images for registrations
-make_plot(subject_id, Template, warped_mprage, 'Warp results', 'mprage2template_qa.png', 131, 105, 45, first_output_dir)
+# Motion correction and time derivative calculation. Overwrites the original 
+# EPI images !!!
+moco_cov = moco(corrected_epi, top_up_folder, first_output_dir)
+
+# Flip the EPI images 
+flipped_epi = flip_epi(corrected_epi, first_output_dir)
+
+# Move flipped EPI to flipped mprage space. Overwrites the original flipped !!!
+flip_to_flip_registration(flipped_epi, flipped_extracted_brain, first_output_dir)
+
+# Apply warps to the standard and flipped EPI images and downsample to 2mm using 
+# the downsampled image as the target.
+warped_epi = apply_warp(corrected_epi, resampled_template_path, first_output_dir, standard_generic, False)
+flipped_warped_epi = apply_warp(flipped_epi, resampled_template_path, first_output_dir, flipped_generic, True)
+
+# Average flipped and unflipped EPI images
+final_epi = average_org_and_flipped(warped_epi, flipped_warped_epi, first_output_dir)
 
 ################## Zip everything and output ##################################
 
