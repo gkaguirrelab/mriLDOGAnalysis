@@ -205,6 +205,13 @@ extraction_threshold = config['extraction_threshold']
 number_of_threads = config['number_of_threads']
 struct_to_struct_transform = config['struct_to_struct_transform']
 
+# Save subject ID to a txt file 
+text_file = os.path.join(first_output_dir, 'subject_id.txt')
+os.system('touch %s' % text_file)
+text_open = open('%s' % text_file, 'w')
+text_open.write('%s' % subject_id)
+text_open.close()
+
 ###################Run Algorithm################################
    
 # Bias corrects mprage images, registers, averages (normalized), skull strips and flips
