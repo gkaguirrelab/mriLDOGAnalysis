@@ -12,6 +12,7 @@ COPY invivoTemplate.nii.gz /opt/invivoTemplate.nii.gz
 COPY 2x2x2resampled_invivoTemplate.nii.gz /opt/2x2x2resampled_invivoTemplate.nii.gz
 RUN chmod +x /flywheel/v0/run
 RUN pip3 install pandas
+RUN pip3 install imageio
     
 # Set the entrypoint  
 ENTRYPOINT /flywheel/v0/run

@@ -1,5 +1,5 @@
 {
-	"name": "preprocesscanine",
+	"name": "ldogfunc",
 	"label": "ldogFunc: functional pre-processing for the LDOG project",
 	"description": "This gear performs preprocessing of the functional scans for the LDOG project.",
 	"author": "Ozenc Taskin",
@@ -22,16 +22,6 @@
 		"total_readout_time_PA":  {
   			"description": "Required for topup. Can be found in nifti header",
   			"type": "number"
-		},
-		"epi_2_struct":  {
-			"default": true,
-  			"description": "Register the EPI image to the structural before the template warp",
-  			"type": "boolean"
-		},
-		"create_pseudohemi":  {
-			"default": false,
-  			"description": "Flip and average the EPI images to create symmetrical pseudo-hemispheres",
-  			"type": "boolean"
 		}
 	},
 	"inputs": {
@@ -45,13 +35,13 @@
 				]
 			}
 		},
-		"PreprocessedStruct": {
+		"preprocessedStruct": {
 			"description": "Output of ldogStruct gear",
 			"base": "file",
 			"optional": false,
 			"type": {
 				"enum": [
-					"archieve"
+					"archive"
 				]
 			}
 		},
