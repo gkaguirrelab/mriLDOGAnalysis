@@ -28,19 +28,20 @@ def topup(subject_id, total_readout_time_AP, total_readout_time_PA, path_to_reco
     
     # Find the AP and PA images
     for i in os.listdir(path_to_recon_fmris):
-        if '1' in os.popen('/usr/local/ANTs/bin/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % os.path.join(path_to_recon_fmris,i)).read():
-            print('found the AP single-rep fmri')
-            ap_image = os.path.join(path_to_recon_fmris, i)
-            print('Full path to the single-rep AP: %s' % ap_image)
-        if '0' in os.popen('/usr/local/ANTs/bin/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % os.path.join(path_to_recon_fmris,i)).read():
-            print('found the PA single-rep fmri')
-            pa_image = os.path.join(path_to_recon_fmris, i)
-            print('Full path to the single-rep PA: %s' % pa_image)
-        else:
-            print('no')
-            
+        if i[-2:] == 'gz' or i[-6:] == 'gz':
+            if '1' in os.popen('/usr/local/ANTs/bin/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % os.path.join(path_to_recon_fmris,i)).read():
+                print('found the AP single-rep fmri')
+                ap_image = os.path.join(path_to_recon_fmris, i)
+                print('Full path to the single-rep AP: %s' % ap_image)
+        if i[-2:] == 'gz' or i[-6:] == 'gz':
+            if '0' in os.popen('/usr/local/ANTs/bin/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % os.path.join(path_to_recon_fmris,i)).read():
+                print('found the PA single-rep fmri')
+                pa_image = os.path.join(path_to_recon_fmris, i)
+                print('Full path to the single-rep PA: %s' % pa_image)
+
     # Merge AP and PA singe-rep images into one for topup
     top_up_folder = os.path.join(output_folder, subject_id + '_top_up')
+    print(os.path.join(top_up_folder, subject_id + '_AP+PA'))
     if not os.path.exists(top_up_folder):
         os.system('mkdir %s' % top_up_folder)
     os.system('FSLDIR=/usr/local/fsl;. ${FSLDIR}/etc/fslconf/fsl.sh;PATH=${FSLDIR}/bin:${PATH};export FSLDIR PATH;/usr/local/fsl/bin/fslmerge -a %s %s %s' % (os.path.join(top_up_folder, subject_id + '_AP+PA'),
@@ -61,12 +62,12 @@ def topup(subject_id, total_readout_time_AP, total_readout_time_PA, path_to_reco
         os.system('mkdir %s' % corrected_epi)
     
     for i in os.listdir(path_to_epi):
-        if int(os.popen('/usr/local/ANTs/bin/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % i).read()) == 1:
+        if int(os.popen('/usr/local/ANTs/bin/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % os.path.join(path_to_epi, i)).read()) == 1:
             os.system('FSLDIR=/usr/local/fsl;. ${FSLDIR}/etc/fslconf/fsl.sh;PATH=${FSLDIR}/bin:${PATH};export FSLDIR PATH;/usr/local/fsl/bin/applytopup --imain=%s --inindex=1 --method=jac --datain=%s --topup=%s --out=%s/corrected_%s' % (os.path.join(path_to_epi, i),
                                                                                                                                                                                                                                              acparam_file,
                                                                                                                                                                                                                                              os.path.join(top_up_folder, subject_id + '_topup_results'),
                                                                                                                                                                                                                                              corrected_epi, i))
-        elif int(os.popen('/usr/local/ANTs/bin/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % i).read()) == 0:
+        elif int(os.popen('/usr/local/ANTs/bin/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % os.path.join(path_to_epi, i)).read()) == 0:
             os.system('FSLDIR=/usr/local/fsl;. ${FSLDIR}/etc/fslconf/fsl.sh;PATH=${FSLDIR}/bin:${PATH};export FSLDIR PATH;/usr/local/fsl/bin/applytopup --imain=%s --inindex=2 --method=jac --datain=%s --topup=%s --out=%s/corrected_%s' % (os.path.join(path_to_epi, i),
                                                                                                                                                                                                                                              acparam_file,
                                                                                                                                                                                                                                              os.path.join(top_up_folder, subject_id + '_topup_results'),
@@ -271,7 +272,6 @@ total_readout_time_AP = config['total_readout_time_AP']
 total_readout_time_PA = config['total_readout_time_PA']
 
 ###################Run Algorithm################################
-print(subject_id)
 
 # Calculate and apply topup
 top_up_folder, corrected_epi = topup(subject_id, total_readout_time_AP, total_readout_time_PA, scout_folder, fMRITimeSeries_folder, first_output_dir)
@@ -295,11 +295,11 @@ warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, firs
 # final_epi = average_org_and_flipped(warped_epi, flipped_warped_epi, first_output_dir)
 
 # Make an image of the invivo and warped EPI
-diagnostic_images = make_plot(subject_id, invivo_template, 'NA', 'EPI_2_Template', subject_id + '_invivo.png', 131, 105, 45, first_output_dir)
-make_plot(subject_id, os.path.join(warped_epi, os.listdir(warped_epi)[0]), 'NA', 'EPI_2_Template', subject_id + '_final.png', 131, 105, 45, first_output_dir)
-
-# Combine the images and make a gif
-make_gif(diagnostic_images, 'EPI_2_Template', final_output_dir)
+#diagnostic_images = make_plot(subject_id, invivo_template, 'NA', 'EPI_2_Template', subject_id + '_invivo.png', 131, 105, 45, first_output_dir)
+#make_plot(subject_id, os.path.join(warped_epi, os.listdir(warped_epi)[0]), 'NA', 'EPI_2_Template', subject_id + '_final.png', 131, 105, 45, first_output_dir)
+#
+## Combine the images and make a gif
+#make_gif(diagnostic_images, 'EPI_2_Template', final_output_dir)
 
 ################## Zip everything and output ##################################
 
