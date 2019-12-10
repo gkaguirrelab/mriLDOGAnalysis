@@ -318,10 +318,9 @@ if extraWarpToTemplate == True:
                                                                                                                                                                 os.path.join(second_warp_matrices, 'second'),
                                                                                                                                                                 2)
     os.system(warp_call)
-
     # Apply warps to the standard and flipped EPI images and downsample to 2mm using 
     # the downsampled image as the target.
-    warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, os.path.join(second_warp_matrices, 'second0GenericAffine.mat'), os.path.join(second_warp_matrices, '1Warp.nii.gz'), False)
+    warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, os.path.join(second_warp_matrices, 'second0GenericAffine.mat'), os.path.join(second_warp_matrices, 'second1Warp.nii.gz'), False)
 else:
     warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, 'NA', 'NA', False)
 
