@@ -6,7 +6,7 @@
 	"maintainer": "Ozenc Taskin <huseyinozenc.taskin@pennmedicine.upenn.edu>",
 	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
 	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
-	"version": "0.1.2",
+	"version": "0.1.6",
 	"custom": {
 		"flywheel": {
 			"suite": "GKAguirreLab"
@@ -43,12 +43,22 @@
 		},
 		"structToStructTransform": {
 			"default":"SyN",
-			"description": "This is the transformation method to use for registering MPRAGE images together before averaging. If a single image is used as input, this config option will not be obtained by the gear as no registration will take place. SyN deformation is used as the default method, but rigid and affine transformations are also available for registering within subject structurals ",
+			"description": "This is the transformation type to use for registering MPRAGE images together before averaging. If a single image is used as input, this config option will not be obtained by the gear as no registration will take place. SyN deformation is used as the default method, but rigid and affine transformations are also available for registering within subject structurals ",
 			"type": "string",
 			"enum": [
 				"SyN",
 				"Rigid",
 				"Affine"
+			]
+		},
+		"transformationMethod": {
+			"default":"skullStrippedMprage-skullStrippedTemplate",
+			"description": "This specifies the image types used for mprage-template warps.",
+			"type": "string",
+			"enum": [
+				"skullStrippedMprage-skullStrippedTemplate",
+				"wholeMprage-skullStrippedTemplate",
+				"wholeMprage-wholeTemplate"
 			]
 		}
 	},

@@ -190,6 +190,7 @@ if os.path.exists(Template_folder):
     Template = os.path.join(Template_folder, os.listdir(Template_folder)[0])
 else:
     Template = '/opt/invivoTemplate.nii.gz'
+    Template_with_skull = '/opt/invivoTemplate-WithSkull.nii.gz'
 
 ###################Parse Config Here############################
 
@@ -204,6 +205,7 @@ subject_id = config['subjectId']
 extraction_threshold = config['extractionThreshold']
 number_of_threads = config['numberOfThreads']
 struct_to_struct_transform = config['structToStructTransform']
+transformationMethod = config['transformationMethod']
 
 # Save subject ID to a txt file 
 text_file = os.path.join(first_output_dir, 'subject_id.txt')
@@ -224,7 +226,12 @@ make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.
 make_plot(subject_id, averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], first_output_dir)
     
 # Warps the averaged mprage to the template 
-warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, extracted_brain, Template, first_output_dir, number_of_threads)
+if transformationMethod == 'skullStrippedMprage-skullStrippedTemplate':
+    warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, extracted_brain, Template, first_output_dir, number_of_threads)
+elif transformationMethod == 'wholeMprage-skullStrippedTemplate':
+    warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, averaged_mprage, Template, first_output_dir, number_of_threads)
+elif transformationMethod == 'wholeMprage-wholeTemplate':
+    warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, averaged_mprage, Template_with_skull, first_output_dir, number_of_threads)
     
 # Saves some more diagnostic images for registrations
 make_plot(subject_id, Template, warped_mprage, 'Warp results', 'mprage2template_qa.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], first_output_dir)
