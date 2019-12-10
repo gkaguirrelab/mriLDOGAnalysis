@@ -6,7 +6,7 @@
 	"maintainer": "Ozenc Taskin <huseyinozenc.taskin@pennmedicine.upenn.edu>",
 	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
 	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
-	"version": "0.1.0",
+	"version": "0.1.5",
 	"custom": {
 		"flywheel": {
 			"suite": "GKAguirreLab"
@@ -15,13 +15,25 @@
 	},
 	"license": "Other",
 	"config": {
-		"total_readout_time_AP":  {
-  			"description": "Required for topup. Can be found in nifti header",
+		"totalReadoutTimeAP":  {
+			"default": 0.0217349,
+  			"description": "total readout time of the single-rep recon api in AP direction. Required for topup. Can be found in nifti header",
   			"type": "number"
 		},
-		"total_readout_time_PA":  {
-  			"description": "Required for topup. Can be found in nifti header",
+		"totalReadoutTimePA":  {
+			"default": 0.0217349,
+  			"description": "total readout time of the single-rep recon api in PA direction. Required for topup. Can be found in nifti header",
   			"type": "number"
+		},
+		"fMRIName":  {
+			"default": "NA",
+  			"description": "Output name for preprocessed data",
+  			"type": "string"
+		},
+		"saveIntermediateFiles": {
+			"default": false,
+			"description": "saves intermediate files created during the analysis",
+			"type": "boolean"
 		}
 	},
 	"inputs": {
@@ -35,7 +47,7 @@
 				]
 			}
 		},
-		"preprocessedStruct": {
+		"StructZip": {
 			"description": "Output of ldogStruct gear",
 			"base": "file",
 			"optional": false,

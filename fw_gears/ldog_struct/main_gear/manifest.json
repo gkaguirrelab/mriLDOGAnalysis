@@ -1,8 +1,8 @@
 {
-	"name": "preprocesscanine",
+	"name": "ldogstruct",
 	"label": "ldogStruct: anatomical pre-processing for the LDOG project",
 	"description": "This gear performs preprocessing for the LDOG project.",
-	"version": "0.1.7",
+	"version": "0.1.2",
 	"inputs": {
 		"MPRAGE_01": {
 			"base": "file",
@@ -66,29 +66,29 @@
 		}
 	},
 	"config": {
-		"centre_of_gravity_x": {
-			"description": "x position of the center voxel. If two structurals are used, obtain the coordinates from the first structural input (MPRAGE_01)",
+		"centreOfGravityX": {
+			"description": "x position of the center voxel. If two structurals are averaged, obtain the coordinates from the first structural input (MPRAGE_01). To derive the required coordinate form from the Flywheel viewer, user can first pick an approximate middle voxel on the coronal-axial-sagital slices using the viewer and substract the selected voxel coordinates from the total amount of voxels in each of these slice directions and finally reorganize these values in a way that centre_x will be saggital, centre_y will be axial, and centre_z will be coronal",
 			"type": "number"
 		},
-		"centre_of_gravity_y": {
-			"description": "y position of the center voxel. If two structurals are used, obtain the coordinates from the first structural input (MPRAGE_01)",
+		"centreOfGravityY": {
+			"description": "y position of the center voxel. If two structurals are averaged, obtain the coordinates from the first structural input (MPRAGE_01)",
 			"type": "number"
 		},
-		"centre_of_gravity_z": {
-			"description": "z position of the center voxel. If two structurals are used, obtain the coordinates from the first structural input (MPRAGE_01)",
+		"centreOfGravityZ": {
+			"description": "z position of the center voxel. If two structurals are averaged, obtain the coordinates from the first structural input (MPRAGE_01)",
 			"type": "number"
 		},
-		"extraction_threshold": {
+		"extractionThreshold": {
 			"default": 0.2,
 			"description": "Functional intensity threshold (BET).",
 			"type": "number"
 		},
-		"number_of_threads": {
+		"numberOfThreads": {
 			"default": 2,
 			"description": "Number of threads to use for registrations",
 			"type": "number"
 		},
-		"struct_to_struct_transform": {
+		"structToStructTransform": {
 			"default": "SyN",
 			"description": "This is the transformation method to use for registering MPRAGE images together before averaging. If a single image is used as input, this config option will not be obtained by the gear as no registration will take place. SyN deformation is used as the default method, but rigid and affine transformations are also available for registering within subject structurals ",
 			"enum": [
@@ -98,7 +98,7 @@
 			],
 			"type": "string"
 		},
-		"subject_id": {
+		"subjectId": {
 			"description": "Subject ID",
 			"type": "string"
 		}
@@ -114,7 +114,7 @@
 		},
 		"gear-builder": {
 			"category": "analysis",
-			"image": "gkaguirrelab/process_ldog:0.1.3"
+			"image": "gkaguirrelab/ldogstruct:0.1.2"
 		}
 	}
 }

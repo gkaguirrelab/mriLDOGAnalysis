@@ -10,6 +10,7 @@ RUN mkdir -p ${FLYWHEEL}
 COPY manifest.json run ${FLYWHEEL}
 COPY invivoTemplate.nii.gz /opt/invivoTemplate.nii.gz
 COPY 2x2x2resampled_invivoTemplate.nii.gz /opt/2x2x2resampled_invivoTemplate.nii.gz
+COPY file_organization.txt /usr/file_organization.txt
 RUN chmod +x /flywheel/v0/run
 RUN pip3 install pandas
 RUN pip3 install imageio

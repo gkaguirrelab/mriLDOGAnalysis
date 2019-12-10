@@ -2,8 +2,18 @@
 	"name": "ldogfunc",
 	"label": "ldogFunc: functional pre-processing for the LDOG project",
 	"description": "This gear performs preprocessing of the functional scans for the LDOG project.",
-	"version": "0.1.0",
+	"version": "0.1.5",
 	"inputs": {
+		"StructZip": {
+			"base": "file",
+			"description": "Output of ldogStruct gear",
+			"optional": false,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
 		"fMRIScoutAP": {
 			"base": "file",
 			"description": "Scout EPI with AP encoding direction",
@@ -33,25 +43,27 @@
 					"nifti"
 				]
 			}
-		},
-		"preprocessedStruct": {
-			"base": "file",
-			"description": "Output of ldogStruct gear",
-			"optional": false,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
 		}
 	},
 	"config": {
-		"total_readout_time_AP": {
-			"description": "Required for topup. Can be found in nifti header",
+		"fMRIName": {
+			"default": "NA",
+			"description": "Output name for preprocessed data",
+			"type": "string"
+		},
+		"saveIntermediateFiles": {
+			"default": false,
+			"description": "saves intermediate files created during the analysis",
+			"type": "boolean"
+		},
+		"totalReadoutTimeAP": {
+			"default": 0.0217349,
+			"description": "total readout time of the single-rep recon api in AP direction. Required for topup. Can be found in nifti header",
 			"type": "number"
 		},
-		"total_readout_time_PA": {
-			"description": "Required for topup. Can be found in nifti header",
+		"totalReadoutTimePA": {
+			"default": 0.0217349,
+			"description": "total readout time of the single-rep recon api in PA direction. Required for topup. Can be found in nifti header",
 			"type": "number"
 		}
 	},
@@ -66,7 +78,7 @@
 		},
 		"gear-builder": {
 			"category": "analysis",
-			"image": "gkaguirrelab/ldogfunc:0.1.0"
+			"image": "gkaguirrelab/ldogfunc:0.1.5"
 		}
 	}
 }

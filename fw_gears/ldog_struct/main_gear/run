@@ -111,7 +111,7 @@ def warp_to_invivo(subject_id, mprage_image, template_path, output_folder, num_t
     
     return (warp_results_folder, warped_mprage, generic_affine)
 
-def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, output_folder):
+def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, apect_ratio_vector, output_folder):
     
     # This function simply gets two MRI images as inputs and overlays them 
     #using different colors for each image. Used as a diagnostic method.
@@ -125,9 +125,9 @@ def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, output_
 
     epi_img = nib.load(base_image)
     epi_img_data = epi_img.get_fdata()
-    ax1.imshow(epi_img_data[x,:,:], cmap="gray")
-    ax2.imshow(epi_img_data[:,y,:], cmap="gray")
-    ax3.imshow(epi_img_data[:,:,z], cmap="gray")
+    ax1.imshow(epi_img_data[x,:,:], cmap="gray", aspect = apect_ratio_vector[0])
+    ax2.imshow(epi_img_data[:,y,:], cmap="gray", aspect = apect_ratio_vector[1])
+    ax3.imshow(epi_img_data[:,:,z], cmap="gray", aspect = apect_ratio_vector[2])
     ax1.axis('off')
     ax2.axis('off')
     ax3.axis('off')  
@@ -135,9 +135,9 @@ def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, output_
     if overlay != 'NA':
         epi_img = nib.load(overlay)
         epi_img_data = epi_img.get_fdata()
-        ax1.imshow(epi_img_data[x,:,:], cmap="hot", alpha=0.4)
-        ax2.imshow(epi_img_data[:,y,:], cmap="hot", alpha=0.4)
-        ax3.imshow(epi_img_data[:,:,z], cmap="hot", alpha=0.4)
+        ax1.imshow(epi_img_data[x,:,:], cmap="hot", alpha=0.4, aspect = apect_ratio_vector[3])
+        ax2.imshow(epi_img_data[:,y,:], cmap="hot", alpha=0.4, aspect = apect_ratio_vector[4])
+        ax3.imshow(epi_img_data[:,:,z], cmap="hot", alpha=0.4, aspect = apect_ratio_vector[5])
         ax1.axis('off')
         ax2.axis('off')
         ax3.axis('off')
@@ -197,13 +197,13 @@ with open(config_path) as config_file:
     job_config = json.load(config_file)
 config = job_config['config']
 
-centre_of_gravity_x = config['centre_of_gravity_x']
-centre_of_gravity_y = config['centre_of_gravity_y']
-centre_of_gravity_z = config['centre_of_gravity_z']
-subject_id = config['subject_id']
-extraction_threshold = config['extraction_threshold']
-number_of_threads = config['number_of_threads']
-struct_to_struct_transform = config['struct_to_struct_transform']
+centre_of_gravity_x = config['centreOfGravityX']
+centre_of_gravity_y = config['centreOfGravityY']
+centre_of_gravity_z = config['centreOfGravityZ']
+subject_id = config['subjectId']
+extraction_threshold = config['extractionThreshold']
+number_of_threads = config['numberOfThreads']
+struct_to_struct_transform = config['structToStructTransform']
 
 # Save subject ID to a txt file 
 text_file = os.path.join(first_output_dir, 'subject_id.txt')
@@ -218,16 +218,16 @@ text_open.close()
 preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(subject_id, T1folder, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, first_output_dir)
 
 # Plot averaged structural
-make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, first_output_dir)
+make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], first_output_dir)
    
 # Saves a brain extraction diagnostic image
-make_plot(subject_id, averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, first_output_dir)
+make_plot(subject_id, averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], first_output_dir)
     
 # Warps the averaged mprage to the template 
 warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, extracted_brain, Template, first_output_dir, number_of_threads)
     
 # Saves some more diagnostic images for registrations
-make_plot(subject_id, Template, warped_mprage, 'Warp results', 'mprage2template_qa.png', 131, 105, 45, first_output_dir)
+make_plot(subject_id, Template, warped_mprage, 'Warp results', 'mprage2template_qa.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], first_output_dir)
 
 ################## Zip everything and output ##################################
 
@@ -236,4 +236,4 @@ os.system('cd %s; mv %s %s/' % (os.path.join(first_output_dir, 'diagnostic_image
 os.system('cd %s; rm -r %s' % (first_output_dir, 'diagnostic_images'))
 
 # Zip and move the maps
-os.system('cd %s; zip -q -r %s *'%(first_output_dir, os.path.join(final_output_dir, subject_id + '_preprocessed.zip')))
+os.system('cd %s; zip -q -r %s *'%(first_output_dir, os.path.join(final_output_dir, subject_id + '_preprocessedStruct.zip')))
