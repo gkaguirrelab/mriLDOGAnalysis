@@ -34,6 +34,11 @@
 			"default": false,
 			"description": "saves intermediate files created during the analysis",
 			"type": "boolean"
+		},
+		"extraWarpToTemplate": {
+			"default": false,
+			"description": "This does does an extra constrained warp to the EPI image",
+			"type": "boolean"
 		}
 	},
 	"inputs": {

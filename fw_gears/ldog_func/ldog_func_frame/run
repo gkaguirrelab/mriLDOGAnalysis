@@ -110,9 +110,9 @@ def moco(subject_id, epi_folder, top_up_folder, output_folder):
         data_concatted = pd.concat([data, data_sqrted, data_diffed, data_diffed_sqrt], axis=1)
         np.savetxt(original_par, data_concatted, delimiter='  ')
         
-    return (moco_cov)
+    return (mc_to_this,moco_cov)
 
-def apply_warp(subject_id, epi_folder, template_path, output_folder, path_to_generic_affine, path_to_warp, flipped=False):
+def apply_warp(subject_id, epi_folder, template_path, output_folder, path_to_generic_affine, path_to_warp, path_to_generic_affine2, path_to_warp2, flipped=False):
         
     # Warp EPI images to invivo template
     if flipped == False:
@@ -123,19 +123,37 @@ def apply_warp(subject_id, epi_folder, template_path, output_folder, path_to_gen
         conv = subject_id + '_final_flipped_preprocessed'      
     if not os.path.exists(warped_epi):
         os.system('mkdir %s' % warped_epi)
+    
+    if path_to_warp2 == 'NA' and path_to_generic_affine2 == 'NA':
+        for i in os.listdir(epi_folder):
+            os.system('/usr/local/ANTs/bin/antsApplyTransforms --float --default-value 0 '
+                      '--input %s --input-image-type 3 '
+                      '--interpolation Linear --output %s/%s_%s '
+                      '--reference-image %s '
+                      '--transform %s --transform %s '
+                      '-v 1' % (os.path.join(epi_folder, i),
+                                warped_epi, conv, i,
+                                template_path,
+                                path_to_warp,
+                                path_to_generic_affine))
+   
+    elif path_to_warp2 != 'NA' and path_to_generic_affine2 != 'NA':
+        for i in os.listdir(epi_folder):
+            os.system('/usr/local/ANTs/bin/antsApplyTransforms --float --default-value 0 '
+                      '--input %s --input-image-type 3 '
+                      '--interpolation Linear --output %s/%s_%s '
+                      '--reference-image %s '
+                      '-transform %s --transform %s --transform %s --transform %s '
+                      '-v 1' % (os.path.join(epi_folder, i),
+                                warped_epi, conv, i,
+                                template_path,
+                                path_to_warp2,
+                                path_to_generic_affine2,
+                                path_to_warp,
+                                path_to_generic_affine))         
+    else:
+        print('There is smoething wrong with the function')
         
-    for i in os.listdir(epi_folder):
-        os.system('/usr/local/ANTs/bin/antsApplyTransforms --float --default-value 0 '
-                  '--input %s --input-image-type 3 '
-                  '--interpolation Linear --output %s/%s_%s '
-                  '--reference-image %s '
-                  '--transform %s --transform %s '
-                  '-v 1' % (os.path.join(epi_folder, i),
-                            warped_epi, conv, i,
-                            template_path,
-                            path_to_warp,
-                            path_to_generic_affine))
-              
     return (warped_epi)
 
 def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, output_folder):
@@ -177,7 +195,7 @@ def make_gif(image_folder, gif_name, output_folder):
     images = []
     for filename in os.listdir(image_folder):
         images.append(imageio.imread(os.path.join(image_folder, filename)))
-        imageio.mimsave('/%s/%s.gif' % (output_folder, gif_name), images, duration=0.7)
+        imageio.mimsave('/%s/%s.gif' % (output_folder, gif_name), images, duration=0.9)
 
 #def flip_epi(epi_folder, output_folder):
 #    
@@ -260,6 +278,7 @@ total_readout_time_AP = config['totalReadoutTimeAP']
 total_readout_time_PA = config['totalReadoutTimePA']
 saveIntermediateFiles = config['saveIntermediateFiles']
 fMRIName = config['fMRIName']
+extraWarpToTemplate = config['extraWarpToTemplate']
 
 # Get the subject id and set some more paths
 with open ('%s' % os.path.join(struct_folder, 'subject_id.txt'), 'r') as idfile:
@@ -278,7 +297,7 @@ top_up_folder, corrected_epi = topup(subject_id, total_readout_time_AP, total_re
 
 # Motion correction and time derivative calculation. Overwrites the original 
 # EPI images !!!
-moco_cov = moco(subject_id, corrected_epi, top_up_folder, first_output_dir)
+mc_to_this, moco_cov = moco(subject_id, corrected_epi, top_up_folder, first_output_dir)
 
 # Flip the EPI images 
 #flipped_epi = flip_epi(corrected_epi, first_output_dir)
@@ -286,20 +305,37 @@ moco_cov = moco(subject_id, corrected_epi, top_up_folder, first_output_dir)
 # Move flipped EPI to flipped mprage space. Overwrites the original flipped !!!
 #lip_to_flip_registration(flipped_epi, flipped_extracted_brain, first_output_dir)
 
-# Apply warps to the standard and flipped EPI images and downsample to 2mm using 
-# the downsampled image as the target.
-warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, False)
+if extraWarpToTemplate == True:
+    temporary_folder = '/usr/tempfol/'
+    os.system('mkdir %s' % temporary_folder)
+    os.system('cp %s %s' % mc_to_this, temporary_folder)
+    warped_single_rep = apply_warp(subject_id, mc_to_this, resampled_template_path, temporary_folder, generic_affine, path_to_warp, False)
+    warped_single_rep_image = os.listdir(warped_single_rep[0])
+    second_warp_matrices = first_output_dir + 'second_warp_matrices'
+    os.system('mkdir %s' % (second_warp_matrices))
+    warp_call = 'export ANTSPATH=/usr/local/ANTs/bin/;export PATH=${ANTSPATH}:$PATH;/usr/local/ANTs/bin/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s -n %s' % (resampled_template_path, 
+                                                                                                                                                                warped_single_rep_image, 
+                                                                                                                                                                os.path.join(second_warp_matrices, 'second'),
+                                                                                                                                                                2)
+    os.system(warp_call)
+
+    # Apply warps to the standard and flipped EPI images and downsample to 2mm using 
+    # the downsampled image as the target.
+    warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, os.path.join(second_warp_matrices, 'second0GenericAffine.mat'), os.path.join(second_warp_matrices, '1Warp.nii.gz'), False)
+else:
+    warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, 'NA', 'NA', False)
+
 #flipped_warped_epi = apply_warp(flipped_epi, resampled_template_path, first_output_dir, flipped_generic, True)
 
 # Average flipped and unflipped EPI images
 # final_epi = average_org_and_flipped(warped_epi, flipped_warped_epi, first_output_dir)
 
-# Make an image of the invivo and warped EPI
-temporary = '/usr/temp/'
-os.system('mkdir %s' % temporary)
-os.system('FSLDIR=/usr/local/fsl;. ${FSLDIR}/etc/fslconf/fsl.sh;PATH=${FSLDIR}/bin:${PATH};export FSLDIR PATH;/usr/local/fsl/bin/fslroi %s %s/singleEpi.nii.gz 0 1' % (os.path.join(warped_epi, os.listdir(warped_epi)[0]), temporary))
+# Make an plot the invivo and warped EPI seperately
+temporary_image = '/usr/tempim/'
+os.system('mkdir %s' % temporary_image)
+os.system('FSLDIR=/usr/local/fsl;. ${FSLDIR}/etc/fslconf/fsl.sh;PATH=${FSLDIR}/bin:${PATH};export FSLDIR PATH;/usr/local/fsl/bin/fslroi %s %s/singleEpi.nii.gz 0 1' % (os.path.join(warped_epi, os.listdir(warped_epi)[0]), temporary_image))
 diagnostic_images = make_plot(subject_id, resampled_template_path, 'NA', 'EPI_2_Template', subject_id + '_invivo.png', 26, 23, 26, first_output_dir)
-make_plot(subject_id, os.path.join(temporary, os.listdir(temporary)[0]), 'NA', 'EPI_2_Template', subject_id + '_final.png', 26, 23, 26, first_output_dir)
+make_plot(subject_id, os.path.join(temporary_image, os.listdir(temporary_image)[0]), 'NA', 'EPI_2_Template', subject_id + '_final.png', 26, 23, 26, first_output_dir)
 
 # Combine the images and make a gif
 make_gif(diagnostic_images, 'EPI_2_Template', final_output_dir)
