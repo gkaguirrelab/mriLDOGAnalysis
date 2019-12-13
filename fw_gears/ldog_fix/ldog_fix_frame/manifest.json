@@ -1,0 +1,220 @@
+{
+	"name": "ldogfix",
+	"label": "ldogFix: archiving ldogfunc outputs",
+	"description": "This gear performs preprocessing for the LDOG project.",
+	"author": "Ozenc Taskin",
+	"maintainer": "Ozenc Taskin <huseyinozenc.taskin@pennmedicine.upenn.edu>",
+	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
+	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
+	"version": "0.1.0",
+	"custom": {
+		"flywheel": {
+			"suite": "GKAguirreLab"
+		},
+		"docker-image": ""
+	},
+	"license": "Other",
+	"config": {},
+	"inputs": {
+		"EPI_01": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": false,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_02": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": false,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_03": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_04": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_05": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_06": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_07": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_08": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_09": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_10": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_11": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_12": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_13": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_14": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_15": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_16": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_17": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_18": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_19": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_20": {
+			"description": "EPI archive",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		}
+	}
+}

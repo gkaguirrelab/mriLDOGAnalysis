@@ -1,0 +1,223 @@
+{
+	"name": "ldogfix",
+	"label": "ldogFix: archiving ldogfunc outputs",
+	"description": "This gear performs preprocessing for the LDOG project.",
+	"version": "0.1.1",
+	"inputs": {
+		"EPI_01": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": false,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_02": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": false,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_03": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_04": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_05": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_06": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_07": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_08": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_09": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_10": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_11": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_12": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_13": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_14": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_15": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_16": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_17": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_18": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_19": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"EPI_20": {
+			"base": "file",
+			"description": "EPI archive",
+			"optional": true,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		}
+	},
+	"config": {},
+	"author": "Ozenc Taskin",
+	"maintainer": "Ozenc Taskin",
+	"license": "Other",
+	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
+	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
+	"custom": {
+		"flywheel": {
+			"suite": "GKAguirreLab"
+		},
+		"gear-builder": {
+			"category": "analysis",
+			"image": "gkaguirrelab/ldogfix:0.1.0"
+		}
+	}
+}
