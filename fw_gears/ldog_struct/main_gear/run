@@ -4,9 +4,10 @@ import os
 import json
 import nibabel as nib
 import matplotlib.pyplot as plt
+import imageio
 
 ###################################### Define Fucntions #####################################
-
+os.system('FSLDIR=/usr/lib/fsl/5.0;PATH=$FSLDIR:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/bet')
 def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, output_folder):
     
     # This script prepares the MPRAGE image(s) for the analysis. Pipeline:  
@@ -26,7 +27,7 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
     
     # Biascorrection 
     for i in mprage_images:
-        call = "/usr/local/ANTs/bin/N4BiasFieldCorrection -d 3 -i %s -o %s -v" % (os.path.join(path_to_mprage, i),
+        call = "/usr/lib/ants/N4BiasFieldCorrection -d 3 -i %s -o %s -v" % (os.path.join(path_to_mprage, i),
                                                                                   os.path.join(path_to_mprage, i))
         os.system(call)
     
@@ -50,7 +51,7 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
             count += 1
             moving = os.path.join(path_to_mprage, i)
             print('Registering %s to %s' % (moving, fixed))
-            register_call = 'export ANTSPATH=/usr/local/ANTs/bin/;export PATH=${ANTSPATH}:$PATH;/usr/local/ANTs/bin/antsRegistrationSyN.sh -d 3 -t %s -f %s -m %s -o %s -n 6' % (transform,
+            register_call = 'export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/antsRegistrationSyN.sh -d 3 -t %s -f %s -m %s -o %s -n 6' % (transform,
                                                                                                                                                                                  fixed,
                                                                                                                                                                                  moving,
                                                                                                                                                                                  os.path.join(registered_mprages, subject_id + '_%sregistered' % count))
@@ -59,7 +60,7 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
         os.system('cd %s; rm *InverseWarped.nii.gz' % registered_mprages)         
         
         # Average the registered MPRAGE with the target
-        average_call = '/usr/local/ANTs/bin/AverageImages 3 %s 1 %s' % (os.path.join(preprocessed_mprage_folder, subject_id + '_averaged_mprages.nii.gz'),
+        average_call = '/usr/lib/ants/AverageImages 3 %s 1 %s' % (os.path.join(preprocessed_mprage_folder, subject_id + '_averaged_mprages.nii.gz'),
                                                                         os.path.join(registered_mprages, '*.nii.gz'))
         os.system(average_call)
         averaged_mprage = os.path.join(preprocessed_mprage_folder, subject_id + '_averaged_mprages.nii.gz')
@@ -70,7 +71,7 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
     # Brain extraction mask (created by fsl BET)
     extracted_mprage = os.path.join(preprocessed_mprage_folder, subject_id + '_brain_averaged_mprages.nii.gz')
     extracted_mask = os.path.join(preprocessed_mprage_folder, subject_id + '_brain_averaged_mprages_mask.nii.gz')
-    call = 'FSLDIR=/usr/local/fsl;. ${FSLDIR}/etc/fslconf/fsl.sh;PATH=${FSLDIR}/bin:${PATH};export FSLDIR PATH;/usr/local/fsl/bin/bet %s %s -f %s -c %s %s %s -m' % (averaged_mprage, extracted_mprage,
+    call = 'FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/bet %s %s -f %s -c %s %s %s -m' % (averaged_mprage, extracted_mprage,
                                                                                                                                                                      extraction_threshold,
                                                                                                                                                                      centre_of_gravity_x,
                                                                                                                                                                      centre_of_gravity_y, 
@@ -79,7 +80,7 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
     
         
     # Brain extraction segmentation (altAnts)
-    call2 = 'export ANTSPATH=/usr/local/ANTs/bin/;export PATH=${ANTSPATH}:$PATH;/usr/local/ANTs/bin/brainExtractionSegmentation.pl --input %s --initial-brain-mask %s --bias-correct 0 --output-root %s' % (averaged_mprage,
+    call2 = 'export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/brainExtractionSegmentation.pl --input %s --initial-brain-mask %s --bias-correct 0 --output-root %s' % (averaged_mprage,
                                                                                                                      extracted_mask,
                                                                                                                      os.path.join(preprocessed_mprage_folder, subject_id + '_final')) 
     os.system(call2)
@@ -88,7 +89,7 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
     return (preprocessed_mprage_folder, averaged_mprage, extracted_brain)    
 #     #Flip the averaged and skull stripped mprage
 #    flipped_extracted_brain = os.path.join(preprocessed_mprage_folder, 'flipped_finalExtractedBrain.nii.gz')
-#    flip_call = 'FSLDIR=/usr/local/fsl;. ${FSLDIR}/etc/fslconf/fsl.sh;PATH=${FSLDIR}/bin:${PATH};export FSLDIR PATH;/usr/local/fsl/bin/fslswapdim %s x -y z %s' % (extracted_mprage, flipped_extracted_brain)
+#    flip_call = 'FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslswapdim %s x -y z %s' % (extracted_mprage, flipped_extracted_brain)
 #    os.system(flip_call)
     
 #    return (preprocessed_mprage_folder, averaged_mprage, extracted_brain, flipped_extracted_brain)
@@ -104,7 +105,7 @@ def warp_to_invivo(subject_id, mprage_image, template_path, output_folder, num_t
     if not os.path.exists(warp_results_folder):
         os.system('mkdir %s' % warp_results_folder)
     
-    warp_call = 'export ANTSPATH=/usr/local/ANTs/bin/;export PATH=${ANTSPATH}:$PATH;/usr/local/ANTs/bin/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s -n %s' % (template_path, mprage_image, os.path.join(warp_results_folder, subject_id + '_'),str(num_threads))
+    warp_call = 'export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s -n %s' % (template_path, mprage_image, os.path.join(warp_results_folder, subject_id + '_'),str(num_threads))
     os.system(warp_call)
     warped_mprage = os.path.join(warp_results_folder, subject_id + '_Warped.nii.gz')
     generic_affine = os.path.join(warp_results_folder, subject_id + '_0GenericAffine.mat')
@@ -146,7 +147,12 @@ def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, apect_r
     
     return(diagnostic_images)
 
-
+def make_gif(image_folder, gif_name, output_folder):
+    images = []
+    for filename in os.listdir(image_folder):
+        images.append(imageio.imread(os.path.join(image_folder, filename)))
+        imageio.mimsave('/%s/%s.gif' % (output_folder, gif_name), images, duration=0.7)
+        
 ###################### Define the Paths and parameters ###########################
 
 # os.system('cat /proc/cpuinfo')
@@ -220,10 +226,10 @@ text_open.close()
 preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(subject_id, T1folder, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, first_output_dir)
 
 # Plot averaged structural
-make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], first_output_dir)
+make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], final_output_dir)
    
 # Saves a brain extraction diagnostic image
-make_plot(subject_id, averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], first_output_dir)
+make_plot(subject_id, averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], final_output_dir)
     
 # Warps the averaged mprage to the template 
 if transformationMethod == 'skullStrippedMprage-skullStrippedTemplate':
@@ -234,13 +240,12 @@ elif transformationMethod == 'wholeMprage-wholeTemplate':
     warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, averaged_mprage, Template_with_skull, first_output_dir, number_of_threads)
     
 # Saves some more diagnostic images for registrations
-make_plot(subject_id, Template, warped_mprage, 'Warp results', 'mprage2template_qa.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], first_output_dir)
+temporary = '/tempim/'
+os.system('mkdir %s' % temporary)
+make_plot(subject_id, Template, 'NA', 'Warp results', 'im1.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
+make_plot(subject_id, warped_mprage, 'NA', 'Warp results', 'im2.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
+make_gif(os.path.join(temporary, 'diagnostic_images'), subject_id + 'mprage2template_qa.png', final_output_dir)
 
 ################## Zip everything and output ##################################
-
-# Move mat, pdf and png files to the final output folder
-os.system('cd %s; mv %s %s/' % (os.path.join(first_output_dir, 'diagnostic_images'), '*.png', final_output_dir)) 
-os.system('cd %s; rm -r %s' % (first_output_dir, 'diagnostic_images'))
-
 # Zip and move the maps
 os.system('cd %s; zip -q -r %s *'%(first_output_dir, os.path.join(final_output_dir, subject_id + '_preprocessedStruct.zip')))

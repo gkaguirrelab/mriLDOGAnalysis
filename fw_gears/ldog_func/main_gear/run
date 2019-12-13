@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 
 ###################################### Define Functions #####################################
+os.system('bet')
 
 def topup(subject_id, total_readout_time_AP, total_readout_time_PA, path_to_recon_fmris, path_to_epi, output_folder):
     
