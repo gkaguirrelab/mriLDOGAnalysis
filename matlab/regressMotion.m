@@ -87,6 +87,9 @@ warning('off','MATLAB:rankDeficientMatrix');
 % Loop through the voxels and regress out the motion component
 for vv = 1:size(data,1)
     datats = data(vv,:)';
+    if all(datats==0)
+        continue
+    end
     meants = mean(datats);
     beta = X\datats;
     cleants = datats - X*beta + meants;
@@ -104,6 +107,6 @@ newName = strrep(acquisitionList(1).name,'_preprocessed_','_preprocessedMoReg_')
 
 % Save the motion corrected fMRI data
 correctedFuncPath = fullfile(acquisitionList(1).folder,newName);
-MRIwrite(thisAcqData,correctedFuncPath)
+MRIwrite(thisAcqData,correctedFuncPath);
 
 end % Main function
