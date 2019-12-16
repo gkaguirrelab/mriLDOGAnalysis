@@ -2,7 +2,7 @@
 	"name": "ldogfunc",
 	"label": "ldogFunc: functional pre-processing for the LDOG project",
 	"description": "This gear performs preprocessing of the functional scans for the LDOG project.",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"inputs": {
 		"StructZip": {
 			"base": "file",
@@ -46,6 +46,11 @@
 		}
 	},
 	"config": {
+		"extraWarpToTemplate": {
+			"default": false,
+			"description": "This does does an extra constrained warp to the EPI image",
+			"type": "boolean"
+		},
 		"fMRIName": {
 			"default": "NA",
 			"description": "Output name for preprocessed data",
@@ -78,7 +83,7 @@
 		},
 		"gear-builder": {
 			"category": "analysis",
-			"image": "gkaguirrelab/ldogfunc:0.1.5"
+			"image": "gkaguirrelab/ldogfunc:0.1.6"
 		}
 	}
 }
