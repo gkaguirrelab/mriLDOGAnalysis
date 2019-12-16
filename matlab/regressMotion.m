@@ -1,4 +1,4 @@
-function correctedFuncPath = regressMotion(funcZipPath, motionParamsPath)
+function correctedFuncPath = regressMotion(funcZipPath, motionParamsPath, outputFolder)
 % Pre-process the ldog func data to regress out the effects of motion
 %
 % Syntax:
@@ -40,9 +40,10 @@ p = inputParser; p.KeepUnmatched = false;
 % Required
 p.addRequired('funcZipPath',@isstr);
 p.addRequired('motionParamsPath',@isstr);
+p.addRequired('outputFolder',@isstr);
 
 % Parse
-p.parse(funcZipPath, motionParamsPath)
+p.parse(funcZipPath, motionParamsPath, outputFolder)
 
 % Create a temp directory to hold the zip file output
 zipDir = fullfile(fileparts(funcZipPath),tempname('.'));
@@ -106,7 +107,7 @@ thisAcqData.vol = data;
 newName = strrep(acquisitionList(1).name,'_preprocessed_','_preprocessedMoReg_');
 
 % Save the motion corrected fMRI data
-correctedFuncPath = fullfile(acquisitionList(1).folder,newName);
+correctedFuncPath = fullfile(outputFolder,newName);
 MRIwrite(thisAcqData,correctedFuncPath);
 
 end % Main function

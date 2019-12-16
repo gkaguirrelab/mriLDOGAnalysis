@@ -14,7 +14,13 @@
 		"docker-image": ""
 	},
 	"license": "Other",
-	"config": {},
+	"config": {
+		"smoothingSigma": {
+			"default": "NA",
+			"description": "Gaussian sigma in mm. To calculate sigma from FWHM, divide your FWHM (in mm) by 2.3548. Default: NA means no smoothing",
+			"type": "string"
+		}
+	},
 	"inputs": {
 		"EPI_01": {
 			"description": "EPI archive",

@@ -6,12 +6,22 @@ import os
 # Set paths and create some folders
 flywheel_base ='/flywheel/v0/'
 first_output_dir = '/firstOutput'
+mcr_path = '/usr/local/MATLAB/MATLAB_Runtime/v97/'
+compiled_matlab_func = '/opt/regressMotion/run_regressMotion.sh'
 final_output_dir = os.path.join(flywheel_base, 'output')
 manifest_file = os.path.join(flywheel_base, 'manifest.json')
 config_path = os.path.join(flywheel_base, 'config.json')
 os.system('mkdir %s'%first_output_dir)
 
-###################Run Algorithm################################
+################### Parse config ##############################################
+
+with open(config_path) as config_file:
+    job_config = json.load(config_file)
+config = job_config['config']
+
+smoothingSigma = config['smoothingSigma']
+
+################### Run Algorithm ################################
    
 num_img = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', 
            '12', '13', '14', '15', '16', '17', '18', '19', '20']
@@ -26,7 +36,12 @@ for i in num_img:
         os.system('unzip -q %s -d %s/files/' % (zip_file, folder_name))
         new_folder_path = os.path.join(first_output_dir, key_name + '_' + subj_sess_name)
         os.system('mkdir %s' % new_folder_path)
-        os.system('cp %s %s/' % (os.path.join(folder_name, 'files', os.listdir(os.path.join(folder_name, 'files'))[0]), new_folder_path))
+        file = os.path.join(folder_name, 'files', os.listdir(os.path.join(folder_name, 'files'))[0])
+        os.system('cp %s %s/' % (file, new_folder_path))
+        cmd = '%s %s %s %s %s' % (compiled_matlab_func, mcr_path, new_folder_path)
+        
+        os.system(cmd)
+
 
 ################## Zip everything and output ##################################
 
