@@ -2,7 +2,7 @@
 	"name": "ldogfunc",
 	"label": "ldogFunc: functional pre-processing for the LDOG project",
 	"description": "This gear performs preprocessing of the functional scans for the LDOG project.",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"inputs": {
 		"StructZip": {
 			"base": "file",
@@ -83,7 +83,7 @@
 		},
 		"gear-builder": {
 			"category": "analysis",
-			"image": "gkaguirrelab/ldogfunc:0.1.6"
+			"image": "gkaguirrelab/ldogfunc:0.1.7"
 		}
 	}
 }

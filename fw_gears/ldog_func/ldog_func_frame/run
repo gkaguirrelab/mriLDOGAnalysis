@@ -262,7 +262,7 @@ config_path = os.path.join(flywheel_base, 'config.json')
 
 # Get the time series
 fMRITimeSeries_folder = os.path.join(flywheel_base, 'input/fMRITimeSeries')
-fMRITimeSeries_zip = os.path.join(fMRITimeSeries_folder, os.listdir(fMRITimeSeries_folder)[0])
+fMRITimeSeries_name = os.path.join(fMRITimeSeries_folder, os.listdir(fMRITimeSeries_folder)[0])
 
 # Unzip the structural zip
 preprocessedStruct_folder = os.path.join(flywheel_base, 'input/StructZip')
@@ -351,7 +351,7 @@ warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, firs
 
 # Set outside the brain to zero 
 for i in os.listdir(warped_epi):
-     set_zero(os.path.join(warped_epi, i), resampled_template_path, os.path.join(warped_epi, i))
+     set_zero(os.path.join(warped_epi, i), resampled_template_path, os.path.join(warped_epi, i))   
 
 # Make an plot the invivo and warped EPI seperately
 temporary_image = '/usr/tempim/'
