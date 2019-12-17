@@ -116,10 +116,6 @@ def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, apect_r
     
     # This function simply gets two MRI images as inputs and overlays them 
     #using different colors for each image. Used as a diagnostic method.
-    
-    diagnostic_images = os.path.join(output_folder, 'diagnostic_images')
-    if not os.path.exists(diagnostic_images):
-        os.system('mkdir %s' % diagnostic_images)
         
     fig, (ax1, ax2, ax3) = plt.subplots(1,3)
     fig.suptitle(title, fontsize=20)
@@ -143,9 +139,7 @@ def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, apect_r
         ax2.axis('off')
         ax3.axis('off')
 
-    plt.savefig(os.path.join(diagnostic_images, subject_id + '_' + filename))    
-    
-    return(diagnostic_images)
+    plt.savefig(os.path.join(output_folder, subject_id + '_' + filename))    
 
 def make_gif(image_folder, gif_name, output_folder):
     images = []
@@ -229,7 +223,8 @@ preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(su
 make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], final_output_dir)
    
 # Saves a brain extraction diagnostic image
-make_plot(subject_id, averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], final_output_dir)
+if transformationMethod == 'skullStrippedMprage-skullStrippedTemplate':
+    make_plot(subject_id, averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], final_output_dir)
     
 # Warps the averaged mprage to the template 
 if transformationMethod == 'skullStrippedMprage-skullStrippedTemplate':
@@ -244,7 +239,7 @@ temporary = '/tempim/'
 os.system('mkdir %s' % temporary)
 make_plot(subject_id, Template, 'NA', 'Warp results', 'im1.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
 make_plot(subject_id, warped_mprage, 'NA', 'Warp results', 'im2.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
-make_gif(os.path.join(temporary, 'diagnostic_images'), subject_id + 'mprage2template_qa.png', final_output_dir)
+make_gif(temporary, subject_id + '_' + 'mprage2template_qa', final_output_dir)
 
 ################## Zip everything and output ##################################
 # Zip and move the maps
