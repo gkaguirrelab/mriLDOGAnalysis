@@ -52,6 +52,9 @@ acqusitionName = strcat(name, ext);
 % Load the data
 thisAcqData = MRIread(epiPath);
 
+% Get the original shape of the data for later reshaping
+originalShape = size(thisAcqData.vol);
+
 % Reshape into a matrix
 data = thisAcqData.vol;
 data = single(data);
