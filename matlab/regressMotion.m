@@ -1,4 +1,4 @@
-function correctedFuncPath = regressMotion(funcZipPath, motionParamsPath, outputFolder)
+function correctedFuncPath = regressMotion(epiPath, motionParamsPath, outputFolder)
 % Pre-process the ldog func data to regress out the effects of motion
 %
 % Syntax:
@@ -38,32 +38,19 @@ function correctedFuncPath = regressMotion(funcZipPath, motionParamsPath, output
 p = inputParser; p.KeepUnmatched = false;
 
 % Required
-p.addRequired('funcZipPath',@isstr);
+p.addRequired('epiPath',@isstr);
 p.addRequired('motionParamsPath',@isstr);
 p.addRequired('outputFolder',@isstr);
 
 % Parse
-p.parse(funcZipPath, motionParamsPath, outputFolder)
+p.parse(epiPath, motionParamsPath, outputFolder)
 
-% Create a temp directory to hold the zip file output
-zipDir = fullfile(fileparts(funcZipPath),tempname('.'));
-mkdir(zipDir)
-
-% Uncompress the zip archive into the zipDir.
-command = ['unzip -q -n ' funcZipPath ' -d ' zipDir];
-system(command);
-
-% Find and load the functional data
-acquisitionList = dir(fullfile(zipDir,'*.nii.gz'));
-
-% Detect if something weird happened
-if length(acquisitionList)~=1
-    error('regressMotion:weirdFuncDataPath','Found either zero or more than one functional data sets');
-end
+% Extract the file name and extension from the full path 
+[~,name,ext] = fileparts(epiPath);
+acqusitionName = strcat(name, ext);
 
 % Load the data
-rawName = fullfile(acquisitionList(1).folder,acquisitionList(1).name);
-thisAcqData = MRIread(rawName);
+thisAcqData = MRIread(epiPath);
 
 % Reshape into a matrix
 data = thisAcqData.vol;
@@ -104,7 +91,7 @@ warning(warningState);
 thisAcqData.vol = data;
 
 % Set the save name
-newName = strrep(acquisitionList(1).name,'_preprocessed_','_preprocessedMoReg_');
+newName = strrep(acqusitionName, '_preprocessed_','_preprocessedMoReg_');
 
 % Save the motion corrected fMRI data
 correctedFuncPath = fullfile(outputFolder,newName);
