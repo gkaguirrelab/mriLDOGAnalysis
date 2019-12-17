@@ -2,7 +2,7 @@
 	"name": "ldogfix",
 	"label": "ldogFix: archiving ldogfunc outputs",
 	"description": "This gear performs preprocessing for the LDOG project.",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"inputs": {
 		"EPI_01": {
 			"base": "file",
@@ -17,7 +17,7 @@
 		"EPI_02": {
 			"base": "file",
 			"description": "EPI archive",
-			"optional": false,
+			"optional": true,
 			"type": {
 				"enum": [
 					"archive"
@@ -203,9 +203,25 @@
 					"archive"
 				]
 			}
+		},
+		"motionParams": {
+			"base": "file",
+			"description": "Text file containing motion parameters organized in colums",
+			"optional": false
 		}
 	},
-	"config": {},
+	"config": {
+		"archiveName": {
+			"default": "NA",
+			"description": "Archive Name to append to the output name",
+			"type": "string"
+		},
+		"smoothingSigma": {
+			"default": "NA",
+			"description": "Gaussian sigma in mm. To calculate sigma from FWHM, divide your FWHM (in mm) by 2.3548. Default: NA means no smoothing",
+			"type": "string"
+		}
+	},
 	"author": "Ozenc Taskin",
 	"maintainer": "Ozenc Taskin",
 	"license": "Other",
@@ -217,7 +233,7 @@
 		},
 		"gear-builder": {
 			"category": "analysis",
-			"image": "gkaguirrelab/ldogfix:0.1.0"
+			"image": "gkaguirrelab/ldogfix:0.1.2"
 		}
 	}
 }

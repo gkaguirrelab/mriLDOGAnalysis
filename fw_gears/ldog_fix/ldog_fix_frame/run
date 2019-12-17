@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os 
+import json
 ###################### Define the Paths and parameters ###########################
 
 # Set paths and create some folders
@@ -20,9 +21,13 @@ with open(config_path) as config_file:
 config = job_config['config']
 
 smoothingSigma = config['smoothingSigma']
+archiveName = config['archiveName']
 
 ################### Run Algorithm ################################
-   
+
+motion_params_folder = os.path.join(flywheel_base, 'input', 'motionParams')
+motion_params = os.path.join(motion_params_folder, os.listdir(motion_params_folder)[0])
+
 num_img = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', 
            '12', '13', '14', '15', '16', '17', '18', '19', '20']
 
@@ -34,17 +39,21 @@ for i in num_img:
         zip_file = os.path.join(folder_name, zip_name)
         subj_sess_name = zip_name[:-21]
         os.system('unzip -q %s -d %s/files/' % (zip_file, folder_name))
-        new_folder_path = os.path.join(first_output_dir, key_name + '_' + subj_sess_name)
+        new_folder_path = os.path.join(first_output_dir, key_name)
         os.system('mkdir %s' % new_folder_path)
         file = os.path.join(folder_name, 'files', os.listdir(os.path.join(folder_name, 'files'))[0])
-        os.system('cp %s %s/' % (file, new_folder_path))
-        cmd = '%s %s %s %s %s' % (compiled_matlab_func, mcr_path, new_folder_path)
-        
+        #os.system('cp %s %s/' % (file, new_folder_path))
+        cmd = '%s %s %s %s %s' % (compiled_matlab_func, mcr_path, file, motion_params, new_folder_path)        
         os.system(cmd)
-
-
+        
+        if smoothingSigma != 'NA':
+            new_corrected_file = os.path.join(new_folder_path, os.listdir(new_folder_path)[0])
+            os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmaths %s -kernel gauss %s -fmean %s' % (new_corrected_file, float(smoothingSigma), new_corrected_file))
+            newname = new_corrected_file.replace('preprocessedMoReg','preprocessedMoRegSmooth')
+            os.system('mv %s %s' % (new_corrected_file, newname))
+            
 ################## Zip everything and output ##################################
 
 # Zip and move the maps
 print(os.listdir(first_output_dir))
-os.system('cd %s; zip -q -r %s/concatenated_epi *'%(first_output_dir, final_output_dir))
+os.system('cd %s; zip -q -r %s/%s *' % (first_output_dir, final_output_dir, archiveName))
