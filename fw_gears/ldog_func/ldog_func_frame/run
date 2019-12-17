@@ -57,18 +57,16 @@ def topup(subject_id, total_readout_time_AP, total_readout_time_PA, path_to_reco
 
     for i in os.listdir(path_to_epi):
         if int(os.popen('/usr/lib/ants/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % os.path.join(path_to_epi, i)).read()) == 1:
-            os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/applytopup --imain=%s --inindex=1 --method=jac --datain=%s --topup=%s --out=%s/%s_corrected_%s' % (os.path.join(path_to_epi, i),
+            os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/applytopup --imain=%s --inindex=1 --method=jac --datain=%s --topup=%s --out=%s/corrected_%s' % (os.path.join(path_to_epi, i),
                                                                                                                                                                                                                                                 acparam_file,
                                                                                                                                                                                                                                                 os.path.join(top_up_folder, subject_id + '_topup_results'),
-                                                                                                                                                                                                                                                corrected_epi,
-                                                                                                                                                                                                                                                subject_id,
+                                                                                                                                                                                                                                                corrected_epi, 
                                                                                                                                                                                                                                                 i))
         elif int(os.popen('/usr/lib/ants/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % os.path.join(path_to_epi, i)).read()) == 0:
-            os.system('FFSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/applytopup --imain=%s --inindex=2 --method=jac --datain=%s --topup=%s --out=%s/%s_corrected_%s' % (os.path.join(path_to_epi, i),
+            os.system('FFSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/applytopup --imain=%s --inindex=2 --method=jac --datain=%s --topup=%s --out=%s/corrected_%s' % (os.path.join(path_to_epi, i),
                                                                                                                                                                                                                                                 acparam_file,
                                                                                                                                                                                                                                                 os.path.join(top_up_folder, subject_id + '_topup_results'),
                                                                                                                                                                                                                                                 corrected_epi,
-                                                                                                                                                                                                                                                subject_id,
                                                                                                                                                                                                                                                 i))
         else:
             raise ValueError('Your time series image is neither in AP nor in PA direction')
@@ -357,17 +355,13 @@ for i in os.listdir(warped_epi):
 temporary_image = '/usr/tempim/'
 os.system('mkdir %s' % temporary_image)
 os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslroi %s %s/singleEpi.nii.gz 0 1' % (os.path.join(warped_epi, os.listdir(warped_epi)[0]), temporary_image))
-diagnostic_images = make_plot(subject_id, resampled_template_path, 'NA', 'EPI_2_Template', subject_id + '_invivo.png', 26, 23, 26, first_output_dir)
-make_plot(subject_id, os.path.join(temporary_image, os.listdir(temporary_image)[0]), 'NA', 'EPI_2_Template', subject_id + '_final.png', 26, 23, 26, first_output_dir)
+diagnostic_images = make_plot(subject_id, resampled_template_path, 'NA', 'EPI_2_Template', subject_id + '_invivo.png', 26, 23, 26, temporary_image)
+make_plot(subject_id, os.path.join(temporary_image, os.listdir(temporary_image)[0]), 'NA', 'EPI_2_Template', subject_id + '_final.png', 26, 23, 26, temporary_image)
 
  #Combine the images and make a gif
 make_gif(diagnostic_images, 'EPI_2_Template', final_output_dir)
 
 ################## Zip everything and output ##################################
-
-# Move mat, pdf and png files to the final output folder
-os.system('cd %s; mv %s %s/' % (os.path.join(first_output_dir, 'diagnostic_images'), '*.png', final_output_dir)) 
-os.system('cd %s; rm -r %s' % (first_output_dir, 'diagnostic_images'))
 
 # Save output
 os.system('cd %s; mv * %s' % (moco_cov, final_output_dir))
