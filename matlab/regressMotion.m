@@ -90,8 +90,9 @@ end
 % Restore the warning state.
 warning(warningState);
 
-% Put the cleaned data back into the acquisition
+% Put the cleaned data back into the acquisition and reshape to 4D
 thisAcqData.vol = data;
+thisAcqData.vol = permute(reshape(thisAcqData.vol, originalShape(1), originalShape(2), originalShape(3), originalShape(4)), [1 2 3 4]);
 
 % Set the save name
 newName = strrep(acqusitionName, '_preprocessed_','_preprocessedMoReg_');
