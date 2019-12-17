@@ -13,9 +13,9 @@ function correctedFuncPath = regressMotion(epiPath, motionParamsPath, outputFold
 %   Requires the Freesurfer MATLAB library to handle read/write operations.
 %
 % Inputs:
-%   funcZipPath           - String. Path to zip files that contain the
-%                           fMRI data to be analyzed. These zip files are
-%                           the output of the ldogFunc.
+%   epiPath               - String. Path to .nii file that contains the
+%                           fMRI data to be analyzed. This is the unzipped
+%                           output of the ldogFunc.
 %   motionParamsPath      - String. Path to a .txt file that contains the
 %                           motion covariates.
 %
@@ -29,9 +29,9 @@ function correctedFuncPath = regressMotion(epiPath, motionParamsPath, outputFold
 %
 % Examples:
 %{
-    funcZipPath = 'N292_112Reps_RightEyeStim_preprocessedFunc.zip';
-    motionParamsPath = 'N292_112Reps_RightEyeStim_motion_params.txt';
-    regressMotion(funcZipPath, motionParamsPath);
+    epiPath = 'N292_N292_final_preprocessed_N292_N292_corrected_1.3.12.2.1107.5.2.32.35335.201912051319034549056903.0.0.0.nii';
+    motionParamsPath = 'N292_N292_motion_params.txt';
+    correctedFuncPath = regressMotion(epiPath, motionParamsPath,'');
 %}
 
 %% Parse inputs
@@ -92,7 +92,7 @@ warning(warningState);
 
 % Put the cleaned data back into the acquisition and reshape to 4D
 thisAcqData.vol = data;
-thisAcqData.vol = permute(reshape(thisAcqData.vol, originalShape(1), originalShape(2), originalShape(3), originalShape(4)), [1 2 3 4]);
+thisAcqData.vol = reshape(thisAcqData.vol, originalShape);
 
 % Set the save name
 newName = strrep(acqusitionName, '_preprocessed_','_preprocessedMoReg_');
