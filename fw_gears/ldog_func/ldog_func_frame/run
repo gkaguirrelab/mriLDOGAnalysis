@@ -79,7 +79,7 @@ def topup(subject_id, total_readout_time_AP, total_readout_time_PA, path_to_reco
                                                                 os.path.join(top_up_folder, subject_id + '_moco_target')))
     return (top_up_folder, corrected_epi)
 
-def moco(subject_id, epi_folder, top_up_folder, output_folder): 
+def moco(subject_id, fMRIname, epi_folder, top_up_folder, output_folder): 
     
     # This function does motion correction and calculates time derivatives of
     # the output motion covariates
@@ -94,7 +94,7 @@ def moco(subject_id, epi_folder, top_up_folder, output_folder):
                                                                                                                                                                                                   os.path.join(epi_folder, i),
                                                                                                                                                                                                   mc_to_this)
         os.system(mcflirt_call)
-    os.system('mv %s/*.par %s/%s.txt' % (epi_folder, moco_cov, subject_id + '_motion_params'))
+    os.system('mv %s/*.par %s/%s.txt' % (epi_folder, moco_cov, subject_id + '_' + fMRIname + '_motion_params'))
     
     # Motion derivatives
     for i in os.listdir(moco_cov):
@@ -173,10 +173,6 @@ def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, output_
     
     # This function simply gets two MRI images as inputs and overlays them 
     #using different colors for each image. Used as a diagnostic method.
-    
-    diagnostic_images = os.path.join(output_folder, 'diagnostic_images')
-    if not os.path.exists(diagnostic_images):
-        os.system('mkdir %s' % diagnostic_images)
         
     fig, (ax1, ax2, ax3) = plt.subplots(1,3)
     fig.suptitle(title, fontsize=20)
@@ -200,9 +196,9 @@ def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, output_
         ax2.axis('off')
         ax3.axis('off')
 
-    plt.savefig(os.path.join(diagnostic_images, subject_id + '_' + filename))    
+    plt.savefig(os.path.join(output_folder, subject_id + '_' + filename))    
     
-    return(diagnostic_images)
+    return (output_folder)
     
 def make_gif(image_folder, gif_name, output_folder):
     images = []
@@ -260,7 +256,9 @@ config_path = os.path.join(flywheel_base, 'config.json')
 
 # Get the time series
 fMRITimeSeries_folder = os.path.join(flywheel_base, 'input/fMRITimeSeries')
-fMRITimeSeries_name = os.path.join(fMRITimeSeries_folder, os.listdir(fMRITimeSeries_folder)[0])
+file_name = os.listdir(fMRITimeSeries_folder)[0]
+fMRITimeSeries_name = os.path.join(fMRITimeSeries_folder, file_name)
+
 
 # Unzip the structural zip
 preprocessedStruct_folder = os.path.join(flywheel_base, 'input/StructZip')
@@ -310,7 +308,7 @@ top_up_folder, corrected_epi = topup(subject_id, total_readout_time_AP, total_re
 
 # Motion correction and time derivative calculation. Overwrites the original 
 # EPI images !!!
-mc_to_this, moco_cov = moco(subject_id, corrected_epi, top_up_folder, first_output_dir)
+mc_to_this, moco_cov = moco(subject_id, file_name, corrected_epi, top_up_folder, first_output_dir)
 
 # Flip the EPI images 
 #flipped_epi = flip_epi(corrected_epi, first_output_dir)
@@ -355,16 +353,18 @@ for i in os.listdir(warped_epi):
 temporary_image = '/usr/tempim/'
 os.system('mkdir %s' % temporary_image)
 os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslroi %s %s/singleEpi.nii.gz 0 1' % (os.path.join(warped_epi, os.listdir(warped_epi)[0]), temporary_image))
-diagnostic_images = make_plot(subject_id, resampled_template_path, 'NA', 'EPI_2_Template', subject_id + '_invivo.png', 26, 23, 26, temporary_image)
-make_plot(subject_id, os.path.join(temporary_image, os.listdir(temporary_image)[0]), 'NA', 'EPI_2_Template', subject_id + '_final.png', 26, 23, 26, temporary_image)
+temporary_plot = '/usr/tempplt/'
+os.system('mkdir %s' % temporary_plot)
+make_plot(subject_id, resampled_template_path, 'NA', 'EPI_2_Template', subject_id + '_invivo.png', 26, 23, 26, temporary_plot)
+image_out = make_plot(subject_id, os.path.join(temporary_image, os.listdir(temporary_image)[0]), 'NA', 'EPI_2_Template', subject_id + '_final.png', 26, 23, 26, temporary_plot)
 
- #Combine the images and make a gif
-make_gif(diagnostic_images, 'EPI_2_Template', final_output_dir)
+ # Combine the images and make a gif
+make_gif(temporary_plot, 'EPI_2_Template', final_output_dir)
 
 ################## Zip everything and output ##################################
 
 # Save output
-os.system('cd %s; mv * %s' % (moco_cov, final_output_dir))
+os.system('cd %s; mv * %s/' % (moco_cov, warped_epi))
 os.system('cd %s; zip -q %s *' % (warped_epi, os.path.join(final_output_dir, subject_id + '_preprocessedFunc.zip')))
 os.system('rm -r %s' % moco_cov)
 os.system('rm -r %s' % warped_epi)
