@@ -2,7 +2,7 @@
 	"name": "ldogfix",
 	"label": "ldogFix: archiving ldogfunc outputs",
 	"description": "This gear performs preprocessing for the LDOG project.",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"inputs": {
 		"EPI_01": {
 			"base": "file",
@@ -203,12 +203,8 @@
 					"archive"
 				]
 			}
-		},
-		"motionParams": {
-			"base": "file",
-			"description": "Text file containing motion parameters organized in colums",
-			"optional": false
 		}
+
 	},
 	"config": {
 		"archiveName": {
