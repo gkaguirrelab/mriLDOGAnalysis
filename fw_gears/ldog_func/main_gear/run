@@ -39,8 +39,8 @@ def topup(subject_id, total_readout_time_AP, total_readout_time_PA, path_to_reco
     if not os.path.exists(top_up_folder):
         os.system('mkdir %s' % top_up_folder)
     os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmerge -a %s %s %s' % (os.path.join(top_up_folder, subject_id + '_AP+PA'),
-                                                                                                                                                              ap_image,
-                                                                                                                                                              pa_image))
+                                                                                                                                                 ap_image,
+                                                                                                                                                 pa_image))
     
     # Calculate the field
     os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/topup --imain=%s --datain=%s '
@@ -51,19 +51,19 @@ def topup(subject_id, total_readout_time_AP, total_readout_time_PA, path_to_reco
                                                                    os.path.join(top_up_folder, subject_id + '_fieldmap_Hz')))
 
     # Apply correction to the EPI image(s)    
-    corrected_epi = os.path.join(output_folder, subject_id + '_corrected_epi')
+    corrected_epi = os.path.join(output_folder, subject_id + '_topup_corrected_epi')
     if not os.path.exists(corrected_epi):
         os.system('mkdir %s' % corrected_epi)
 
     for i in os.listdir(path_to_epi):
         if int(os.popen('/usr/lib/ants/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % os.path.join(path_to_epi, i)).read()) == 1:
-            os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/applytopup --imain=%s --inindex=1 --method=jac --datain=%s --topup=%s --out=%s/corrected_%s' % (os.path.join(path_to_epi, i),
+            os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/applytopup --imain=%s --inindex=1 --method=jac --datain=%s --topup=%s --out=%s/1topup_%s' % (os.path.join(path_to_epi, i),
                                                                                                                                                                                                                                                 acparam_file,
                                                                                                                                                                                                                                                 os.path.join(top_up_folder, subject_id + '_topup_results'),
                                                                                                                                                                                                                                                 corrected_epi, 
                                                                                                                                                                                                                                                 i))
         elif int(os.popen('/usr/lib/ants/PrintHeader %s | grep descrip | grep phase |  cut -d \';\' -f 3 | cut -d \'=\' -f 2' % os.path.join(path_to_epi, i)).read()) == 0:
-            os.system('FFSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/applytopup --imain=%s --inindex=2 --method=jac --datain=%s --topup=%s --out=%s/corrected_%s' % (os.path.join(path_to_epi, i),
+            os.system('FFSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/applytopup --imain=%s --inindex=2 --method=jac --datain=%s --topup=%s --out=%s/1topup_%s' % (os.path.join(path_to_epi, i),
                                                                                                                                                                                                                                                 acparam_file,
                                                                                                                                                                                                                                                 os.path.join(top_up_folder, subject_id + '_topup_results'),
                                                                                                                                                                                                                                                 corrected_epi,
@@ -91,8 +91,8 @@ def moco(subject_id, fMRIname, epi_folder, top_up_folder, output_folder):
         os.system('mkdir %s' % moco_cov)
     for i in os.listdir(epi_folder):
         mcflirt_call = 'FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/mcflirt -in %s -o %s -reffile %s -dof 12 -plots' % (os.path.join(epi_folder, i),
-                                                                                                                                                                                                  os.path.join(epi_folder, i),
-                                                                                                                                                                                                  mc_to_this)
+                                                                                                                                                                                     os.path.join(epi_folder, i),
+                                                                                                                                                                                     mc_to_this)
         os.system(mcflirt_call)
     os.system('mv %s/*.par %s/%s.txt' % (epi_folder, moco_cov, subject_id + '_' + fMRIname + '_motion_params'))
     
@@ -115,10 +115,10 @@ def apply_warp(subject_id, epi_folder, template_path, output_folder, path_to_gen
     # Warp EPI images to invivo template
     if flipped == False:
         warped_epi = os.path.join(output_folder, subject_id + '_preprocessed_epi')
-        conv = subject_id + '_final_preprocessed'
+        conv = subject_id + '_preprocessed'
     else:
         warped_epi = os.path.join(output_folder, subject_id + '_flipped_preprocessed_epi')
-        conv = subject_id + '_final_flipped_preprocessed'      
+        conv = subject_id + '_flipped_preprocessed'      
     if not os.path.exists(warped_epi):
         os.system('mkdir %s' % warped_epi)
     
@@ -130,7 +130,7 @@ def apply_warp(subject_id, epi_folder, template_path, output_folder, path_to_gen
                       '--reference-image %s '
                       '--transform %s --transform %s '
                       '-v 1' % (os.path.join(epi_folder, i),
-                                warped_epi, conv, i,
+                                warped_epi, conv, i[6:],
                                 template_path,
                                 path_to_warp,
                                 path_to_generic_affine))
@@ -141,9 +141,9 @@ def apply_warp(subject_id, epi_folder, template_path, output_folder, path_to_gen
                       '--input %s --input-image-type 3 '
                       '--interpolation Linear --output %s/%s_%s '
                       '--reference-image %s '
-                      '-transform %s --transform %s --transform %s --transform %s '
+                      '--transform %s --transform %s --transform %s --transform %s '
                       '-v 1' % (os.path.join(epi_folder, i),
-                                warped_epi, conv, i,
+                                warped_epi, conv, i[6:],
                                 template_path,
                                 path_to_warp2,
                                 path_to_generic_affine2,
@@ -169,14 +169,15 @@ def set_zero(data_path, template_path, output_path):
     
     nib.save(data, output_path)
 
-def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, output_folder):
+def make_plot(subject_id, base_image, overlay, title, subtitle, filename, x, y, z, output_folder):
     
     # This function simply gets two MRI images as inputs and overlays them 
     #using different colors for each image. Used as a diagnostic method.
         
     fig, (ax1, ax2, ax3) = plt.subplots(1,3)
     fig.suptitle(title, fontsize=20)
-
+    ax2.title.set_text(subtitle)
+    
     epi_img = nib.load(base_image)
     epi_img_data = epi_img.get_fdata()
     ax1.imshow(epi_img_data[x,:,:], cmap="gray")
@@ -206,40 +207,6 @@ def make_gif(image_folder, gif_name, output_folder):
         images.append(imageio.imread(os.path.join(image_folder, filename)))
         imageio.mimsave('/%s/%s.gif' % (output_folder, gif_name), images, duration=0.9)
 
-#def flip_epi(epi_folder, output_folder):
-#    
-#    # This function x-y flips the EPI images.
-#
-#    # Flip 4D hemispheres 
-#    flipped_epi = os.path.join(output_folder, 'flipped')
-#    if not os.path.exists(flipped_epi):
-#        os.system('mkdir %s' % flipped_epi)
-#    for i in os.listdir(epi_folder):
-#        corrected_imaj = os.path.join(epi_folder, i)
-#        flipped_imaj = os.path.join(flipped_epi, i)
-#        flip_call = 'fslswapdim %s x -y z %s' % (corrected_imaj, flipped_imaj)
-#        os.system(flip_call)
-#        
-#    return (flipped_epi)
-#
-#def average_org_and_flipped(original_epi_path, flipped_epi_path, output_folder):   
-#    
-#    # This function averages the processed original and processed flipped epi images
-#    
-#    final_epi = os.path.join(output_folder, 'final_preprocessed_fmri')
-#    if not os.path.exists(final_epi):
-#        os.system('mkdir %s' % final_epi)
-#    for i in os.listdir(original_epi_path):
-#        avgcall = 'AverageImages 4 %s 0 %s %s' % (os.path.join(final_epi, 'final_' + i),
-#                                                  os.path.join(original_epi_path, i),
-#                                                  os.path.join(flipped_epi_path, 'flipped_' + i))
-#        #avgcall = 'fslmaths %s -add %s -div 2 %s -odt float' % (os.path.join(original_epi_path, i),
-#        #                                                        os.path.join(flipped_epi_path, 'flipped_' + i),
-#        #                                                        os.path.join(final_epi, 'final_' + i))
-#        os.system(avgcall)        
-#    
-#    return (final_epi)    
-
 ###################### Define the Paths and parameters ###########################
 
 # os.system('cat /proc/cpuinfo')
@@ -258,7 +225,6 @@ config_path = os.path.join(flywheel_base, 'config.json')
 fMRITimeSeries_folder = os.path.join(flywheel_base, 'input/fMRITimeSeries')
 file_name = os.listdir(fMRITimeSeries_folder)[0]
 fMRITimeSeries_name = os.path.join(fMRITimeSeries_folder, file_name)
-
 
 # Unzip the structural zip
 preprocessedStruct_folder = os.path.join(flywheel_base, 'input/StructZip')
@@ -309,45 +275,66 @@ top_up_folder, corrected_epi = topup(subject_id, total_readout_time_AP, total_re
 # Motion correction and time derivative calculation. Overwrites the original 
 # EPI images !!!
 mc_to_this, moco_cov = moco(subject_id, file_name, corrected_epi, top_up_folder, first_output_dir)
+prime_image_folder = '/prime_image'
+os.system('mkdir %s' % prime_image_folder)
+os.system('cp %s %s/' % (mc_to_this, prime_image_folder))
+prime_image = os.path.join(prime_image_folder, os.listdir(prime_image_folder)[0])
+os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslroi %s %s 0 1' % (prime_image, prime_image))
 
-# Flip the EPI images 
-#flipped_epi = flip_epi(corrected_epi, first_output_dir)
+# Apply warp to the prime
+os.system('/usr/lib/ants/antsApplyTransforms --float --default-value 0 '
+          '--input %s --input-image-type 0 '
+          '--interpolation Linear --output %s '
+          '--reference-image %s '
+          '--transform %s --transform %s '
+          '-v 1' % (prime_image,
+                    prime_image,
+                    resampled_template_path,
+                    path_to_warp,
+                    generic_affine))
 
-#Move flipped EPI to flipped mprage space. Overwrites the original flipped !!!
-#flip_to_flip_registration(flipped_epi, flipped_extracted_brain, first_output_dir)
+# Set prime outside values to zero
+set_zero(prime_image, resampled_template_path, prime_image)
 
-# print(mc_to_this)
-
-# if extraWarpToTemplate == True:
-#     temporary_folder = '/usr/tempfol/'
-#     os.system('mkdir %s' % temporary_folder)
-#     os.system('cp %s %s/' % (mc_to_this, temporary_folder))
-#     first_warp_folder = '/usr/firstvol/'
-#     os.system('mkdir %s' % first_warp_folder)    
-#     warped_single_rep = apply_warp(subject_id, temporary_folder, resampled_template_path, first_warp_folder, generic_affine, path_to_warp, 'NA', 'NA', False)
-#     warped_single_rep_image = os.listdir(warped_single_rep[0])
-#     second_warp_matrices = first_output_dir + 'second_warp_matrices'
-#     os.system('mkdir %s' % (second_warp_matrices))
-#     warp_call = 'export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s -n %s' % (resampled_template_path, 
-#                                                                                                                                                     warped_single_rep_image, 
-#                                                                                                                                                     os.path.join(second_warp_matrices, 'second'),
-#                                                                                                                                                     2)
-#     os.system(warp_call)
-#     #Apply warps to the standard and flipped EPI images and downsample to 2mm using 
-#     #the downsampled image as the target.
-#     warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, os.path.join(second_warp_matrices, 'second0GenericAffine.mat'), os.path.join(second_warp_matrices, 'second1Warp.nii.gz'), False)
-# else:
-#     warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, 'NA', 'NA', False)
-warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, 'NA', 'NA', False)
-
-#flipped_warped_epi = apply_warp(flipped_epi, resampled_template_path, first_output_dir, flipped_generic, True)
-
-# Average flipped and unflipped EPI images
-# final_epi = average_org_and_flipped(warped_epi, flipped_warped_epi, first_output_dir)
+if extraWarpToTemplate == True:
+    second_warp_folder = os.path.join(first_output_dir, 'second_warp')
+    os.system('mkdir %s' % second_warp_folder)
+    os.system('antsRegistration --verbose 1 --dimensionality 3 --float 0 '
+              '--collapse-output-transforms 1 '
+              '--output [ %s/second,%s/primeSecondWarped.nii.gz,%s/primeSecondInverseWarped.nii.gz ] '
+              '--interpolation Linear --use-histogram-matching 0 '
+              '--winsorize-image-intensities [ 0.005,0.995 ] '
+              '--initial-moving-transform [ %s,%s,1 ] '
+              '--transform Rigid[ 0.1 ] --metric MI[ %s,%s,1,32,Regular,0.25 ] '
+              '--convergence [ 1000x500x250x100,1e-6,10 ] '
+              '--shrink-factors 8x4x2x1 --smoothing-sigmas 3x2x1x0vox '
+              '--transform Affine[ 0.1 ] '
+              '--metric MI[ %s,%s,1,32,Regular,0.25 ] '
+              '--convergence [ 1000x500x250x100,1e-6,10 ] '
+              '--shrink-factors 8x4x2x1 --smoothing-sigmas 3x2x1x0vox '
+              '--transform SyN[ 0.1,3,0 ] --metric CC[ %s,%s,1,4 ] '
+              '--convergence [ 10x10,1e-6,10 ] --shrink-factors 1x1 '
+              '--smoothing-sigmas 1x0vox' % (second_warp_folder,
+                                              second_warp_folder,
+                                              second_warp_folder,
+                                              resampled_template_path,
+                                              prime_image,
+                                              resampled_template_path,
+                                              prime_image,
+                                              resampled_template_path,
+                                              prime_image,
+                                              resampled_template_path,
+                                              prime_image))
+    second_warp = os.path.join(second_warp_folder, 'second1Warp.nii.gz')
+    second_affine = os.path.join(second_warp_folder, 'second0GenericAffine.mat')    
+    warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, second_affine, second_warp, False)
+                                      
+else:    
+    warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, 'NA', 'NA', False)
 
 # Set outside the brain to zero 
 for i in os.listdir(warped_epi):
-     set_zero(os.path.join(warped_epi, i), resampled_template_path, os.path.join(warped_epi, i))   
+      set_zero(os.path.join(warped_epi, i), resampled_template_path, os.path.join(warped_epi, i))   
 
 # Make an plot the invivo and warped EPI seperately
 temporary_image = '/usr/tempim/'
@@ -355,13 +342,14 @@ os.system('mkdir %s' % temporary_image)
 os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslroi %s %s/singleEpi.nii.gz 0 1' % (os.path.join(warped_epi, os.listdir(warped_epi)[0]), temporary_image))
 temporary_plot = '/usr/tempplt/'
 os.system('mkdir %s' % temporary_plot)
-make_plot(subject_id, resampled_template_path, 'NA', 'EPI_2_Template', subject_id + '_invivo.png', 26, 23, 26, temporary_plot)
-image_out = make_plot(subject_id, os.path.join(temporary_image, os.listdir(temporary_image)[0]), 'NA', 'EPI_2_Template', subject_id + '_final.png', 26, 23, 26, temporary_plot)
+make_plot(subject_id, resampled_template_path, 'NA', subject_id + ' EPI_2_Template', 'template', subject_id + '_invivo.png', 26, 23, 26, temporary_plot)
+#image_out = make_plot(subject_id, os.path.join(temporary_image, os.listdir(temporary_image)[0]), 'NA', subject_id + ' EPI_2_Template', 'warped', subject_id + '_final.png', 26, 23, 26, temporary_plot)
+image_out = make_plot(subject_id, prime_image, 'NA', subject_id + ' EPI_2_Template', 'warped', subject_id + '_final.png', 26, 23, 26, temporary_plot)
 
- # Combine the images and make a gif
-make_gif(temporary_plot, 'EPI_2_Template', final_output_dir)
+# Combine the images and make a gif
+make_gif(temporary_plot, subject_id + '_EPI_2_Template', final_output_dir)
 
-################## Zip everything and output ##################################
+# ################## Zip everything and output ##################################
 
 # Save output
 os.system('cd %s; mv * %s/' % (moco_cov, warped_epi))
