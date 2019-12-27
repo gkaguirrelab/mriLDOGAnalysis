@@ -35,10 +35,25 @@
 			"description": "saves intermediate files created during the analysis",
 			"type": "boolean"
 		},
-		"extraWarpToTemplate": {
+		"additionalWarpToTemplate": {
 			"default": false,
 			"description": "This does does an extra constrained warp to the EPI image",
 			"type": "boolean"
+		},
+		"additionalWarpConvergence": {
+			"default": "10x10",
+			"description": "Convergence for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
+			"type": "string"
+		},
+		"additionalWarpShrinkFactors": {
+			"default": "1x1",
+			"description": "Shrink Factors for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
+			"type": "string"
+		},
+		"additionalWarpSmoothingSigmas": {
+			"default": "1x0vox",
+			"description": "Smoothing Sigmas for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
+			"type": "string"
 		}
 	},
 	"inputs": {

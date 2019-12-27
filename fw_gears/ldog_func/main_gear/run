@@ -79,7 +79,7 @@ def topup(subject_id, total_readout_time_AP, total_readout_time_PA, path_to_reco
                                                                 os.path.join(top_up_folder, subject_id + '_moco_target')))
     return (top_up_folder, corrected_epi)
 
-def moco(subject_id, fMRIname, epi_folder, top_up_folder, output_folder): 
+def moco(subject_id, fMRIName, epi_folder, top_up_folder, output_folder): 
     
     # This function does motion correction and calculates time derivatives of
     # the output motion covariates
@@ -94,7 +94,7 @@ def moco(subject_id, fMRIname, epi_folder, top_up_folder, output_folder):
                                                                                                                                                                                      os.path.join(epi_folder, i),
                                                                                                                                                                                      mc_to_this)
         os.system(mcflirt_call)
-    os.system('mv %s/*.par %s/%s.txt' % (epi_folder, moco_cov, subject_id + '_' + fMRIname + '_motion_params'))
+    os.system('mv %s/*.par %s/%s.txt' % (epi_folder, moco_cov, subject_id + '_motion_params_' + fMRIName))
     
     # Motion derivatives
     for i in os.listdir(moco_cov):
@@ -255,7 +255,10 @@ total_readout_time_AP = config['totalReadoutTimeAP']
 total_readout_time_PA = config['totalReadoutTimePA']
 saveIntermediateFiles = config['saveIntermediateFiles']
 fMRIName = config['fMRIName']
-extraWarpToTemplate = config['extraWarpToTemplate']
+additionalWarpToTemplate = config['additionalWarpToTemplate']
+additionalWarpConvergence = config['additionalWarpConvergence']
+additionalWarpShrinkFactors = config['additionalWarpShrinkFactors']
+additionalWarpSmoothingSigmas = config['additionalWarpSmoothingSigmas']
 
 # Get the subject id and set some more paths
 with open ('%s' % os.path.join(struct_folder, 'subject_id.txt'), 'r') as idfile:
@@ -275,11 +278,12 @@ top_up_folder, corrected_epi = topup(subject_id, total_readout_time_AP, total_re
 # Motion correction and time derivative calculation. Overwrites the original 
 # EPI images !!!
 mc_to_this, moco_cov = moco(subject_id, file_name, corrected_epi, top_up_folder, first_output_dir)
-prime_image_folder = '/prime_image'
+prime_image_folder = os.path.join(first_output_dir, subject_id + '_prime_image')
 os.system('mkdir %s' % prime_image_folder)
 os.system('cp %s %s/' % (mc_to_this, prime_image_folder))
 prime_image = os.path.join(prime_image_folder, os.listdir(prime_image_folder)[0])
-os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslroi %s %s 0 1' % (prime_image, prime_image))
+prime_to_warp = '/tmp/prime_to_warp'
+os.system('mkdir %s; cp %s %s/' % (prime_to_warp, mc_to_this, prime_to_warp))
 
 # Apply warp to the prime
 os.system('/usr/lib/ants/antsApplyTransforms --float --default-value 0 '
@@ -296,8 +300,8 @@ os.system('/usr/lib/ants/antsApplyTransforms --float --default-value 0 '
 # Set prime outside values to zero
 set_zero(prime_image, resampled_template_path, prime_image)
 
-if extraWarpToTemplate == True:
-    second_warp_folder = os.path.join(first_output_dir, 'second_warp')
+if additionalWarpToTemplate == True:
+    second_warp_folder = os.path.join(first_output_dir, subject_id + '_second_warp')
     os.system('mkdir %s' % second_warp_folder)
     os.system('antsRegistration --verbose 1 --dimensionality 3 --float 0 '
               '--collapse-output-transforms 1 '
@@ -313,8 +317,8 @@ if extraWarpToTemplate == True:
               '--convergence [ 1000x500x250x100,1e-6,10 ] '
               '--shrink-factors 8x4x2x1 --smoothing-sigmas 3x2x1x0vox '
               '--transform SyN[ 0.1,3,0 ] --metric CC[ %s,%s,1,4 ] '
-              '--convergence [ 10x10,1e-6,10 ] --shrink-factors 1x1 '
-              '--smoothing-sigmas 1x0vox' % (second_warp_folder,
+              '--convergence [ %s,1e-6,10 ] --shrink-factors %s '
+              '--smoothing-sigmas %s' % (second_warp_folder,
                                               second_warp_folder,
                                               second_warp_folder,
                                               resampled_template_path,
@@ -324,14 +328,31 @@ if extraWarpToTemplate == True:
                                               resampled_template_path,
                                               prime_image,
                                               resampled_template_path,
-                                              prime_image))
+                                              prime_image,
+                                              additionalWarpConvergence,
+                                              additionalWarpShrinkFactors,
+                                              additionalWarpSmoothingSigmas))
     second_warp = os.path.join(second_warp_folder, 'second1Warp.nii.gz')
     second_affine = os.path.join(second_warp_folder, 'second0GenericAffine.mat')    
-    warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, second_affine, second_warp, False)
-                                      
+    warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, second_affine, second_warp, False)  
+    primewarped = os.path.join(prime_to_warp, os.listdir(prime_to_warp)[0])    
+    os.system('/usr/lib/ants/antsApplyTransforms --float --default-value 0 '
+              '--input %s --input-image-type 0 '
+              '--interpolation Linear --output %s '
+              '--reference-image %s '
+              '--transform %s --transform %s --transform %s --transform %s '
+              '-v 1' % (primewarped,
+                        primewarped,
+                        resampled_template_path,
+                        second_warp,
+                        second_affine,
+                        path_to_warp,
+                        generic_affine))
+    set_zero(primewarped, resampled_template_path, primewarped)
 else:    
     warped_epi = apply_warp(subject_id, corrected_epi, resampled_template_path, first_output_dir, generic_affine, path_to_warp, 'NA', 'NA', False)
-
+    primewarped = prime_image
+    
 # Set outside the brain to zero 
 for i in os.listdir(warped_epi):
       set_zero(os.path.join(warped_epi, i), resampled_template_path, os.path.join(warped_epi, i))   
@@ -341,13 +362,17 @@ temporary_image = '/usr/tempim/'
 os.system('mkdir %s' % temporary_image)
 os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslroi %s %s/singleEpi.nii.gz 0 1' % (os.path.join(warped_epi, os.listdir(warped_epi)[0]), temporary_image))
 temporary_plot = '/usr/tempplt/'
+temporary_plot2 = '/usr/tempplt2/'
 os.system('mkdir %s' % temporary_plot)
+os.system('mkdir %s' % temporary_plot2)
 make_plot(subject_id, resampled_template_path, 'NA', subject_id + ' EPI_2_Template', 'template', subject_id + '_invivo.png', 26, 23, 26, temporary_plot)
-#image_out = make_plot(subject_id, os.path.join(temporary_image, os.listdir(temporary_image)[0]), 'NA', subject_id + ' EPI_2_Template', 'warped', subject_id + '_final.png', 26, 23, 26, temporary_plot)
-image_out = make_plot(subject_id, prime_image, 'NA', subject_id + ' EPI_2_Template', 'warped', subject_id + '_final.png', 26, 23, 26, temporary_plot)
+make_plot(subject_id, resampled_template_path, 'NA', subject_id + ' EPI_2_Template', 'template', subject_id + '_invivo.png', 26, 23, 26, temporary_plot2)
+make_plot(subject_id, primewarped, 'NA', subject_id + ' EPI_2_Template', 'warped_prime', subject_id + '_final.png', 26, 23, 26, temporary_plot)
+make_plot(subject_id, os.path.join(temporary_image, os.listdir(temporary_image)[0]), 'NA', subject_id + ' EPI_2_Template', 'warped_epi_1st_vol', subject_id + '_final.png', 26, 23, 26, temporary_plot2)
 
 # Combine the images and make a gif
-make_gif(temporary_plot, subject_id + '_EPI_2_Template', final_output_dir)
+make_gif(temporary_plot, subject_id + '_prime_2_Template', final_output_dir)
+make_gif(temporary_plot2, subject_id + '_EPI_2_Template2', final_output_dir)
 
 # ################## Zip everything and output ##################################
 

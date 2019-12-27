@@ -26,7 +26,7 @@ RUN apt-get update \
 
 # Install python packages
 RUN pip3 install --upgrade pip
-RUN pip3 install nibabel matplotlib imageio pandas numpy
+RUN pip3 install nibabel==2.5.1 matplotlib imageio pandas numpy
 
 # Set the entrypoint  
 ENTRYPOINT /flywheel/v0/run
