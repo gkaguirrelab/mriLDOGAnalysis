@@ -47,10 +47,12 @@ for i in num_img:
         os.system(cmd)
         
         if smoothingSigma != 'NA':
-            new_corrected_file = os.path.join(new_folder_path, os.listdir(new_folder_path)[0])
-            os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmaths %s -kernel gauss %s -fmean %s' % (new_corrected_file, float(smoothingSigma), new_corrected_file))
-            newname = new_corrected_file.replace('preprocessedMoReg','preprocessedMoRegSmooth')
-            os.system('mv %s %s' % (new_corrected_file, newname))
+            for i in os.listdir(new_folder_path):
+                if i[-3:] == '.gz':
+                    new_corrected_file = os.path.join(new_folder_path,i)
+                    os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmaths %s -kernel gauss %s -fmean %s' % (new_corrected_file, float(smoothingSigma), new_corrected_file))
+                    newname = new_corrected_file.replace('preprocessedMoReg','preprocessedMoRegSmooth')
+                    os.system('mv %s %s' % (new_corrected_file, newname))
             
 ################## Zip everything and output ##################################
 

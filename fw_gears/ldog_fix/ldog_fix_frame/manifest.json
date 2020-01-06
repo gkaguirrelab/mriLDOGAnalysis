@@ -6,7 +6,7 @@
 	"maintainer": "Ozenc Taskin <huseyinozenc.taskin@pennmedicine.upenn.edu>",
 	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
 	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"custom": {
 		"flywheel": {
 			"suite": "GKAguirreLab"
@@ -21,7 +21,7 @@
 			"type": "string"
 		},
 		"archiveName": {
-			"default": "NA",
+			"default": "archive",
 			"description": "Archive Name to append to the output name",
 			"type": "string"
 		}
