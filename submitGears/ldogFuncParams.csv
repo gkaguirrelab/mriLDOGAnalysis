@@ -1,0 +1,9 @@
+projectLabel,canineFovea,gearName,ldogFunc,rootSession,fMRITimeSeries,ConfigKeys,"{'fMRIName','additionalWarpToTemplate','totalReadoutTimeAP','totalReadoutTimePA'}",ConfigVals,"{subjectName,true,0.0217349,0.0217349}"
+Inputs,StructZip,fMRIScoutAP,fMRIScoutPA,fMRITimeSeries,analysisSubmissionTag,,,,
+DefaultLabel,ldogstruct/preprocessedStruct.zip,ep2d_bold 2x2x3 iPAT2 AP,ep2d_bold 2x2x3 iPAT2 PA,,,,,,
+FileSuffix,zip,nifti,nifti,nifti,,,,,
+ContainerType,analysis,acquisition,acquisition,acquisition,,Notes,,,
+ExactStringMatch,0,0,0,0,,,,,
+,,,,,,,,,
+,,,,,,,,,
+N292,N292/photoFlicker_1,N292/photoFlicker_1,N292/photoFlicker_1,N292/photoFlicker_1/ep2d_bold 2x2x3 iPAT2 AP_144Reps_LplusS_run01,N292_photoFlicker_1_LplusS_run01,,,,
