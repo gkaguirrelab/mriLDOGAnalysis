@@ -1,0 +1,28 @@
+[
+	{
+		"flavor": "",
+		"hook": "",
+		"importance": "",
+		"localHookTemplate": "",
+		"name": "flywheelMRSupport",
+		"pathPlacement": "append",
+		"subfolder": "",
+		"toolboxRoot": "",
+		"type": "include",
+		"update": "",
+		"url": ""
+	},
+        {
+		"flavor": "",
+		"hook": "",
+		"importance": "",
+		"localHookTemplate": "config/mriLDOGAnalysisLocalHookTemplate.m",
+		"name": "mriLDOGAnalysis",
+		"pathPlacement": "append",
+		"subfolder": "code",
+		"toolboxRoot": "",
+		"type": "git",
+		"update": "",
+		"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis.git"
+	}	
+]
