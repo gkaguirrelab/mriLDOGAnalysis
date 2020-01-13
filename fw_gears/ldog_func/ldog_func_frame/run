@@ -300,6 +300,11 @@ os.system('/usr/lib/ants/antsApplyTransforms --float --default-value 0 '
 # Set prime outside values to zero
 set_zero(prime_image, resampled_template_path, prime_image)
 
+## Create initial warp images
+initial_image_folder = '/tmp/initial_image'
+os.system('mkdir %s' % initial_image_folder)
+make_plot(subject_id, prime_image, 'NA', subject_id + ' Initial Warp', 'initial_warp', subject_id + '_final.png', 26, 23, 26, initial_image_folder)
+
 if additionalWarpToTemplate == True:
     second_warp_folder = os.path.join(first_output_dir, subject_id + '_second_warp')
     os.system('mkdir %s' % second_warp_folder)
@@ -308,6 +313,7 @@ if additionalWarpToTemplate == True:
               '--output [ %s/second,%s/primeSecondWarped.nii.gz,%s/primeSecondInverseWarped.nii.gz ] '
               '--interpolation Linear --use-histogram-matching 0 '
               '--winsorize-image-intensities [ 0.005,0.995 ] '
+              '--use-histogram-matching 0 '
               '--initial-moving-transform [ %s,%s,1 ] '
               '--transform Rigid[ 0.1 ] --metric MI[ %s,%s,1,32,Regular,0.25 ] '
               '--convergence [ 1000x500x250x100,1e-6,10 ] '
@@ -369,10 +375,12 @@ make_plot(subject_id, resampled_template_path, 'NA', subject_id + ' EPI_2_Templa
 make_plot(subject_id, resampled_template_path, 'NA', subject_id + ' EPI_2_Template', 'template', subject_id + '_invivo.png', 26, 23, 26, temporary_plot2)
 make_plot(subject_id, primewarped, 'NA', subject_id + ' EPI_2_Template', 'warped_prime', subject_id + '_final.png', 26, 23, 26, temporary_plot)
 make_plot(subject_id, os.path.join(temporary_image, os.listdir(temporary_image)[0]), 'NA', subject_id + ' EPI_2_Template', 'warped_epi_1st_vol', subject_id + '_final.png', 26, 23, 26, temporary_plot2)
+make_plot(subject_id, primewarped, 'NA', subject_id + ' Final Warp', 'final_warp', subject_id + '_final.png', 26, 23, 26, initial_image_folder)
 
 # Combine the images and make a gif
 make_gif(temporary_plot, subject_id + '_prime_2_Template', final_output_dir)
 make_gif(temporary_plot2, subject_id + '_EPI_2_Template2', final_output_dir)
+make_gif(initial_image_folder, subject_id + '_initial_warp', final_output_dir)
 
 # ################## Zip everything and output ##################################
 
