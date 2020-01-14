@@ -1,0 +1,10 @@
+projectLabel,canineFovea,gearName,ldogFix,rootSession,EPI_01,ConfigKeys,"{'archiveName','smoothingSigma'}",ConfigVals,"{archiveName,'NA'}",,,,,,,,,,,,,,
+Inputs,EPI_01,EPI_02,EPI_03,EPI_04,EPI_05,EPI_06,EPI_07,EPI_08,EPI_09,EPI_10,EPI_11,EPI_12,EPI_13,EPI_14,EPI_15,EPI_16,EPI_17,EPI_18,EPI_19,EPI_20,archiveName,analysisSubmissionTag,
+DefaultLabel,,,,,,,,,,,,,,,,,,,,,,,
+FileSuffix,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,,,
+ContainerType,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,config,,
+ExactStringMatch,0,0,,,,,,,,,,,,,,,,,,,,,Notes
+,,,,,,,,,,,,,,,,,,,,,,,
+N292,N292/photoFlicker_1/ldogfunc/N292_photoFlicker_1_LplusS_run01_preprocessedFunc.zip,N292/photoFlicker_1/ldogfunc/N292_photoFlicker_1_LplusS_run06_preprocessedFunc.zip,N292/photoFlicker_1/ldogfunc/N292_photoFlicker_1_LplusS_run08_preprocessedFunc.zip,,,,,,,,,,,,,,,,,,'N292_photoFlicker_1_LplusS',N292_photoFlicker_1_LplusS,
+N292,N292/photoFlicker_1/ldogfunc/N292_photoFlicker_1_LminusS_run02_preprocessedFunc.zip,N292/photoFlicker_1/ldogfunc/N292_photoFlicker_1_LminusS_run04_preprocessedFunc.zip,N292/photoFlicker_1/ldogfunc/N292_photoFlicker_1_LminusS_run09_preprocessedFunc.zip,,,,,,,,,,,,,,,,,,'N292_photoFlicker_1_LminusS',N292_photoFlicker_1_LminusS,
+N292,N292/photoFlicker_1/ldogfunc/N292_photoFlicker_1_RodMel_run03_preprocessedFunc.zip,N292/photoFlicker_1/ldogfunc/N292_photoFlicker_1_RodMel_run05_preprocessedFunc.zip,N292/photoFlicker_1/ldogfunc/N292_photoFlicker_1_RodMel_run07_preprocessedFunc.zip,,,,,,,,,,,,,,,,,,'N292_photoFlicker_1_RodMel',N292_photoFlicker_1_RodMel,
