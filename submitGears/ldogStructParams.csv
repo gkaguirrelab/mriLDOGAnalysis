@@ -12,4 +12,4 @@ N292,N292/lightFluxFlicker,N292/lightFluxFlicker,96,34,103,'skullStrippedMprage-
 M662,M662/foveaLocalizer_1.1,M662/foveaLocalizer_1.1,96,60,88,'skullStrippedMprage-skullStrippedTemplate',0.2,M662_foveaLocalizer_1.1,
 M662,M662/foveaLocalizer_2.1,M662/foveaLocalizer_2.1,91,42,95,'skullStrippedMprage-skullStrippedTemplate',0.2,M662_foveaLocalizer_2.1,
 M662,M662/foveaLocalizer_3.1,M662/foveaLocalizer_3.1,94,37,88,'skullStrippedMprage-skullStrippedTemplate',0.2,M662_foveaLocalizer_3.1,
-M662,M662/MPRAGE and EPI Scout/MPRAGE_0.7mm_1avg,M662/lightFluxFlicker/MPRAGE_0.7mm_1avg_run06,98,34,93,'skullStrippedMprage-skullStrippedTemplate',0.27,M662_lightFluxFlicker,
+M662,M662/lightFluxFlicker/MPRAGE_0.7mm_1avg_run06,M662/MPRAGE and EPI Scout/MPRAGE_0.7mm_1avg,98,34,93,'skullStrippedMprage-skullStrippedTemplate',0.27,M662_lightFluxFlicker,
