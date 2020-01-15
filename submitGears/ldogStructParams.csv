@@ -2,7 +2,7 @@ projectLabel,canineFovea,gearName,ldogStruct,rootSession,MPRAGE_01,ConfigKeys,"{
 Inputs,MPRAGE_01,MPRAGE_02,centreOfGravityX,centreOfGravityY,centreOfGravityZ,transformationMethod,extractionThreshold,analysisSubmissionTag,
 DefaultLabel,MPRAGE_0.7mm_1avg01,MPRAGE_0.7mm_1avg02,,,,,,,
 FileSuffix,nifti,nifti,,,,,,,
-ContainerType,acquisition,acquisition,config,config,config,config,,,Notes
+ContainerType,acquisition,acquisition,config,config,config,config,config,,Notes
 ExactStringMatch,0,0,,,,,,,
 ,,,,,,,,,
 N293,N293/photoFlicker_1,N293/photoFlicker_1,90,45,100,'wholeMprage-wholeTemplate',0.5,N293_photoFlicker_1,
