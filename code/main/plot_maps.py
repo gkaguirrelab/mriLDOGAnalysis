@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import imageio
 import re 
+import sys
 
 def plot_maps(template_path, map_path, threshold, output):
     
@@ -86,4 +87,4 @@ def plot_maps(template_path, map_path, threshold, output):
     os.system('rm -r %s' % coronal_temp)
     os.system('rm -r %s' % axial_temp)
     
-    
+    plot_maps(*sys.argv[1:])   
