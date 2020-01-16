@@ -5,11 +5,11 @@ import numpy as np
 import imageio
 import re 
 
-def natural_key(string_):
-    return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
-
 def plot_maps(template_path, map_path, threshold, output):
-
+    
+    def natural_key(string_):
+        return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
+    
     template_load = nb.load(template_path)
     map_load = nb.load(map_path)
     template_data = template_load.get_data()
@@ -81,11 +81,9 @@ def plot_maps(template_path, map_path, threshold, output):
     for image in image_names:
         images.append(imageio.imread(os.path.join(coronal_temp, image)))
     imageio.mimsave('/%s/%s.gif' % (output, 'coronal_plots'), images, duration=0.35)    
-    return(map_data, template_data)
     
-template_path = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/2x2x2resampled_invivoTemplate.nii.gz'
-map_path = '/home/ozzy/Desktop/tes/N292_R2_map.nii.gz' 
-threshold = 0.1
-output = '/home/ozzy/Desktop/tes/'
-
-plot_maps(template_path, map_path, threshold, output)
+    os.system('rm -r %s' % saggital_temp)
+    os.system('rm -r %s' % coronal_temp)
+    os.system('rm -r %s' % axial_temp)
+    
+    
