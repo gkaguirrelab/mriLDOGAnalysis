@@ -1,7 +1,7 @@
 {
 	"name": "ldogfix",
 	"label": "ldogFix: archiving ldogfunc outputs",
-	"description": "This gear performs preprocessing for the LDOG project.",
+	"description": "This gear packages multiple ldogfunc outputs into one archive, regresses out motion confounds and does smoothing(optional)",
 	"author": "Ozenc Taskin",
 	"maintainer": "Ozenc Taskin <huseyinozenc.taskin@pennmedicine.upenn.edu>",
 	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",

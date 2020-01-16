@@ -1,8 +1,8 @@
 {
 	"name": "ldogfix",
 	"label": "ldogFix: archiving ldogfunc outputs",
-	"description": "This gear performs preprocessing for the LDOG project.",
-	"version": "0.1.4",
+	"description": "This gear packages multiple ldogfunc outputs into one archive, regresses out motion confounds and does smoothing(optional)",
+	"version": "0.1.5",
 	"inputs": {
 		"EPI_01": {
 			"base": "file",
