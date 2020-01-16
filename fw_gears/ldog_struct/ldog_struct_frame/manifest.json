@@ -42,7 +42,7 @@
 			"type": "number"
 		},
 		"structToStructTransform": {
-			"default":"SyN",
+			"default":"Affine",
 			"description": "This is the transformation type to use for registering MPRAGE images together before averaging. If a single image is used as input, this config option will not be obtained by the gear as no registration will take place. SyN deformation is used as the default method, but rigid and affine transformations are also available for registering within subject structurals ",
 			"type": "string",
 			"enum": [

@@ -10,13 +10,6 @@ import imageio
 os.system('FSLDIR=/usr/lib/fsl/5.0;PATH=$FSLDIR:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/bet')
 def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, output_folder):
     
-    # This script prepares the MPRAGE image(s) for the analysis. Pipeline:  
-        # 1 - Bias correcting each MPRAGE images
-        # 2 - Registering MPRAGES if there is more than one
-        # 3 - Averaging the registered and target MPRAGE if there is more than one
-        # 4 - Skull stripping the MPRAGE
-        # 5 - x-y flipping the skull stripped MPRAGE
-    
     # Create the output folder
     preprocessed_mprage_folder = os.path.join(output_folder, subject_id + '_preprocessed_mprage')
     if not os.path.exists(preprocessed_mprage_folder):
@@ -31,13 +24,14 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
                                                                                   os.path.join(path_to_mprage, i))
         os.system(call)
     
+    # Create a subfolder for registered images 
     registered_mprages = os.path.join(preprocessed_mprage_folder, 'registered')
     if not os.path.exists(registered_mprages):
         os.system('mkdir %s' % registered_mprages) 
         
-    # Register MPRAGEs if there are more than one of them
+    # Register MPRAGE images if there are more than one of them
     if len(mprage_images) > 1: 
-        os.system('mv %s %s/' % (os.path.join(path_to_mprage, mprage_images[0]), registered_mprages))
+        os.system('mv %s %s/fixed_mprage.nii.gz' % (os.path.join(path_to_mprage, mprage_images[0]), registered_mprages))
         fixed = os.path.join(registered_mprages, os.listdir(registered_mprages)[0])
         
         if struct_to_struct_transform == 'Rigid':
@@ -52,59 +46,49 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
             moving = os.path.join(path_to_mprage, i)
             print('Registering %s to %s' % (moving, fixed))
             register_call = 'export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/antsRegistrationSyN.sh -d 3 -t %s -f %s -m %s -o %s -n 6' % (transform,
-                                                                                                                                                                                 fixed,
-                                                                                                                                                                                 moving,
-                                                                                                                                                                                 os.path.join(registered_mprages, subject_id + '_%sregistered' % count))
+                                                                                                                                                                      fixed,
+                                                                                                                                                                      moving,
+                                                                                                                                                                      os.path.join(registered_mprages, subject_id + '_%sregistered' % count))
             os.system(register_call)
         
+        # Get rid of the files we don't want to store 
         os.system('cd %s; rm *InverseWarped.nii.gz' % registered_mprages)         
         
-        # Average the registered MPRAGE with the target
+        # Average the registered MPRAGE(s) with the target
         average_call = '/usr/lib/ants/AverageImages 3 %s 1 %s' % (os.path.join(preprocessed_mprage_folder, subject_id + '_averaged_mprages.nii.gz'),
-                                                                        os.path.join(registered_mprages, '*.nii.gz'))
+                                                                  os.path.join(registered_mprages, '*.nii.gz'))
         os.system(average_call)
-        averaged_mprage = os.path.join(preprocessed_mprage_folder, subject_id + '_averaged_mprages.nii.gz')
-   
+        averaged_mprage = os.path.join(preprocessed_mprage_folder, subject_id + '_averaged_mprages.nii.gz')   
     else:
-        averaged_mprage = os.path.join(mprage_images[0])        
+        averaged_mprage = os.path.join(path_to_mprage, mprage_images[0])        
     
-    # Brain extraction mask (created by fsl BET)
+    # Brain extraction mask creation (fsl BET)
     extracted_mprage = os.path.join(preprocessed_mprage_folder, subject_id + '_brain_averaged_mprages.nii.gz')
     extracted_mask = os.path.join(preprocessed_mprage_folder, subject_id + '_brain_averaged_mprages_mask.nii.gz')
     call = 'FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/bet %s %s -f %s -c %s %s %s -m' % (averaged_mprage, extracted_mprage,
-                                                                                                                                                                     extraction_threshold,
-                                                                                                                                                                     centre_of_gravity_x,
-                                                                                                                                                                     centre_of_gravity_y, 
-                                                                                                                                                                     centre_of_gravity_z)
+                                                                                                                                                        extraction_threshold,
+                                                                                                                                                        centre_of_gravity_x,
+                                                                                                                                                        centre_of_gravity_y, 
+                                                                                                                                                        centre_of_gravity_z)
     os.system(call)
     
-        
-    # Brain extraction segmentation (altAnts)
+    # Brain extraction segmentation with altAnts
     call2 = 'export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/brainExtractionSegmentation.pl --input %s --initial-brain-mask %s --bias-correct 0 --output-root %s' % (averaged_mprage,
-                                                                                                                     extracted_mask,
-                                                                                                                     os.path.join(preprocessed_mprage_folder, subject_id + '_final')) 
+                                                                                                                                                                                                extracted_mask,
+                                                                                                                                                                                                os.path.join(preprocessed_mprage_folder, subject_id + '_final')) 
     os.system(call2)
     extracted_brain = os.path.join(preprocessed_mprage_folder, subject_id + '_finalExtractedBrain.nii.gz')
 
-    return (preprocessed_mprage_folder, averaged_mprage, extracted_brain)    
-#     #Flip the averaged and skull stripped mprage
-#    flipped_extracted_brain = os.path.join(preprocessed_mprage_folder, 'flipped_finalExtractedBrain.nii.gz')
-#    flip_call = 'FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslswapdim %s x -y z %s' % (extracted_mprage, flipped_extracted_brain)
-#    os.system(flip_call)
-    
-#    return (preprocessed_mprage_folder, averaged_mprage, extracted_brain, flipped_extracted_brain)
-
+    return (preprocessed_mprage_folder, averaged_mprage, extracted_brain)
 
 def warp_to_invivo(subject_id, mprage_image, template_path, output_folder, num_threads): 
     
-    # This function is a wrapper around ANTs SyN registration. 
-        
-    # Warp to Template (use 5 threads change -n flag in warp_call if you want more threads)
-
+    # Create the main folder for warp results
     warp_results_folder = os.path.join(output_folder, subject_id + '_reg_avgmprage2atlas')
     if not os.path.exists(warp_results_folder):
         os.system('mkdir %s' % warp_results_folder)
     
+    # Warp mprage to template
     warp_call = 'export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/antsRegistrationSyN.sh -d 3 -f %s -m %s -o %s -n %s' % (template_path, mprage_image, os.path.join(warp_results_folder, subject_id + '_'),str(num_threads))
     os.system(warp_call)
     warped_mprage = os.path.join(warp_results_folder, subject_id + '_Warped.nii.gz')
@@ -115,7 +99,7 @@ def warp_to_invivo(subject_id, mprage_image, template_path, output_folder, num_t
 def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, apect_ratio_vector, output_folder):
     
     # This function simply gets two MRI images as inputs and overlays them 
-    #using different colors for each image. Used as a diagnostic method.
+    # using different colors for each image. Used as a diagnostic image.
         
     fig, (ax1, ax2, ax3) = plt.subplots(1,3)
     fig.suptitle(title, fontsize=20)
@@ -142,6 +126,8 @@ def make_plot(subject_id, base_image, overlay, title, filename, x, y, z, apect_r
     plt.savefig(os.path.join(output_folder, subject_id + '_' + filename))    
 
 def make_gif(image_folder, gif_name, output_folder):
+    
+    # Make a gif out of multiple images
     images = []
     for filename in os.listdir(image_folder):
         images.append(imageio.imread(os.path.join(image_folder, filename)))
