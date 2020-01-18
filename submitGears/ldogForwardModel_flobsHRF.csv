@@ -1,0 +1,8 @@
+projectLabel,canineFovea,gearName,forwardModel,rootSession,funcZip01,ConfigKeys,"{'averageAcquisitions','dataFileType','dataSourceType','modelClass','modelOpts','tr'}",ConfigVals,"{'1','volumetric','ldogfix','flobsHRF',modelOpts,'3.0'}",,,,,,,
+Inputs,StructZip,funcZip01,funcZip02,funcZip03,funcZip04,funcZip05,funcZip06,funcZip07,funcZip08,funcZip09,funcZip10,stimFile,maskFile,modelOpts,analysisSubmissionTag,
+DefaultLabel,ldogstruct/preprocessedStruct.zip,,,,,,,,,,,,,,,
+FileSuffix,zip,zip,,,,,,,,,,mat,nii,,,
+ContainerType,analysis,analysis,,,,,,,,,,project,project,config,,
+ExactStringMatch,0,0,,,,,,,,,,0,,,,Notes
+,,,,,,,,,,,,,,,,
+M662,M662/lightFluxFlicker,M662/lightFluxFlicker/ldogFix/M662_lightFluxFlicker_rightEyeStim.zip,M662/foveaLocalizer_1.2/ldogFix/M662_foveaLocalizer_1_rightEyeStim.zip,M662/foveaLocalizer_1.1/ldogFix/M662_foveaLocalizer_1_leftEyeStim.zip,M662/foveaLocalizer_2.1/ldogFix/M662_foveaLocalizer_2_rightEyeStim.zip,M662/foveaLocalizer_2.1/ldogFix/M662_foveaLocalizer_2_leftEyeStim.zip,M662/foveaLocalizer_3.1/ldogFix/M662_foveaLocalizer_3_rightEyeStim.zip,M662/foveaLocalizer_3.1/ldogFix/M662_foveaLocalizer_3_leftEyeStim.zip,,,,lightFluxFlicker_1x112_On=0.mat,,"'(polyDeg), 13'",M662_flobsHRF,
