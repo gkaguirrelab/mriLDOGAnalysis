@@ -10,6 +10,7 @@ RUN mkdir -p ${FLYWHEEL}
 COPY manifest.json run ${FLYWHEEL}
 COPY invivoTemplate.nii.gz /opt/invivoTemplate.nii.gz
 COPY invivoTemplate-WithSkull.nii.gz /opt/invivoTemplate-WithSkull.nii.gz
+COPY 2x2x2resampled_invivoTemplate.nii.gz /opt/2x2x2resampled_invivoTemplate.nii.gz
 RUN chmod +x /flywheel/v0/run
 
 # Install required packages    

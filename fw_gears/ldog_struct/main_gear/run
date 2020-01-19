@@ -8,7 +8,7 @@ import imageio
 
 ###################################### Define Fucntions #####################################
 os.system('FSLDIR=/usr/lib/fsl/5.0;PATH=$FSLDIR:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/bet')
-def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, output_folder):
+def prepare_mprage(subject_id, path_to_mprage, first_mprage_input, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, output_folder):
     
     # Create the output folder
     preprocessed_mprage_folder = os.path.join(output_folder, subject_id + '_preprocessed_mprage')
@@ -18,20 +18,24 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
     # Find MPRAGE images
     mprage_images = os.listdir(path_to_mprage)
     
-    # Biascorrection 
-    for i in mprage_images:
-        call = "/usr/lib/ants/N4BiasFieldCorrection -d 3 -i %s -o %s -v" % (os.path.join(path_to_mprage, i),
-                                                                                  os.path.join(path_to_mprage, i))
-        os.system(call)
-    
+    # Biascorrection
+    if len(mprage_images) > 0:
+        os.system('/usr/lib/ants/N4BiasFieldCorrection -d 3 -i %s -o %s -v' % (first_mprage_input, first_mprage_input))        
+        for i in mprage_images:
+            call = '/usr/lib/ants/N4BiasFieldCorrection -d 3 -i %s -o %s -v' % (os.path.join(path_to_mprage, i),
+                                                                                os.path.join(path_to_mprage, i))
+            os.system(call)
+    else:
+        os.system('/usr/lib/ants/N4BiasFieldCorrection -d 3 -i %s -o %s -v' % (first_mprage_input, first_mprage_input))
+        
     # Create a subfolder for registered images 
     registered_mprages = os.path.join(preprocessed_mprage_folder, 'registered')
     if not os.path.exists(registered_mprages):
         os.system('mkdir %s' % registered_mprages) 
         
     # Register MPRAGE images if there are more than one of them
-    if len(mprage_images) > 1: 
-        os.system('mv %s %s/fixed_mprage.nii.gz' % (os.path.join(path_to_mprage, mprage_images[0]), registered_mprages))
+    if len(mprage_images) > 0: 
+        os.system('mv %s %s/fixed_mprage.nii.gz' % (first_mprage_input, registered_mprages))
         fixed = os.path.join(registered_mprages, os.listdir(registered_mprages)[0])
         
         if struct_to_struct_transform == 'Rigid':
@@ -44,7 +48,6 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
         for i in os.listdir(path_to_mprage):
             count += 1
             moving = os.path.join(path_to_mprage, i)
-            print('Registering %s to %s' % (moving, fixed))
             register_call = 'export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/antsRegistrationSyN.sh -d 3 -t %s -f %s -m %s -o %s -n 6' % (transform,
                                                                                                                                                                       fixed,
                                                                                                                                                                       moving,
@@ -60,7 +63,7 @@ def prepare_mprage(subject_id, path_to_mprage, centre_of_gravity_x, centre_of_gr
         os.system(average_call)
         averaged_mprage = os.path.join(preprocessed_mprage_folder, subject_id + '_averaged_mprages.nii.gz')   
     else:
-        averaged_mprage = os.path.join(path_to_mprage, mprage_images[0])        
+        averaged_mprage = first_mprage_input        
     
     # Brain extraction mask creation (fsl BET)
     extracted_mprage = os.path.join(preprocessed_mprage_folder, subject_id + '_brain_averaged_mprages.nii.gz')
@@ -149,7 +152,10 @@ os.system('mkdir %s' % T1folder)
 
 MPRAGE_01_folder = os.path.join(flywheel_base, 'input/MPRAGE_01')
 MPRAGE_01 = os.path.join(MPRAGE_01_folder, os.listdir(MPRAGE_01_folder)[0])
-os.system('cp %s %s' % (MPRAGE_01, T1folder))
+first_mprage_tmp = '/tmp/first_mprage_tmp'
+os.system('mkdir %s' % first_mprage_tmp)
+os.system('cp %s %s' % (MPRAGE_01, first_mprage_tmp))
+first_mprage = os.path.join(first_mprage_tmp, os.listdir(first_mprage_tmp)[0])
 
 MPRAGE_02_folder = os.path.join(flywheel_base, 'input/MPRAGE_02')
 if os.path.exists(MPRAGE_02_folder):
@@ -177,6 +183,7 @@ if os.path.exists(Template_folder):
 else:
     Template = '/opt/invivoTemplate.nii.gz'
     Template_with_skull = '/opt/invivoTemplate-WithSkull.nii.gz'
+    Template_resampled = '/opt/2x2x2resampled_invivoTemplate.nii.gz'
 
 ###################Parse Config Here############################
 
@@ -203,7 +210,7 @@ text_open.close()
 ###################Run Algorithm################################
    
 # Bias corrects mprage images, registers, averages (normalized), skull strips and flips
-preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(subject_id, T1folder, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, first_output_dir)
+preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(subject_id, T1folder, first_mprage, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, first_output_dir)
 
 # Plot averaged structural
 make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], final_output_dir)
@@ -227,6 +234,15 @@ make_plot(subject_id, Template, 'NA', 'Warp results', 'im1.png', 131, 105, 45, [
 make_plot(subject_id, warped_mprage, 'NA', 'Warp results', 'im2.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
 make_gif(temporary, subject_id + '_' + 'mprage2template_qa', final_output_dir)
 
+os.system('mv %s %s/' % (MPRAGE_01, T1folder))
 ################## Zip everything and output ##################################
-# Zip and move the maps
+# Add the atlas images to the output folder
+atlas_folder = os.path.join(first_output_dir, 'Atlas')
+os.system('mkdir %s' % atlas_folder)
+if 'Template_resampled' in locals():
+    os.system('cp %s %s; cp %s %s' % (Template, atlas_folder, Template_resampled, atlas_folder))
+else:
+    os.system('cp %s %s' % (Template, atlas_folder))
+
+# Zip everything
 os.system('cd %s; zip -q -r %s *'%(first_output_dir, os.path.join(final_output_dir, subject_id + '_preprocessedStruct.zip')))
