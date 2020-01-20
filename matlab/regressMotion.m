@@ -42,6 +42,9 @@ p.addRequired('epiPath',@isstr);
 p.addRequired('motionParamsPath',@isstr);
 p.addRequired('outputFolder',@isstr);
 
+% Optional
+p.addParameter('convertToPercentChangeSignal', "false",@isstr)
+
 % Parse
 p.parse(epiPath, motionParamsPath, outputFolder)
 
@@ -84,7 +87,15 @@ for vv = 1:size(data,1)
     meants = mean(datats);
     beta = X\datats;
     cleants = datats - X*beta + meants;
+
+    % If asked to do so, convert the data to % change units
+    if strcmp(p.Results.convertToPercentChangeSignal,"true")
+        cleants = 100.* ((cleants - meants)./meants);
+    end
+    
+    % Store the cleaned vector
     data(vv,:) = cleants';
+    
 end
 
 % Restore the warning state.
