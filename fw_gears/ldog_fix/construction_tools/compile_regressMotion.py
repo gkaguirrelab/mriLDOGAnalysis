@@ -1,7 +1,7 @@
 import os 
 import sys
 
-def compile_regressMotion(path_to_matlab_documents='/home/ozenc/Documents/MATLAB/', output_folder='/home/ozenc/Documents/MATLAB/projects/mriLDOGAnalysis/fw_gears/ldog_fix/ldog_fix_frame/regressMotion'):
+def compile_regressMotion(path_to_matlab_documents='/home/ozzy/Documents/MATLAB/', output_folder='/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/fw_gears/ldog_fix/ldog_fix_frame/regressMotion'):
     
     # This function compiles the mainPRF.m. It works with ToolboxToolbox folder 
     # organization.Therefore, it assumes that the required MATLAB functions are 
@@ -24,7 +24,7 @@ def compile_regressMotion(path_to_matlab_documents='/home/ozenc/Documents/MATLAB
     
     #mcc_path = '/usr/local/MATLAB/R2018b/bin/mcc'
     mcc_path = 'mcc'
-    mcc_call = '%s -m -R -nodisplay %s -I %s -d %s -v'%(mcc_path, os.path.join(path_to_matlab_documents,'/home/ozenc/Documents/MATLAB/projects/mriLDOGAnalysis/matlab/regressMotion.m'),  
+    mcc_call = '%s -m -R -nodisplay %s -I %s -d %s -v'%(mcc_path, os.path.join(path_to_matlab_documents,'/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/matlab/regressMotion.m'),  
                                                         os.path.join(path_to_matlab_documents,'toolboxes/freesurferMatlab/matlab/'),
                                                         output_folder)
     
