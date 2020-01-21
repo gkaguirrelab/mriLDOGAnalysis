@@ -2,6 +2,9 @@
 
 import os 
 import json
+import nibabel as nb
+import numpy as np
+
 ###################### Define the Paths and parameters ###########################
 
 # Set paths and create some folders
@@ -26,8 +29,19 @@ convertToPercentChangeSignal = config['convertToPercentChangeSignal']
 
 ################### Run Algorithm ################################
 
+# Get stim file input
+stim_folder = os.path.join(flywheel_base, 'input/stimFile/')
+if os.path.exists(stim_folder):
+    stim_file = os.path.join(stim_folder, os.listdir(stim_folder)[0])
+else:
+    stim_file = 'Na'
+
 num_img = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', 
            '12', '13', '14', '15', '16', '17', '18', '19', '20']
+
+# Creatre a working dir as input folder modifications are not allowed 
+working_dir = '/tmp/workdir'
+os.system('mkdir %s' % working_dir)
 
 for i in num_img:   
     key_name = 'EPI_' + i
@@ -44,16 +58,38 @@ for i in num_img:
                 motion_params = os.path.join(folder_name, 'files', file)
             if file[-3:] == '.gz':
                 image_file = os.path.join(folder_name, 'files', file)
-        cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s" % (compiled_matlab_func, mcr_path, image_file, motion_params, new_folder_path, convertToPercentChangeSignal)        
-        os.system(cmd)
-        
-        if smoothingSigma != 'NA':
-            for i in os.listdir(new_folder_path):
-                if i[-3:] == '.gz':
-                    new_corrected_file = os.path.join(new_folder_path,i)
-                    os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmaths %s -kernel gauss %s -fmean %s' % (new_corrected_file, float(smoothingSigma), new_corrected_file))
-                    newname = new_corrected_file.replace('preprocessedMoReg','preprocessedMoRegSmooth')
-                    os.system('mv %s %s' % (new_corrected_file, newname))
+                new_image_location = os.path.join(working_dir, file)
+                os.system('cp %s %s' % (image_file, new_image_location))
+                
+                if smoothingSigma != 'NA':
+                    # image_raw = nb.load(new_image_location)
+                    # image_data = image_raw.get_data()
+                    # volume_num = np.shape(image_data)[3]
+                    # first_image = image_data[:,:,:,0]
+                    # for i in range(volume_num):
+                    #     idx = i + 1
+                    #     if idx == 112:
+                    #         continue
+                    #     else:
+                    #         first_image = np.add(first_image, image_data[:,:,:,idx])                   
+                                             
+                    # averaged_image = first_image / volume_num   
+                    # averaged_image = np.nan_to_num(averaged_image, nan=0)
+                    # zeroindexes = np.where(averaged_image == 0) 
+                    newname = new_image_location.replace('preprocessedMoReg','preprocessedMoRegSmooth')
+                    os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmaths %s -kernel gauss %s -fmean %s' % (newname, float(smoothingSigma), newname))                   
+                    # smooth_image_raw = nb.load(new_image_location)
+                    # smooth_image_data = smooth_image_raw.get_data()
+    
+                    # for i in range(np.shape(smooth_image_data)[3]):
+                    #     smooth_image_data[zeroindexes] = 2000
+                    #     nb.save(smooth_image_raw, os.path.join(final_output_dir, 'lala.nii.gz'))
+                    
+                    cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s" % (compiled_matlab_func, mcr_path, newname, motion_params, first_output_dir, convertToPercentChangeSignal, stim_file)
+                    os.system(cmd)
+                else:
+                    cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s" % (compiled_matlab_func, mcr_path, newname, motion_params, first_output_dir, convertToPercentChangeSignal, stim_file)
+                    os.system(cmd)                    
             
 ################## Zip everything and output ##################################
 

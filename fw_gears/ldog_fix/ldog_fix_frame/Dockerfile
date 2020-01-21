@@ -17,6 +17,7 @@ RUN apt-get update \
     && apt-get install -y \
     wget \
     python3 \
+    python3-pip \
     zip \
     unzip \
     fsl-core
@@ -26,6 +27,7 @@ RUN wget http://ssd.mathworks.com/supportfiles/downloads/R2019b/Release/2/deploy
 RUN mkdir matlabins
 RUN unzip MATLAB_Runtime_R2019b_Update_2_glnxa64.zip -d /matlabins/
 RUN /matlabins/install -mode silent -agreeToLicense yes
+RUN pip3 install numpy nibabel
 
 # Set the entrypoint  
 ENTRYPOINT /flywheel/v0/run
