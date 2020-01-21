@@ -24,6 +24,11 @@
 			"default": "archive",
 			"description": "Archive Name to append to the output name",
 			"type": "string"
+		},
+		"convertToPercentChangeSignal": {
+			"default": "false",
+			"description": "Converts signal to percentage change",
+			"type": "string"
 		}
 	},
 	"inputs": {

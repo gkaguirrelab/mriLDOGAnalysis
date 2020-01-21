@@ -22,6 +22,7 @@ config = job_config['config']
 
 smoothingSigma = config['smoothingSigma']
 archiveName = config['archiveName']
+convertToPercentChangeSignal = config['convertToPercentChangeSignal']
 
 ################### Run Algorithm ################################
 
@@ -43,7 +44,7 @@ for i in num_img:
                 motion_params = os.path.join(folder_name, 'files', file)
             if file[-3:] == '.gz':
                 image_file = os.path.join(folder_name, 'files', file)
-        cmd = '%s %s %s %s %s' % (compiled_matlab_func, mcr_path, image_file, motion_params, new_folder_path)        
+        cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s" % (compiled_matlab_func, mcr_path, image_file, motion_params, new_folder_path, convertToPercentChangeSignal)        
         os.system(cmd)
         
         if smoothingSigma != 'NA':
