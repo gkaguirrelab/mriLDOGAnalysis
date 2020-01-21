@@ -90,7 +90,7 @@ for vv = 1:size(data,1)
 
     % If asked to do so, convert the data to % change units
     if strcmp(p.Results.convertToPercentChangeSignal,"true")
-        cleants = 100.* ((cleants - meants)./meants);
+        cleants = 100.* ((cleants - meants)./meants)+100;
     end
     
     % Store the cleaned vector
