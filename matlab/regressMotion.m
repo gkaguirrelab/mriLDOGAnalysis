@@ -31,7 +31,8 @@ function correctedFuncPath = regressMotion(epiPath, motionParamsPath, outputFold
 %{
     epiPath = 'N292_N292_final_preprocessed_N292_N292_corrected_1.3.12.2.1107.5.2.32.35335.201912051319034549056903.0.0.0.nii';
     motionParamsPath = 'N292_N292_motion_params.txt';
-    correctedFuncPath = regressMotion(epiPath, motionParamsPath,'');
+    stimulusPath = 'lightFluxFlicker_1x112_On=0.mat';
+    correctedFuncPath = regressMotion(epiPath, motionParamsPath,'','stimulusPath',stimulusPath);
 %}
 
 %% Parse inputs
@@ -44,9 +45,10 @@ p.addRequired('outputFolder',@isstr);
 
 % Optional
 p.addParameter('convertToPercentChangeSignal', "false",@isstr)
+p.addParameter('stimulusPath', "" ,@isstr)
 
 % Parse
-p.parse(epiPath, motionParamsPath, outputFolder)
+p.parse(epiPath, motionParamsPath, outputFolder, varargin{:})
 
 % Extract the file name and extension from the full path 
 [~,name,ext] = fileparts(epiPath);
@@ -70,6 +72,32 @@ X = readmatrix(motionParamsPath);
 % Check that the motion covariates and data match
 if size(X,1) ~= size(data,2)
     error('regressMotion:mismatchRegressors','The data and motion parameters have different temporal lengths');
+end
+
+% If a stimulusVector has been supplied, load this and partial this effect
+% out of the X matrix
+if ~isempty(p.Results.stimulusPath)
+    % Load the stimulus
+    load(p.Results.stimulusPath,'stimulus');
+    % We want a
+    if iscell(stimulus)
+        stimulus = stimulus{1};
+    end
+    % Check that we were passed a vector
+    if size(stimulus,1) ~= 1
+        error('regressMotion:multiDimensionalStimulus','The stimulus must be a one dimensional vector');
+    end
+    % Check that the stiumulus matches the data
+    if size(data,2) ~= length(stimulus)
+        error('regressMotion:mismatchStimulus','The data and the stimulus vector have different temporal lengths');
+    end
+    % Prepare the stimulus vector for regression
+    stimulus = (stimulus - mean(stimulus))';
+    % Regress the stimulus out of each element of the X matrix
+    for ii = 1:size(X,2)
+        b=stimulus\X(:,ii);
+        X(:,ii) = X(:,ii) - b*stimulus;
+    end
 end
 
 % Store the warning state
