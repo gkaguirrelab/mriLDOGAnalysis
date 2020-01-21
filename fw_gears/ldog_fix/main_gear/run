@@ -39,11 +39,9 @@ else:
 num_img = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', 
            '12', '13', '14', '15', '16', '17', '18', '19', '20']
 
-# Creatre a working dir as input folder modifications are not allowed 
-working_dir = '/tmp/workdir'
-os.system('mkdir %s' % working_dir)
-
 for i in num_img:   
+    
+    # Make the folders here
     key_name = 'EPI_' + i
     folder_name = os.path.join(flywheel_base, 'input/%s' % key_name)
     if os.path.exists(folder_name):
@@ -53,15 +51,17 @@ for i in num_img:
         os.system('unzip -q %s -d %s/files/' % (zip_file, folder_name))
         new_folder_path = os.path.join(first_output_dir, key_name)
         os.system('mkdir %s' % new_folder_path)
+        
+     # Assing the variables
         for file in os.listdir(os.path.join(folder_name, 'files')):
             if file[-3:] == 'txt':
                 motion_params = os.path.join(folder_name, 'files', file)
             if file[-3:] == '.gz':
-                image_file = os.path.join(folder_name, 'files', file)
-                new_image_location = os.path.join(working_dir, file)
-                os.system('cp %s %s' % (image_file, new_image_location))
+                image_file = os.path.join(folder_name, 'files', file)     
+                # new_image_location = os.path.join(working_dir, file)
+                # os.system('cp %s %s' % (image_file, new_image_location))
                 
-                if smoothingSigma != 'NA':
+                if smoothingSigma != 'NA':                  
                     # image_raw = nb.load(new_image_location)
                     # image_data = image_raw.get_data()
                     # volume_num = np.shape(image_data)[3]
@@ -75,9 +75,21 @@ for i in num_img:
                                              
                     # averaged_image = first_image / volume_num   
                     # averaged_image = np.nan_to_num(averaged_image, nan=0)
-                    # zeroindexes = np.where(averaged_image == 0) 
-                    newname = new_image_location.replace('preprocessedMoReg','preprocessedMoRegSmooth')
-                    os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmaths %s -kernel gauss %s -fmean %s' % (newname, float(smoothingSigma), newname))                   
+                    # zeroindexes = np.where(averaged_image == 0)               
+                    
+                    # Set the saving path with a new name for smoothing
+                    newname = file.replace('preprocessedMoReg','preprocessedMoRegSmooth')
+                    
+                    # Creatre a working dir as input folder modifications are not allowed 
+                    working_dir = '/tmp/workdirectory'
+                    #os.system('mkdir %s' % working_dir)
+
+                    first_level_smoothing_save_tmp = os.path.join(working_dir, newname)
+                    #save_path_with_the_name = os.path.join(new_folder_path, newname)
+
+                    os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmaths %s -kernel gauss %s -fmean %s' % (image_file, float(smoothingSigma), first_level_smoothing_save_tmp))                
+                   
+
                     # smooth_image_raw = nb.load(new_image_location)
                     # smooth_image_data = smooth_image_raw.get_data()
     
@@ -85,10 +97,10 @@ for i in num_img:
                     #     smooth_image_data[zeroindexes] = 2000
                     #     nb.save(smooth_image_raw, os.path.join(final_output_dir, 'lala.nii.gz'))
                     
-                    cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s" % (compiled_matlab_func, mcr_path, newname, motion_params, first_output_dir, convertToPercentChangeSignal, stim_file)
+                    cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s" % (compiled_matlab_func, mcr_path, first_level_smoothing_save_tmp, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file)
                     os.system(cmd)
                 else:
-                    cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s" % (compiled_matlab_func, mcr_path, newname, motion_params, first_output_dir, convertToPercentChangeSignal, stim_file)
+                    cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s" % (compiled_matlab_func, mcr_path, image_file, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file)
                     os.system(cmd)                    
             
 ################## Zip everything and output ##################################

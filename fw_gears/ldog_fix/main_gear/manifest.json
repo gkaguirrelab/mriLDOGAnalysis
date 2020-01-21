@@ -2,7 +2,7 @@
 	"name": "ldogfix",
 	"label": "ldogFix: archiving ldogfunc outputs",
 	"description": "This gear packages multiple ldogfunc outputs into one archive, regresses out motion confounds and does smoothing(optional)",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"inputs": {
 		"EPI_01": {
 			"base": "file",
