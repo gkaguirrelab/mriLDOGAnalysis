@@ -1,4 +1,4 @@
-function correctedFuncPath = regressMotion(epiPath, motionParamsPath, outputFolder)
+function correctedFuncPath = regressMotion(epiPath, motionParamsPath, outputFolder, varargin)
 % Pre-process the ldog func data to regress out the effects of motion
 %
 % Syntax:
