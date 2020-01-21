@@ -31,8 +31,8 @@ function correctedFuncPath = regressMotion(epiPath, motionParamsPath, outputFold
 %{
     epiPath = 'N292_N292_final_preprocessed_N292_N292_corrected_1.3.12.2.1107.5.2.32.35335.201912051319034549056903.0.0.0.nii';
     motionParamsPath = 'N292_N292_motion_params.txt';
-    stimulusPath = 'lightFluxFlicker_1x112_On=0.mat';
-    correctedFuncPath = regressMotion(epiPath, motionParamsPath,'','stimulusPath',stimulusPath);
+    stimFile = 'lightFluxFlicker_1x112_On=0.mat';
+    correctedFuncPath = regressMotion(epiPath, motionParamsPath,'','stimFile',stimFile);
 %}
 
 %% Parse inputs
@@ -45,7 +45,7 @@ p.addRequired('outputFolder',@isstr);
 
 % Optional
 p.addParameter('convertToPercentChangeSignal', "false",@isstr)
-p.addParameter('stimulusPath', "" ,@isstr)
+p.addParameter('stimFile', "Na" ,@isstr)
 
 % Parse
 p.parse(epiPath, motionParamsPath, outputFolder, varargin{:})
@@ -76,9 +76,9 @@ end
 
 % If a stimulusVector has been supplied, load this and partial this effect
 % out of the X matrix
-if ~isempty(p.Results.stimulusPath)
+if ~strcmp(p.Results.stimFile,'Na')
     % Load the stimulus
-    load(p.Results.stimulusPath,'stimulus');
+    load(p.Results.stimFile,'stimulus');
     % We want a
     if iscell(stimulus)
         stimulus = stimulus{1};
