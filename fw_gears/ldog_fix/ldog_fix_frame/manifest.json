@@ -32,6 +32,16 @@
 		}
 	},
 	"inputs": {
+		"stimFile": {
+			"base": "file",
+			"description": "Stimulus File",
+			"optional": true,
+			"type": {
+				"enum": [
+					"MATLAB archive"
+				]
+			}
+		},
 		"EPI_01": {
 			"description": "EPI archive",
 			"base": "file",
