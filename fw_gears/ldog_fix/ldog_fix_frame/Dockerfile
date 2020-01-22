@@ -27,7 +27,7 @@ RUN wget http://ssd.mathworks.com/supportfiles/downloads/R2019b/Release/2/deploy
 RUN mkdir matlabins
 RUN unzip MATLAB_Runtime_R2019b_Update_2_glnxa64.zip -d /matlabins/
 RUN /matlabins/install -mode silent -agreeToLicense yes
-RUN pip3 install numpy nibabel
+RUN pip3 install numpy nibabel==2.5.1
 
 # Set the entrypoint  
 ENTRYPOINT /flywheel/v0/run
