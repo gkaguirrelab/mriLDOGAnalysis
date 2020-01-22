@@ -64,41 +64,32 @@ for i in num_img:
                 os.system('cp %s %s' % (image_file, tmp_working_dir))
                 new_image_location = os.path.join(tmp_working_dir, os.listdir(tmp_working_dir)[0])
                     
-                if smoothingSigma != 'NA':                  
-                    # image_raw = nb.load(new_image_location)
-                    # image_data = image_raw.get_data()
-                    # volume_num = np.shape(image_data)[3]
-                    # first_image = image_data[:,:,:,0]
-                    # for i in range(volume_num):
-                    #     idx = i + 1
-                    #     if idx == 112:
-                    #         continue
-                    #     else:
-                    #         first_image = np.add(first_image, image_data[:,:,:,idx])                   
+                if smoothingSigma != 'NA':     
+                    
+                    # Get the zero indexes                    
+                    image_raw = nb.load(new_image_location)
+                    image_data = image_raw.get_data()
+                    volume_num = np.shape(image_data)[3]
+                    first_image = image_data[:,:,:,0]
+                    for i in range(volume_num):
+                        idx = i + 1
+                        if idx == 112:
+                            continue
+                        else:
+                            first_image = np.add(first_image, image_data[:,:,:,idx])                   
                                                  
-                    # averaged_image = first_image / volume_num   
-                    # averaged_image = np.nan_to_num(averaged_image, nan=0)
-                    # zeroindexes = np.where(averaged_image == 0)               
-                        
-                    # Set the saving path with a new name for smoothing
-                    # newname = file.replace('preprocessedMoReg','preprocessedMoRegSmooth')
-                        
-                    # Creatre a working dir as input folder modifications are not allowed 
-                    # working_dir = '/tmp/workdirectory'
-                    # os.system('mkdir %s' % working_dir)
-    
-                    # first_level_smoothing_save_tmp = os.path.join(working_dir, newname)
-                    # save_path_with_the_name = os.path.join(new_folder_path, newname)
-    
+                    averaged_image = first_image / volume_num   
+                    averaged_image = np.nan_to_num(averaged_image, nan=0)
+                    zeroindexes = np.where(averaged_image == 0)               
+                    
+                    # Smooth
                     os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmaths %s -kernel gauss %s -fmean %s' % (new_image_location, float(smoothingSigma), new_image_location))                
                        
-                    #os.system('mv %s %s' % (image_file, first_output_dir))
-                    # smooth_image_raw = nb.load(new_image_location)
-                    # smooth_image_data = smooth_image_raw.get_data()
-        
-                    # for i in range(np.shape(smooth_image_data)[3]):
-                    #     smooth_image_data[zeroindexes] = 2000
-                    #     nb.save(smooth_image_raw, os.path.join(final_output_dir, 'lala.nii.gz'))
+                    smooth_image_raw = nb.load(new_image_location)
+                    smooth_image_data = smooth_image_raw.get_data()
+                    
+                    smooth_image_data[zeroindexes] = 0
+                    nb.save(smooth_image_raw, new_image_location)
                         
                     cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file)
                     os.system(cmd)
