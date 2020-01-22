@@ -56,7 +56,7 @@ for i in num_img:
         for file in os.listdir(os.path.join(folder_name, 'files')):
             if file[-3:] == 'txt':
                 motion_params = os.path.join(folder_name, 'files', file)
-            elif file[-3:] == '.gz':
+            if file[-3:] == '.gz':
                 image_file = os.path.join(folder_name, 'files', file)     
                     
                 tmp_working_dir = '/tmp/tmpworkingdir_%s' % file
@@ -88,7 +88,7 @@ for i in num_img:
                     smooth_image_raw = nb.load(new_image_location)
                     smooth_image_data = smooth_image_raw.get_data()
                     
-                    smooth_image_data[zeroindexes] = 2000
+                    smooth_image_data[zeroindexes] = 0
                     nb.save(smooth_image_raw, new_image_location)
                         
                     cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file)

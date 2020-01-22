@@ -56,7 +56,7 @@ for i in num_img:
         for file in os.listdir(os.path.join(folder_name, 'files')):
             if file[-3:] == 'txt':
                 motion_params = os.path.join(folder_name, 'files', file)
-            elif file[-3:] == '.gz':
+            if file[-3:] == '.gz':
                 image_file = os.path.join(folder_name, 'files', file)     
                     
                 tmp_working_dir = '/tmp/tmpworkingdir_%s' % file
