@@ -11,7 +11,7 @@ COPY manifest.json run ${FLYWHEEL}
 COPY invivoTemplate.nii.gz /opt/invivoTemplate.nii.gz
 COPY invivoTemplate-WithSkull.nii.gz /opt/invivoTemplate-WithSkull.nii.gz
 COPY 2x2x2resampled_invivoTemplate.nii.gz /opt/2x2x2resampled_invivoTemplate.nii.gz
-COPY Woofsurfer /opt/Woofsurfer
+COPY Woofsurfer.zip /opt/Woofsurfer.zip
 RUN chmod +x /flywheel/v0/run
 
 # Install required packages    
