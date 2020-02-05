@@ -12,6 +12,7 @@ COPY invivoTemplate.nii.gz /opt/invivoTemplate.nii.gz
 COPY invivoTemplate-WithSkull.nii.gz /opt/invivoTemplate-WithSkull.nii.gz
 COPY 2x2x2resampled_invivoTemplate.nii.gz /opt/2x2x2resampled_invivoTemplate.nii.gz
 COPY Woofsurfer.zip /opt/Woofsurfer.zip
+COPY exvivo_warp_files.zip /opt/exvivo_warp_files.zip
 RUN chmod +x /flywheel/v0/run
 
 # Install required packages    
@@ -27,7 +28,7 @@ RUN apt-get update \
 
 # Install python packages
 RUN pip3 install --upgrade pip
-RUN pip3 install nibabel matplotlib imageio
+RUN pip3 install nibabel==2.5.1 matplotlib imageio
 
 # Clone the altAnts    
 RUN git clone https://github.com/cookpa/altAntsBrainExtraction.git 
