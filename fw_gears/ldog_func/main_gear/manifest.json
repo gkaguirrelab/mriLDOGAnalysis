@@ -1,104 +1,104 @@
 {
-	"name": "ldogfunc",
-	"label": "ldogFunc: functional pre-processing for the LDOG project",
-	"description": "This gear performs preprocessing of the functional scans for the LDOG project.",
-	"version": "0.2.4",
-	"inputs": {
-		"StructZip": {
-			"base": "file",
-			"description": "Output of ldogStruct gear",
-			"optional": false,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"fMRIScoutAP": {
-			"base": "file",
-			"description": "Scout EPI with AP encoding direction",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"fMRIScoutPA": {
-			"base": "file",
-			"description": "Scout EPI with PA encoding direction",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"fMRITimeSeries": {
-			"base": "file",
-			"description": "fMRI Time Series images",
-			"optional": false,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		}
-	},
-	"config": {
-		"additionalWarpConvergence": {
-			"default": "10x10",
-			"description": "Convergence for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
-			"type": "string"
-		},
-		"additionalWarpShrinkFactors": {
-			"default": "1x1",
-			"description": "Shrink Factors for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
-			"type": "string"
-		},
-		"additionalWarpSmoothingSigmas": {
-			"default": "1x0vox",
-			"description": "Smoothing Sigmas for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
-			"type": "string"
-		},
-		"additionalWarpToTemplate": {
-			"default": false,
-			"description": "This does does an extra constrained warp to the EPI image",
-			"type": "boolean"
-		},
-		"fMRIName": {
-			"default": "NA",
-			"description": "Output name for preprocessed data",
-			"type": "string"
-		},
-		"saveIntermediateFiles": {
-			"default": false,
-			"description": "saves intermediate files created during the analysis",
-			"type": "boolean"
-		},
-		"totalReadoutTimeAP": {
-			"default": 0.0217349,
-			"description": "total readout time of the single-rep recon api in AP direction. Required for topup. Can be found in nifti header",
-			"type": "number"
-		},
-		"totalReadoutTimePA": {
-			"default": 0.0217349,
-			"description": "total readout time of the single-rep recon api in PA direction. Required for topup. Can be found in nifti header",
-			"type": "number"
-		}
-	},
-	"author": "Ozenc Taskin",
-	"maintainer": "Ozenc Taskin",
-	"license": "Other",
-	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
-	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
-	"custom": {
-		"flywheel": {
-			"suite": "GKAguirreLab"
-		},
-		"gear-builder": {
-			"category": "analysis",
-			"image": "gkaguirrelab/ldogfunc:0.2.2"
-		}
-	}
+    "name": "ldogfunc",
+    "label": "ldogFunc: functional pre-processing for the LDOG project",
+    "description": "This gear performs preprocessing of the functional scans for the LDOG project.",
+    "version": "0.2.5",
+    "inputs": {
+        "StructZip": {
+            "base": "file",
+            "description": "Output of ldogStruct gear",
+            "optional": false,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "fMRIScoutAP": {
+            "base": "file",
+            "description": "Scout EPI with AP encoding direction",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "fMRIScoutPA": {
+            "base": "file",
+            "description": "Scout EPI with PA encoding direction",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "fMRITimeSeries": {
+            "base": "file",
+            "description": "fMRI Time Series images",
+            "optional": false,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        }
+    },
+    "config": {
+        "additionalWarpConvergence": {
+            "default": "10x10",
+            "description": "Convergence for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
+            "type": "string"
+        },
+        "additionalWarpShrinkFactors": {
+            "default": "1x1",
+            "description": "Shrink Factors for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
+            "type": "string"
+        },
+        "additionalWarpSmoothingSigmas": {
+            "default": "1x0vox",
+            "description": "Smoothing Sigmas for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
+            "type": "string"
+        },
+        "additionalWarpToTemplate": {
+            "default": false,
+            "description": "This does does an extra constrained warp to the EPI image",
+            "type": "boolean"
+        },
+        "fMRIName": {
+            "default": "NA",
+            "description": "Output name for preprocessed data",
+            "type": "string"
+        },
+        "saveIntermediateFiles": {
+            "default": false,
+            "description": "saves intermediate files created during the analysis",
+            "type": "boolean"
+        },
+        "totalReadoutTimeAP": {
+            "default": 0.0217349,
+            "description": "total readout time of the single-rep recon api in AP direction. Required for topup. Can be found in nifti header",
+            "type": "number"
+        },
+        "totalReadoutTimePA": {
+            "default": 0.0217349,
+            "description": "total readout time of the single-rep recon api in PA direction. Required for topup. Can be found in nifti header",
+            "type": "number"
+        }
+    },
+    "author": "Ozenc Taskin",
+    "maintainer": "Ozenc Taskin",
+    "license": "Other",
+    "source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
+    "url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
+    "custom": {
+        "flywheel": {
+            "suite": "GKAguirreLab"
+        },
+        "gear-builder": {
+            "category": "analysis",
+            "image": "gkaguirrelab/ldogfunc:0.2.5"
+        }
+    }
 }
