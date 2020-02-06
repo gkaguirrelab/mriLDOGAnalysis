@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import imageio
 
 ###################################### Define Fucntions #####################################
+
 os.system('FSLDIR=/usr/lib/fsl/5.0;PATH=$FSLDIR:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/bet')
 def prepare_mprage(subject_id, path_to_mprage, first_mprage_input, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, output_folder):
     
@@ -237,12 +238,14 @@ make_plot(subject_id, warped_mprage, 'NA', 'Warp results', 'im2.png', 131, 105, 
 make_gif(temporary, subject_id + '_' + 'mprage2template_qa', final_output_dir)
 
 os.system('mv %s %s/' % (MPRAGE_01, T1folder))
+
 ################## Zip everything and output ##################################
+
 # Add the atlas images to the output folder
 atlas_folder = os.path.join(first_output_dir, 'Atlas')
 os.system('mkdir %s' % atlas_folder)
 if 'Template_resampled' in locals():
-    os.system('cp %s %s; cp %s %s; cp %s %s; cp %s %s;' % (Template, atlas_folder, Template_with_skull, atlas_folder, Template_resampled, atlas_folder, surface_template, atlas_folder, intoex_calculations, atlas_folder))
+    os.system('cp %s %s; cp %s %s; cp %s %s; cp %s %s; cp %s %s' % (Template, atlas_folder, Template_with_skull, atlas_folder, Template_resampled, atlas_folder, surface_template, atlas_folder, intoex_calculations, atlas_folder))
 else:
     os.system('cp %s %s' % (Template, atlas_folder))
 
