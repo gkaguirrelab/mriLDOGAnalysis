@@ -1,249 +1,249 @@
 {
-	"name": "ldogfix",
-	"label": "ldogFix: archiving ldogfunc outputs",
-	"description": "This gear packages multiple ldogfunc outputs into one archive, regresses out motion confounds and does smoothing(optional)",
-	"version": "0.2.3",
-	"inputs": {
-		"stimFile": {
-			"base": "file",
-			"description": "Stimulus File",
-			"optional": true,
-			"type": {
-				"enum": [
-					"MATLAB archive"
-				]
-			}
-		},
-		"EPI_01": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": false,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_02": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_03": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_04": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_05": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_06": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_07": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_08": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_09": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_10": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_11": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_12": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_13": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_14": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_15": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_16": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_17": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_18": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_19": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		},
-		"EPI_20": {
-			"base": "file",
-			"description": "EPI archive",
-			"optional": true,
-			"type": {
-				"enum": [
-					"archive"
-				]
-			}
-		}
-	},
-	"config": {
-		"archiveName": {
-			"default": "archive",
-			"description": "Archive Name to append to the output name",
-			"type": "string"
-		},
-		"convertToPercentChangeSignal": {
-			"default": "false",
-			"description": "Converts signal to percentage change",
-			"type": "string"
-		},
-		"smoothingSigma": {
-			"default": "NA",
-			"description": "Gaussian sigma in mm. To calculate sigma from FWHM, divide your FWHM (in mm) by 2.3548. Default: NA means no smoothing",
-			"type": "string"
-		}
-	},
-	"author": "Ozenc Taskin",
-	"maintainer": "Ozenc Taskin",
-	"license": "Other",
-	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
-	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
-	"custom": {
-		"flywheel": {
-			"suite": "GKAguirreLab"
-		},
-		"gear-builder": {
-			"category": "analysis",
-			"image": "gkaguirrelab/ldogfix:0.1.9"
-		}
-	}
+    "name": "ldogfix",
+    "label": "ldogFix: archiving ldogfunc outputs",
+    "description": "This gear packages multiple ldogfunc outputs into one archive, regresses out motion confounds and does smoothing(optional)",
+    "version": "0.2.4",
+    "inputs": {
+        "EPI_01": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": false,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_02": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_03": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_04": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_05": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_06": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_07": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_08": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_09": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_10": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_11": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_12": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_13": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_14": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_15": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_16": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_17": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_18": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_19": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "EPI_20": {
+            "base": "file",
+            "description": "EPI archive",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "archive"
+                ]
+            }
+        },
+        "stimFile": {
+            "base": "file",
+            "description": "Stimulus File",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "MATLAB archive"
+                ]
+            }
+        }
+    },
+    "config": {
+        "archiveName": {
+            "default": "archive",
+            "description": "Archive Name to append to the output name",
+            "type": "string"
+        },
+        "convertToPercentChangeSignal": {
+            "default": "false",
+            "description": "Converts signal to percentage change",
+            "type": "string"
+        },
+        "smoothingSigma": {
+            "default": "NA",
+            "description": "Gaussian sigma in mm. To calculate sigma from FWHM, divide your FWHM (in mm) by 2.3548. Default: NA means no smoothing",
+            "type": "string"
+        }
+    },
+    "author": "Ozenc Taskin",
+    "maintainer": "Ozenc Taskin",
+    "license": "Other",
+    "source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
+    "url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
+    "custom": {
+        "flywheel": {
+            "suite": "GKAguirreLab"
+        },
+        "gear-builder": {
+            "category": "analysis",
+            "image": "gkaguirrelab/ldogfix:0.2.4"
+        }
+    }
 }
