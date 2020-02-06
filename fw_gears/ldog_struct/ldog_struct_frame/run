@@ -237,7 +237,7 @@ make_plot(subject_id, Template, 'NA', 'Warp results', 'im1.png', 131, 105, 45, [
 make_plot(subject_id, warped_mprage, 'NA', 'Warp results', 'im2.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
 make_gif(temporary, subject_id + '_' + 'mprage2template_qa', final_output_dir)
 
-os.system('mv %s %s/' % (MPRAGE_01, T1folder))
+os.system('cp %s %s/' % (MPRAGE_01, T1folder))
 
 ################## Zip everything and output ##################################
 

@@ -2,7 +2,7 @@
     "name": "ldogstruct",
     "label": "ldogStruct: anatomical pre-processing for the LDOG project",
     "description": "This gear performs preprocessing for the LDOG project.",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "inputs": {
         "MPRAGE_01": {
             "base": "file",
@@ -124,7 +124,7 @@
         },
         "gear-builder": {
             "category": "analysis",
-            "image": "gkaguirrelab/ldogstruct:0.2.2"
+            "image": "gkaguirrelab/ldogstruct:0.2.3"
         }
     }
 }
