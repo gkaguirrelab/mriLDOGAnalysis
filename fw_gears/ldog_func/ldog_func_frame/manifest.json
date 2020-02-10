@@ -6,7 +6,7 @@
 	"maintainer": "Ozenc Taskin <huseyinozenc.taskin@pennmedicine.upenn.edu>",
 	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
 	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
-	"version": "0.1.6",
+	"version": "0.2.7",
 	"custom": {
 		"flywheel": {
 			"suite": "GKAguirreLab"
@@ -41,12 +41,12 @@
 			"type": "boolean"
 		},
 		"additionalWarpConvergence": {
-			"default": "10x10",
+			"default": "50x10",
 			"description": "Convergence for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
 			"type": "string"
 		},
 		"additionalWarpShrinkFactors": {
-			"default": "1x1",
+			"default": "2x1",
 			"description": "Shrink Factors for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
 			"type": "string"
 		},
