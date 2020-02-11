@@ -64,9 +64,6 @@ moco_cov = moco(corrected_epi, top_up_folder, output_folder)
 # Flip the EPI images 
 flipped_epi = flip_epi(corrected_epi, output_folder)
 
-# Move flipped EPI to flipped mprage space. Overwrites the original flipped !!!
-flip_to_flip_registration(flipped_epi, flipped_extracted_brain, output_folder)
-
 # Apply warps to the standard and flipped EPI images and downsample to 2mm using 
 # the downsampled image as the target.
 warped_epi = apply_warp(corrected_epi, resampled_template_path, output_folder, standard_generic, False)

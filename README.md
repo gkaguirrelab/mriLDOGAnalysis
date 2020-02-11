@@ -1,77 +1,98 @@
 # mriLDOGAnalysis
-Analysis code for all projects under the LDOG protocol
+Analysis code and Flywheel gears for all projects under the LDOG protocol
 
-# Requirements
+# Software Requirements
+- Python3 (Python2 should also work but not tested)
+- FSL 
+- ANTs 
+- Freesurfer
+- altAntsBrainExtraction - https://github.com/cookpa/altAntsBrainExtraction
+- ITK-Snap
 
-- Python 2 (Python 3 should also work but not tested)
-- FSL for fmri analysis
-- ANTs for registrations
+# Python package requirements
+- nibabel
+- matplotlib
+- imageio
+- pandas
+- numpy
 
-# Analysis Instructions
+# ldog_struct steps
 
-1 - Create an empty analysis folder where you will place your MRI images and where the results folder will be created.
+1 - MPRAGE images are bias corrected.
 
-2 - Download the design folder which includes the on>off and off>on event design templates inside and place it into the analysis folder you created in step 1. This template file is automatically modified by a loop by the python function according to the specific subject information and used as an input for the fMRI analysis.
+    "N4BiasFieldCorrection -d 3 -i |IMAGE| -o |OUTPUT|"
 
-3 - Download the Atlas folder which contains the canine atlases and in-vivo --> ex-vivo transformations. Place it in the main analysis folder.
+2 - If more than one MPRAGE is used, they are linearly registered together.
 
-4 - Download your EPI and MPRAGE images and place them into two different subfolders inside the main analysis folder.
+    "antsRegistrationSyN.sh -d 3 -t |TRANSFORM-TYPE| -f |FIXED| -m |MOVING| -o |OUTPUT| -n 6"
 
-5 - Rename your EPI images as you please but specify the direction of the images (AP or PA) by putting capital AP or PA somewhere in the name. The script needs to be able to identify which images are AP and which images are PA for topup process. If you do not put the capital letters AP or PA in the name of your EPI files, the script will throw an error. 
+3 - Registered MPRAGES are averaged.
 
-5 - If you want to do the full analysis by using the fullAnalysis.py pipeline, also download the second_lvl_design folder and place it in the main analysis folder.
+    "AverageImages 3 |OUTPUT| 1 |/images/*| 
 
-6 - Create another subfolder and place the single-rep images in there for topup.
+4 - A brain extraction mask is created with FSL Bet.
 
-6 - Run fullAnalysis.py function and point it to your T1, EPI, Canine Atlas, Single-rep images, Design, Second level design, Output and ANTs scripts folders (don't use a slash at the end of the paths. Use it like /home/Desktop/T1). This function will do the first 8 steps mentioned under "Analysis Details" section. It creates a main results folder at the specified path. All of your results such as registrations, 1st and 2nd level outputs, and final in-vivo deformed maps will be saved in this folder.
+    "bet |INPUT| |OUTPUT| -f |EXTRACTION THRESHOLD| -c |CENTER VOXEL X| |CENTER VOXEL Y| |CENTER VOXEL Z| -m'
 
-Warning: fullAnalysis.py performs second level analysis and takes a fixed effects single group average. If you want to compare right and left eyes with each other or employ an entirely different second level model, you need to do any higher level analysis manually. In this case, you can first use onlyPreprocAndFirstLvl.py function to do preprocessing and 1st lvl analysis, then do the rest of the analysis yourself. and finally run onlyPostprocess.py (coming soon) to map the data to in-vivo and surface templates.
+5 - Segmentation function from altAntsBrainExtraction is used to skull strip. The mask obtained from the previous stage is used here.
 
-# Analysis Details
+    "brainExtractionSegmentation.pl --input |WHOLE-HEAD IMAGE| --initial-brain-mask |MASK| --bias-correct 0 --output-root |OUTPUT ROOT NAME|
 
-1 - Two MPRAGE images were registered using FSL's flirt Rigid Body transformation (6DOF) 
-
-    "flirt -in |INPUT| -ref |REFERENCE| -out |OUTPUT| -omat |OUTPUT_MATRIX| -bins 256 -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 6  -interp trilinear"
-
-2 - Registered T1 images were averaged using ANTs' AverageImages
-
-    "AverageImages 3 |OUTPUT| 1 |IMAGE| |IMAGE|"
-
-3 - Averaged T1-with-skull images were non-linearly registered (warped) to a canine template-without-skull (Datta et al., 2012) and a warp image and deformation matrix were obtained. ANTs is used for non-linear registration since it works better with non-brain-extracted volumes.
+6 - The images are non-linearly registered (warped) to a skull stripped canine template (Datta et al., 2012) and a warp image and deformation matrix were obtained.
 
     "antsRegistrationSyN -d 3 -f |TEMPLATE| -m |T1| -o |OUTPUT_NAME|"
 
-4 - Topup was performed on the data for AP and PA directions:
+# ldog_func steps
+
+1 - Topup is performed on the data for AP and PA directions:
 
     a) Two single-rep images are merged together
 	"fslmerge -a |AP+PA.nii.gz| |AP_image.nii.gz| |PA_image.nii.gz|
-    b) Distortion map is calculated using the merged map and acquisition parameters text file:
+    b) Field map is calculated using the merged image and acquisition parameters text file which includes the phase encoding directions and times:
 	"topup --imain=|AP+PA.nii.gz| --datain=|Acqparams.txt| --config=b02b0.cnf --out=topup_results --iout=b0_unwarped --fout=fieldmap_Hz"
     c) Correction is applied to each EPI image:
 	"applytopup --imain=EPI_AP.nii.gz --inindex=1 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz"
 	"applytopup --imain=EPI_PA.nii.gz --inindex=2 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz"
 
-5 - FSL's 1st level fmri analysis was performed on the individual EPIs. 
-Note: FSL does the 1st level analysis in the native space. It creates registration files in each 1st level output folder but does not apply the transformations until the 2nd level analysis. If you do not specify any registration in the 1st step, your 2nd level analysis will fail because FSL will look for a registration file during this stage and won't be able to find one. In order to be able to do the 2nd level analysis without any transformations we need to trick FSL. For this we need to do some registrations in the first level to have FSL create the necessary files (doesn't really matter what we register to since we are only after creating some files). Then, we replace those files with identity matrices so no transformation takes place.
+2 - Motion correction is performed. Topup corrected AP scout image is used as the target. Time derivatives and squares are calculated. 
+
+    "mcflirt -in |INPUT| -o |OUTPUT| -reffile |TARGET IMAGE| -dof 12 -plots
    
-6 - Tricking FSL to do the group analysis without registration:
+3 - The warp field and affine matrix obtained from the ldog_struct gear is applied to each time series. 
 
-    a) Make sure the folder called reg_standard does not appear in your 1st level analysis directories. Delete if it appears. It usually appears when some registration is applied to the data which we don't want at this stage.
-    b) Copy an identity matrix from FSL's main directory to the reg subfolder of each of your 1st level output folders and rename the matrices example_func2standard.mat. This will make transformations ineffective.
-	"cp $FSLDIR/etc/flirtsch/ident.mat reg/example_func2standard.mat"
-    c) Overwrite the standard.nii.gz image which is located in the same reg directory with the mean_func.nii.gz image in your main 1st level directory so that no interpolation will take place either.
-	"cp mv mean_func.nii.gz reg/standard.nii.gz"
-    d) Check if everything looks alright. Voxel intensities between stats/cope#.nii.gz and reg_standard/stats/cope#.nii.gz should be exactly the same and data dimension and pixel size should be the same as mean_func
+    "antsApplyTransforms --float --default-value 0 --input |INPUT| --input-image-type 3 --interpolation Linear --output |OUTPUT| --reference-image |TARGET| --transform |WARP| --transform |AFFINE MAT|"
 
-7 - Do the 2nd level fixed effects single group averaging for both off>on and on>off conditions. 
+4 - Using the template as reference the BOLD images are skull stripped.
 
-8 - Transform the Z-stat maps into native space by applying the deformation fields we obtained after non-linear registration (Step 3).
+# ldog_fix steps
 
-    "antsApplyTransforms -d 3 -r |TEMPLATE| -i |ZSTAT_MAP| -t |XXX1Warp.nii.gz| -t |XXX0GenericAffine.mat| -o |out.nii.gz| -v 1"
+1 - Data is smoothed:
 
-9 - Generating surface maps: Activations in the invivo space are mapped onto the surface brain using a registration matrix created by an in-vivo to ex-vivo registration.
+    "fslmaths |INPUT| -kernel gauss |VALUE| -fmean |OUTPUT|
 
-Note: In-vivo to ex-vivo atlas transformation was performed by FSL's linear transfromation (FLIRT) with 12 DOF. Then, the transformation matrix created by FLIRT was converted to freesurfer .dat format by tkregister2 command so that it can be used for mapping:
+2 - Signal is converted to percentage change
 
-    "tkregister2 --mov invivoTemplate.nii.gz --fsl intoex.mat --targ SurfaceTemplate/Woofsurfer/mri/orig/001.mgz --noedit --reg register.dat"
+
+# Additional processing 
+
+1 - For fMRI analysis, the preprocessed images are used as inputs for the forwardModel gear which performs non-linear model fitting.
+
+2 - Maps are warped to the ex-vivo surface template with a 3-step registration:
+
+    a) Linear registration to the original surfer volume (located in Woofsurfer/mri/T1.nii)
+       "flirt -in |INVIVO| -ref |T1.nii| -out |OUTPUT_LINEAR_IMAGE| -omat |OUTPUT MATRIX| -bins 256 -cost corratio -searchrx -180 180 -searchry -180 180 -searchrz -180 180 -dof 12  -interp trilinear
+    b) The omat obtained from above step is coverted to ITK style matrix by using ITK-Snap tool 
+       "c3d_affine_tool -ref |T1.nii| -src |INVIVO| |FSL OUTPUT MATRIX| -fsl2ras -oitk |ITK NEW MATRIX NAME.mat|
+    c) A warp between the output of the step a) and original surfer volume
+       "antsRegistrationSyN.sh -d 3 -t so -f |T1.nii| -m |OUTPUT_LINEAR_IMAGE| -o |OUTPUT| -n 6
+    d) Applying the warp by combining the linear matrix with the warp field
+       "antsApplyTransforms --float --default-value 0 --input |INPUT_MAP| --input-image-type 3 --interpolation Linear --output |FINAL_MAP| --reference-image |T1.nii| --transform |WARP| --transform |GENERIC_AFFINE| --transform |AFFINE MAT_converted_from_fsl|"
+
+3 - Create a register.dat matrix by using an FSL identity matrix. Using the output of the previous step (final warped image) as the moving and target:
+
+    "tkregister2 --mov |ALREADY_WARPED_INVIVO| --fsl |IDENTITY.MAT| --targ |ALREADY_WARPED_INVIVO| --noedit --reg register.dat" 
+
+4 - Create surface maps. Using the output of the previous step (final warped image) as the moving and target again:
+
+    "mri_vol2surf --mov |ALREADY_WARPED_INVIVO| --ref |ALREADY_WARPED_INVIVO| --reg |REGISTER.DAT| --srcsubject Woofsurfer --hemi |WHICH HEMI| --o |OUTPUT|  
 
