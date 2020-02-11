@@ -46,13 +46,13 @@ Analysis code and Flywheel gears for all projects under the LDOG protocol
 
 1 - Topup is performed on the data for AP and PA directions:
 
-    a) Two single-rep images are merged together
-	"fslmerge -a |AP+PA.nii.gz| |AP_image.nii.gz| |PA_image.nii.gz|
-    b) Field map is calculated using the merged image and acquisition parameters text file which includes the phase encoding directions and times:
-	"topup --imain=|AP+PA.nii.gz| --datain=|Acqparams.txt| --config=b02b0.cnf --out=topup_results --iout=b0_unwarped --fout=fieldmap_Hz"
-    c) Correction is applied to each EPI image:
-	"applytopup --imain=EPI_AP.nii.gz --inindex=1 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz"
-	"applytopup --imain=EPI_PA.nii.gz --inindex=2 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz"
+a) Two single-rep images are merged together
+    "fslmerge -a |AP+PA.nii.gz| |AP_image.nii.gz| |PA_image.nii.gz|
+b) Field map is calculated using the merged image and acquisition parameters text file which includes the phase encoding directions and times:
+    "topup --imain=|AP+PA.nii.gz| --datain=|Acqparams.txt| --config=b02b0.cnf --out=topup_results --iout=b0_unwarped --fout=fieldmap_Hz"
+c) Correction is applied to each EPI image:
+    "applytopup --imain=EPI_AP.nii.gz --inindex=1 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz"
+    "applytopup --imain=EPI_PA.nii.gz --inindex=2 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz"
 
 2 - Motion correction is performed. Topup corrected AP scout image is used as the target. Time derivatives and squares are calculated. 
 
