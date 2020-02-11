@@ -47,13 +47,17 @@ Analysis code and Flywheel gears for all projects under the LDOG protocol
 1 - Topup is performed on the data for AP and PA directions:
 
 a) Two single-rep images are merged together
+    
     "fslmerge -a |AP+PA.nii.gz| |AP_image.nii.gz| |PA_image.nii.gz|
 
 b) Field map is calculated using the merged image and acquisition parameters text file which includes the phase encoding directions and times:
+    
     "topup --imain=|AP+PA.nii.gz| --datain=|Acqparams.txt| --config=b02b0.cnf --out=topup_results --iout=b0_unwarped --fout=fieldmap_Hz"
 
 c) Correction is applied to each EPI image:
+    
     "applytopup --imain=EPI_AP.nii.gz --inindex=1 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz"
+    
     "applytopup --imain=EPI_PA.nii.gz --inindex=2 --method=jac --datatin=Acqparams.txt --topup=topup_results --out=corrected.nii.gz"
 
 2 - Motion correction is performed. Topup corrected AP scout image is used as the target. Time derivatives and squares are calculated. 
@@ -81,14 +85,21 @@ c) Correction is applied to each EPI image:
 
 2 - Maps are warped to the ex-vivo surface template with a 3-step registration:
 
-    a) Linear registration to the original surfer volume (located in Woofsurfer/mri/T1.nii)
-       "flirt -in |INVIVO| -ref |T1.nii| -out |OUTPUT_LINEAR_IMAGE| -omat |OUTPUT MATRIX| -bins 256 -cost corratio -searchrx -180 180 -searchry -180 180 -searchrz -180 180 -dof 12  -interp trilinear
-    b) The omat obtained from above step is coverted to ITK style matrix by using ITK-Snap tool 
-       "c3d_affine_tool -ref |T1.nii| -src |INVIVO| |FSL OUTPUT MATRIX| -fsl2ras -oitk |ITK NEW MATRIX NAME.mat|
-    c) A warp between the output of the step a) and original surfer volume
-       "antsRegistrationSyN.sh -d 3 -t so -f |T1.nii| -m |OUTPUT_LINEAR_IMAGE| -o |OUTPUT| -n 6
-    d) Applying the warp by combining the linear matrix with the warp field
-       "antsApplyTransforms --float --default-value 0 --input |INPUT_MAP| --input-image-type 3 --interpolation Linear --output |FINAL_MAP| --reference-image |T1.nii| --transform |WARP| --transform |GENERIC_AFFINE| --transform |AFFINE MAT_converted_from_fsl|"
+a) Linear registration to the original surfer volume (located in Woofsurfer/mri/T1.nii)
+       
+    "flirt -in |INVIVO| -ref |T1.nii| -out |OUTPUT_LINEAR_IMAGE| -omat |OUTPUT MATRIX| -bins 256 -cost corratio -searchrx -180 180 -searchry -180 180 -searchrz -180 180 -dof 12  -interp trilinear
+
+b) The omat obtained from above step is coverted to ITK style matrix by using ITK-Snap tool 
+    
+    "c3d_affine_tool -ref |T1.nii| -src |INVIVO| |FSL OUTPUT MATRIX| -fsl2ras -oitk |ITK NEW MATRIX NAME.mat|
+
+c) A warp between the output of the step a) and original surfer volume
+    
+    "antsRegistrationSyN.sh -d 3 -t so -f |T1.nii| -m |OUTPUT_LINEAR_IMAGE| -o |OUTPUT| -n 6
+
+d) Applying the warp by combining the linear matrix with the warp field
+       
+    "antsApplyTransforms --float --default-value 0 --input |INPUT_MAP| --input-image-type 3 --interpolation Linear --output |FINAL_MAP| --reference-image |T1.nii| --transform |WARP| --transform |GENERIC_AFFINE| --transform |AFFINE MAT_converted_from_fsl|"
 
 3 - Create a register.dat matrix by using an FSL identity matrix. Using the output of the previous step (final warped image) as the moving and target:
 
