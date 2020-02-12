@@ -68,7 +68,7 @@ for i in num_img:
             first_image = image_data[:,:,:,0]
             for i in range(volume_num):
                 idx = i + 1
-                if idx == 112:
+                if idx == volume_num:
                     continue
                 else:
                     first_image = np.add(first_image, image_data[:,:,:,idx])                   
