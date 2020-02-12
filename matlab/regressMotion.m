@@ -79,7 +79,7 @@ end
 if ~strcmp(p.Results.stimFile,'Na')
     % Load the stimulus
     load(p.Results.stimFile,'stimulus');
-    % We want a
+    % We want a vector, not a cell
     if iscell(stimulus)
         stimulus = stimulus{1};
     end
