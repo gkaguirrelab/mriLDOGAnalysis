@@ -1,4 +1,4 @@
-projectLabel,canineFovea,gearName,forwardModel,rootSession,funcZip01,ConfigKeys,"{'averageAcquisitions','dataFileType','dataSourceType','modelClass','modelOpts','tr'}",ConfigVals,"{'1','volumetric','ldogfix','glm',modelOpts,'3.0'}",,,,,,,
+projectLabel,canineFovea,gearName,forwardModel,rootSession,funcZip01,ConfigKeys,"{'averageAcquisitions','dataFileType','dataSourceType','modelClass','modelOpts','tr'}",ConfigVals,"{'0','volumetric','ldogfix','glm',modelOpts,'3.0'}",,,,,,,
 Inputs,structZip,maskFile,funcZip01,funcZip02,funcZip03,funcZip04,funcZip05,funcZip06,funcZip07,funcZip08,funcZip09,funcZip10,stimFile,modelOpts,analysisSubmissionTag,
 DefaultLabel,ldogstruct/preprocessedStruct.zip,,,,,,,,,,,,,,,
 FileSuffix,zip,,zip,,,,,,,,,,mat,,,
