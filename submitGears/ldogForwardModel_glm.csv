@@ -1,0 +1,10 @@
+projectLabel,canineFovea,gearName,forwardModel,rootSession,funcZip01,ConfigKeys,"{'averageAcquisitions','dataFileType','dataSourceType','modelClass','modelOpts','tr'}",ConfigVals,"{'1','volumetric','ldogfix','flobsHRF',modelOpts,'3.0'}",,,,,,,
+Inputs,structZip,maskFile,funcZip01,funcZip02,funcZip03,funcZip04,funcZip05,funcZip06,funcZip07,funcZip08,funcZip09,funcZip10,stimFile,modelOpts,analysisSubmissionTag,
+DefaultLabel,ldogstruct/preprocessedStruct.zip,,,,,,,,,,,,,,,
+FileSuffix,zip,,zip,,,,,,,,,,mat,,,
+ContainerType,analysis,project,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,project,config,,
+ExactStringMatch,0,0,0,,,,,,,,,,0,,,Notes
+,,,,,,,,,,,,,,,,
+N292,N292/photoFlicker_1,2x2x2resampled_invivoTemplate.nii.gz,N292/photoFlicker_1/ldogfix/N292_photoFlicker_1_LplusS.zip,N292/photoFlicker_2/ldogfix/N292_photoFlicker_2_LplusS.zip,,,,,,,,,photoFlicker_LplusS_acq_01_06_08_x2_stimulus.mat,"'(polyDeg), 5'",N292_photoFlicker_glm_LplusS,
+N292,N292/photoFlicker_1,2x2x2resampled_invivoTemplate.nii.gz,N292/photoFlicker_1/ldogfix/N292_photoFlicker_1_LminusS.zip,N292/photoFlicker_2/ldogfix/N292_photoFlicker_2_LminusS.zip,,,,,,,,,photoFlicker_LminusS_acq_01_06_08_x2_stimulus.mat,"'(polyDeg), 5'",N292_photoFlicker_glm_LminusS,
+N292,N292/photoFlicker_1,2x2x2resampled_invivoTemplate.nii.gz,N292/photoFlicker_1/ldogfix/N292_photoFlicker_1_LplusS.zip,N292/photoFlicker_2/ldogfix/N292_photoFlicker_2_LplusS.zip,,,,,,,,,photoFlicker_LplusS_acq_01_06_08_x2_stimulus.mat,"'(polyDeg), 5'",N292_photoFlicker_glm_LplusS,
