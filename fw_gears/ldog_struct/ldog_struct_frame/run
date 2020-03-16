@@ -178,6 +178,41 @@ if os.path.exists(MPRAGE_05_folder):
     MPRAGE_05 = os.path.join(MPRAGE_05_folder, os.listdir(MPRAGE_05_folder)[0])
     os.system('cp %s %s' % (MPRAGE_05, T1folder))
 
+MPRAGE_06_folder = os.path.join(flywheel_base, 'input/MPRAGE_06')
+if os.path.exists(MPRAGE_06_folder):
+    MPRAGE_06 = os.path.join(MPRAGE_06_folder, os.listdir(MPRAGE_06_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_06, T1folder))
+    
+MPRAGE_07_folder = os.path.join(flywheel_base, 'input/MPRAGE_07')
+if os.path.exists(MPRAGE_07_folder):
+    MPRAGE_07 = os.path.join(MPRAGE_07_folder, os.listdir(MPRAGE_07_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_07, T1folder))
+
+MPRAGE_08_folder = os.path.join(flywheel_base, 'input/MPRAGE_08')
+if os.path.exists(MPRAGE_08_folder):
+    MPRAGE_08 = os.path.join(MPRAGE_08_folder, os.listdir(MPRAGE_08_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_08, T1folder))
+
+MPRAGE_09_folder = os.path.join(flywheel_base, 'input/MPRAGE_09')
+if os.path.exists(MPRAGE_09_folder):
+    MPRAGE_09 = os.path.join(MPRAGE_09_folder, os.listdir(MPRAGE_09_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_09, T1folder))  
+    
+MPRAGE_10_folder = os.path.join(flywheel_base, 'input/MPRAGE_10')
+if os.path.exists(MPRAGE_10_folder):
+    MPRAGE_10 = os.path.join(MPRAGE_10_folder, os.listdir(MPRAGE_10_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_10, T1folder))
+
+MPRAGE_11_folder = os.path.join(flywheel_base, 'input/MPRAGE_11')
+if os.path.exists(MPRAGE_11_folder):
+    MPRAGE_11 = os.path.join(MPRAGE_11_folder, os.listdir(MPRAGE_11_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_11, T1folder))
+
+MPRAGE_12_folder = os.path.join(flywheel_base, 'input/MPRAGE_12')
+if os.path.exists(MPRAGE_12_folder):
+    MPRAGE_12 = os.path.join(MPRAGE_12_folder, os.listdir(MPRAGE_12_folder)[0])
+    os.system('cp %s %s' % (MPRAGE_12, T1folder))
+    
 Template_folder = os.path.join(flywheel_base, 'input/Template')
 if os.path.exists(Template_folder):
     Template = os.path.join(Template_folder, os.listdir(Template_folder)[0])

@@ -113,6 +113,76 @@
 				]
 			}
 		},
+		"MPRAGE_06": {
+			"description": "MPRAGE image",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_07": {
+			"description": "MPRAGE image",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_08": {
+			"description": "MPRAGE image",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_09": {
+			"description": "MPRAGE image",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_10": {
+			"description": "MPRAGE image",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_11": {
+			"description": "MPRAGE image",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"MPRAGE_12": {
+			"description": "MPRAGE image",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
 		"Template": {
 			"description": "Template image to use for warping. This is optional. If left empty, the gear uses the invivoTemplate",
 			"base": "file",
