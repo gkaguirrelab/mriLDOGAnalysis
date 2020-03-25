@@ -2,9 +2,15 @@ import os
 
 def trick_fsl(first_lvl_results_folder):
     
-    # This function loops through the first level analysis results and deletes
-    # and replaces some files so that FSL will not do it's on registration once
-    # the data is fed through the second level analysis
+    '''
+    Description:
+        This function loops through the first level analysis results and deletes
+        and replaces some files so that FSL will not do it's on registration once
+        the data is fed through the second level analysis
+    
+    Inputs:
+        - first_lvl_results_folder: Path to the first level FSL analysis folder 
+    '''
     
     print('TRICKING FSL SO NO REGISTRATION TAKES PLACE')
     

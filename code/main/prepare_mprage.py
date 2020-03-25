@@ -1,13 +1,24 @@
 import os
 
-def prepare_mprage(path_to_mprage, centre_of_gravity, extraction_threshold, output_folder):
+def prepare_mprage(path_to_mprage, centre_of_gravity, extraction_threshold, output_path):
     
-    # This script prepares the MPRAGE image(s) for the analysis. Pipeline:  
-        # 1 - Bias correcting each MPRAGE images
-        # 2 - Registering MPRAGES if there is more than one
-        # 3 - Averaging the registered and target MPRAGE if there is more than one
-        # 4 - Skull stripping the MPRAGE
-        # 5 - x-y flipping the skull stripped MPRAGE
+    '''
+    Description: 
+        This script prepares the MPRAGE image(s) for the analysis. Pipeline:  
+        1 - Bias correcting each MPRAGE images
+        2 - Registering MPRAGES if there is more than one
+        3 - Averaging the registered and target MPRAGE if there is more than one
+        4 - Skull stripping the MPRAGE
+        5 - x-y flipping the skull stripped MPRAGE for making pseudohemisphere
+    Inputs:
+        - path_to_mprage: Path to a folder containing one or more T1 images
+        - centre_of_gravity: Is a list of coordinates of the middle (gravity) 
+        of the brain image. Example: [95,68,102]
+        - extraction_threshold: Brain extraction threshold. 0.5 is a good
+        value for human brain extraction
+        - output_path: Output path. Script creates more folders in this location
+        and organizes the output.
+    '''
     
     # Find MPRAGE images
     mprage_images = os.listdir(path_to_mprage)
@@ -19,7 +30,7 @@ def prepare_mprage(path_to_mprage, centre_of_gravity, extraction_threshold, outp
         os.system(call)
     
     # Register MPRAGEs if there are two of them 
-    preprocessed_mprage_folder = os.path.join(output_folder, 'preprocessed_mprage')
+    preprocessed_mprage_folder = os.path.join(output_path, 'preprocessed_mprage')
     if not os.path.exists(preprocessed_mprage_folder):
         os.system('mkdir %s' % preprocessed_mprage_folder)
         

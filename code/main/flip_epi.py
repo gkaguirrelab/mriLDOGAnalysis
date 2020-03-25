@@ -2,7 +2,15 @@ import os
 
 def flip_epi(epi_folder, output_folder):
     
-    # This function x-y flips the EPI images.
+    '''
+    Description:
+        This function x-y flips the EPI images.
+        
+    Inputs:
+        - epi_folder: Path to a folder containing epi images
+        - output_folder: Path to save the output. The script creates more folders
+        in this path and organizes the output   
+    '''
 
     # Flip 4D hemispheres 
     flipped_epi = os.path.join(output_folder, 'flipped')
