@@ -6,7 +6,7 @@ def set_zero(working_image, template_image):
     '''
     Description:
         Sets the values outside the brain to zero using another image as the 
-        base image. Can be used to skull strip coregistered images. Warning !!
+        guide image. Can be used to skull strip co-registered images. Warning !!
         Overwrites the original image
         
     Inputs:
