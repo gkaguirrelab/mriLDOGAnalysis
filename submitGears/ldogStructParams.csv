@@ -1,4 +1,3 @@
-<<<<<<< HEAD,,,,,,,,,,,,
 projectLabel,canineFovea,gearName,ldogStruct,rootSession,MPRAGE_01,ConfigKeys,"{'centreOfGravityX','centreOfGravityY','centreOfGravityZ','subjectId','transformationMethod','extractionThreshold','structToStructTransform'}",ConfigVals,"{centreOfGravityX,centreOfGravityY,centreOfGravityZ,subjectName,transformationMethod,extractionThreshold,'Affine'}",,,
 Inputs,MPRAGE_01,MPRAGE_02,MPRAGE_03,MPRAGE_04,MPRAGE_05,centreOfGravityX,centreOfGravityY,centreOfGravityZ,transformationMethod,extractionThreshold,analysisSubmissionTag,
 DefaultLabel,MPRAGE_0.7mm_1avg01,MPRAGE_0.7mm_1avg02,MPRAGE_0.7mm_1avg03,MPRAGE_0.7mm_1avg04,MPRAGE_0.7mm_1avg05,,,,,,,
