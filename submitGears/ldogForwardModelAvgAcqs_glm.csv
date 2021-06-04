@@ -6,10 +6,8 @@ ContainerType,analysis,project,analysis,analysis,analysis,analysis,analysis,anal
 ExactStringMatch,0,0,0,,,,,,,,,,0,,,,Notes
 ,,,,,,,,,,,,,,,,,
 EM501,EM501/maxFlicker/ldogstruct/EM501_preprocessedStruct.zip,2x2x2resampled_invivoTemplate.nii.gz,EM501/maxFlicker/ldogfix/EM501_maxFlicker_LeftEye.zip,,,,,,,,,,lightFluxFlicker_1x112_On=1.mat,"'(polyDeg), 13,(hrfParams),[-0.7981, 0.6827, 0.2380]'",'0',EM501_maxFlicker_LeftEye,
-stop,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,
 EM501,EM501/maxFlicker/ldogstruct/EM501_preprocessedStruct.zip,2x2x2resampled_invivoTemplate.nii.gz,EM501/maxFlicker/ldogfix/EM501_maxFlicker_RightEye.zip,,,,,,,,,,lightFluxFlicker_1x112_On=1.mat,"'(polyDeg), 13,(hrfParams),[-0.7981, 0.6827, 0.2380]'",'0',EM501_maxFlicker_RightEye,
-,,,,,,,,,,,,,,,,,
+stop,,,,,,,,,,,,,,,,,
 EM543,EM543/photoFlicker_2/ldogstruct/EM543_preprocessedStruct.zip,2x2x2resampled_invivoTemplate.nii.gz,EM543/photoFlicker_2/ldogfix/EM543_photoFlicker_2_LightFlux_RightEye.zip,EM543/photoFlicker_2/ldogfix/EM543_photoFlicker_2_LightFlux_LeftEye.zip,,,,,,,,,blockedStimulus_1x144_On=1.mat,"'(polyDeg), 13,(hrfParams),[-0.7981, 0.6827, 0.2380]'",'0',EM543_photoFlicker_glm_LFOmnibus,
 EM543,EM543/photoFlicker_2/ldogstruct/EM543_preprocessedStruct.zip,2x2x2resampled_invivoTemplate.nii.gz,EM543/photoFlicker_2/ldogfix/EM543_photoFlicker_2_LplusS_RightEye.zip,EM543/photoFlicker_2/ldogfix/EM543_photoFlicker_2_LminusS_RightEye.zip,EM529/photoFlicker_2/ldogfix/EM529_photoFlicker_2_LightFlux_RightEye.zip,EM543/photoFlicker_2/ldogfix/EM543_photoFlicker_2_LplusS_LeftEye.zip,EM543/photoFlicker_2/ldogfix/EM543_photoFlicker_2_LminusS_LeftEye.zip,EM543/photoFlicker_2/ldogfix/EM543_photoFlicker_2_LightFlux_LeftEye.zip,,,,,blockedStimulus_1x144_On=1.mat,"'(polyDeg), 13,(hrfParams),[-0.7981, 0.6827, 0.2380]'",'0',EM543_photoFlicker_glm_Omnibus,
 EM543,EM543/photoFlicker_2/ldogstruct/EM543_preprocessedStruct.zip,2x2x2resampled_invivoTemplate.nii.gz,EM543/photoFlicker_2/ldogfix/EM543_photoFlicker_2_LplusS_RightEye.zip,,,,,,,,,,blockedStimulus_1x144_On=1.mat,"'(polyDeg), 13,(hrfParams),[-0.7981, 0.6827, 0.2380]'",'0',EM543_photoFlicker_glm_LplusS_RightEye,
