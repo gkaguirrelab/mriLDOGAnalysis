@@ -5,7 +5,7 @@ FileSuffix,nifti,nifti,nifti,nifti,nifti,,,,,,,
 ContainerType,acquisition,acquisition,acquisition,acquisition,acquisition,config,config,config,config,config,,Notes
 ExactStringMatch,0,0,0,0,0,,,,,,,
 ,,,,,,,,,,,,
-EM532,EM532/maxFlicker,EM532/maxFlicker,,,,95,52,85,'skullStrippedMprage-skullStrippedTemplate',0.2,EM532_maxFlicker,
+EM532,EM532/maxFlicker,EM532/maxFlicker,,,,88,59,91,'skullStrippedMprage-skullStrippedTemplate',0.2,EM532_maxFlicker,
 EM543,EM543/photoFlicker_3,EM543/photoFlicker_3,,,,92,57,83,'skullStrippedMprage-skullStrippedTemplate',0.2,EM543_photoFlicker_3,
 stop,,,,,,,,,,,,
 EM529,EM529/photoFlicker_3,EM529/photoFlicker_3,,,,102,52,95,'skullStrippedMprage-skullStrippedTemplate',0.2,EM529_photoFlicker_3,
