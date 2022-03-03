@@ -97,13 +97,13 @@ modelOpts = [modelOpts(1:end-1) ' },' ];
 % Create and add the avgAcqIdx. Average over eyes and acquisitions to
 % show time-series for a given photoreceptor direction. This output is in
 % the form of text that can be supplied to the forwardModelWrapper
-avgGuide = {[1,2,3,4,5,6],[7,8,9,10,11,12],[13,14,15,16,17,18]};
+avgGuide = {[1,2,3],[4,5,6],[7,8,9],[10,11,12],[13,14,15],[16,17,18]};
 modelOpts = [modelOpts '(avgAcqIdx),{ '];
 for ii = 1:length(avgGuide)
     thisVector = [];
     thisSet = arrayfun(@(thisIdx) [(thisIdx-1)*nTRsPerAcq+1 thisIdx*nTRsPerAcq],avgGuide{ii},'UniformOutput',false);
     thisSet = cell2mat(thisSet);    
-    modelOpts = [modelOpts sprintf('[%d:%d,%d:%d,%d:%d,%d:%d,%d:%d,%d:%d],',thisSet)];
+    modelOpts = [modelOpts sprintf('[%d:%d,%d:%d,%d:%d],',thisSet)];
 end
 
 % Remove trailing comma  and cap with bracket
