@@ -63,11 +63,11 @@ for ii=1:nBlocks
 end
 
 % Assemble the cell array of stimulus matrices
-fullMatrix = zeros(nAcq,144*nAcq);
+fullMatrix = zeros(nAcq,144);
 stimulus = {};
-for ii=1:18
+for ii=1:nAcq
     thisMatrix = fullMatrix;
-    thisMatrix(ii,(ii-1)*nTRsPerAcq+1:ii*nTRsPerAcq) = stimVector;
+    thisMatrix(ii,:) = stimVector;
     stimulus{ii} = thisMatrix;
 end
 
