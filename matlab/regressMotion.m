@@ -74,6 +74,11 @@ if size(X,1) ~= size(data,2)
     error('regressMotion:mismatchRegressors','The data and motion parameters have different temporal lengths');
 end
 
+% Mean center the elements of the X matrix
+for ii=1:size(X,2)
+    X(:,ii) = X(:,ii) - mean(X(:,ii));
+end
+
 % If a stimulusVector has been supplied, load this and partial this effect
 % out of the X matrix
 if ~strcmp(p.Results.stimFile,'Na')
@@ -99,6 +104,11 @@ if ~strcmp(p.Results.stimFile,'Na')
         X(:,ii) = X(:,ii) - b*stimulus;
     end
 end
+
+% Perform a dimensionality reduction on the X matix to keep those pca
+% coefficients that explain at least 5% of the variance
+[coeff,~,~,~,explained] = pca(X');
+X=coeff(:,1:find(explained<5,1)-1);
 
 % Store the warning state
 warningState = warning;
