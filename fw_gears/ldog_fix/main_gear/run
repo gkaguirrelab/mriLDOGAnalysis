@@ -10,7 +10,7 @@ import numpy as np
 # Set paths and create some folders
 flywheel_base ='/flywheel/v0/'
 first_output_dir = '/firstOutput'
-mcr_path = '/usr/local/MATLAB/MATLAB_Runtime/v97/'
+mcr_path = '/usr/local/MATLAB/MATLAB_Runtime/v98/'
 compiled_matlab_func = '/opt/regressMotion/run_regressMotion.sh'
 final_output_dir = os.path.join(flywheel_base, 'output')
 manifest_file = os.path.join(flywheel_base, 'manifest.json')
