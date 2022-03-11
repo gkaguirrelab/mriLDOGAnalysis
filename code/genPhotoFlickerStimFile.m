@@ -93,11 +93,10 @@ end
 % Remove trailing comma  and cap with bracket
 modelOpts = [modelOpts(1:end-1) ' },' ];
 
-
 % Create and add the avgAcqIdx. Average over eyes and acquisitions to
 % show time-series for a given photoreceptor direction. This output is in
 % the form of text that can be supplied to the forwardModelWrapper
-avgGuide = {[1,2,3],[4,5,6],[7,8,9],[10,11,12],[13,14,15],[16,17,18]};
+avgGuide = {[1,7,13],[2,8,14],[3,9,15],[4,10,16],[5,11,17],[6,12,18]};
 modelOpts = [modelOpts '(avgAcqIdx),{ '];
 for ii = 1:length(avgGuide)
     thisVector = [];
