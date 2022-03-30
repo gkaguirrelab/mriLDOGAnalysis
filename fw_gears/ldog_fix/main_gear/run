@@ -26,7 +26,7 @@ config = job_config['config']
 smoothingSigma = config['smoothingSigma']
 archiveName = config['archiveName']
 convertToPercentChangeSignal = config['convertToPercentChangeSignal']
-
+makePseudoHemisphere = config['makePseudoHemisphere']
 ################### Run Algorithm ################################
 
 # Get stim file input
@@ -86,15 +86,16 @@ for i in num_img:
             smooth_image_data[zeroindexes] = 0
             nb.save(smooth_image_raw, new_image_location)
                         
-            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file)
+            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s 'makePseudoHemi' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file, makePseudoHemisphere)
             os.system(cmd)
             final_image_path = os.path.join(new_folder_path, os.listdir(new_folder_path)[0])
             new_name = final_image_path.replace('MoReg','MoRegSmooth')
             os.system('mv %s %s' % (final_image_path, new_name))
         else:
-            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file)
+            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s 'makePseudoHemi' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file, makePseudoHemisphere)
             os.system(cmd)                    
             
+        os.system('mv %s/*.png %s' % (new_folder_path, final_output_dir))
 ################## Zip everything and output ##################################
 
 # Zip and move the maps

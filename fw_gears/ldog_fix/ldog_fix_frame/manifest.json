@@ -29,6 +29,11 @@
 			"default": "false",
 			"description": "Converts signal to percentage change",
 			"type": "string"
+		},
+		"makePseudoHemisphere": {
+			"default": "false",
+			"description": "Save final images as pseudohemispheres by flipping and averaging",
+			"type": "string"
 		}
 	},
 	"inputs": {
