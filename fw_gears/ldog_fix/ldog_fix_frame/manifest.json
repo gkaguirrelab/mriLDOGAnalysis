@@ -34,7 +34,17 @@
 			"default": "false",
 			"description": "Save final images as pseudohemispheres by flipping and averaging",
 			"type": "string"
-		}
+		},
+		"makePseudoHemisphere": {
+			"default": "false",
+			"description": "Save final images as pseudohemispheres by flipping and averaging",
+			"type": "string"
+		},		
+		"regressGlobalSignal": {
+			"default": "false",
+			"description": "Regress globab signal from the  data",
+			"type": "string"
+		}			
 	},
 	"inputs": {
 		"stimFile": {
