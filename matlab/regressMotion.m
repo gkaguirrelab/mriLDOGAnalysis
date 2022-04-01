@@ -29,9 +29,9 @@ function correctedFuncPath = regressMotion(epiPath, motionParamsPath, outputFold
 %
 % Examples:
 %{
-    epiPath = 'N292_N292_final_preprocessed_N292_N292_corrected_1.3.12.2.1107.5.2.32.35335.201912051319034549056903.0.0.0.nii';
-    motionParamsPath = 'N292_N292_motion_params.txt';
-    stimFile = 'lightFluxFlicker_1x112_On=0.mat';
+    epiPath = 'N292_photoFlicker_1_LplusS_run01_preprocessed__1.3.12.2.1107.5.2.32.35335.2019120511441319299753175.0.0.0.nii.gz';
+    motionParamsPath = 'N292_photoFlicker_1_LplusS_run01_motion_params_1.3.12.2.1107.5.2.32.35335.2019120511441319299753175.0.0.0.nii.gz.txt';
+    stimFile = 'blockedStimulus_1x144_On=1.mat';
     correctedFuncPath = regressMotion(epiPath, motionParamsPath,'','stimFile',stimFile);
 %}
 
@@ -44,6 +44,7 @@ p.addRequired('motionParamsPath',@isstr);
 p.addRequired('outputFolder',@isstr);
 
 % Optional
+p.addParameter('regressGlobalSignal', "false",@isstr)
 p.addParameter('convertToPercentChangeSignal', "false",@isstr)
 p.addParameter('stimFile', "Na" ,@isstr)
 p.addParameter('makePseudoHemi',"false", @isstr)
@@ -95,9 +96,22 @@ if size(X,1) ~= size(data,2)
     error('regressMotion:mismatchRegressors','The data and motion parameters have different temporal lengths');
 end
 
-% Mean center the elements of the X matrix
+% regressGlobalSignal if set
+if strcmp(p.Results.regressGlobalSignal,"true")
+
+    % Intra-cortical voxels will never have a zero value in their time
+    % series
+    idx = ~any(data'==0)';
+
+    % Obtain the mean intra-cortical signal, and add it to X
+    X(:,end+1) = mean(data(idx,:));
+
+end
+
+% Mean center the elements of the X matrix, and standardize
 for ii=1:size(X,2)
     X(:,ii) = X(:,ii) - mean(X(:,ii));
+    X(:,ii) = X(:,ii) / std(X(:,ii));
 end
 
 % If a stimulusVector has been supplied, load this and partial this effect
