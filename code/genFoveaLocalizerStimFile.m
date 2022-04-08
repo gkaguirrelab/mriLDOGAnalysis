@@ -37,23 +37,26 @@ nTRsPerAcq = nBlocks*blockLength;
 
 stimLabels = {...
     'rightEye_01','rightEye_02','rightEye_03','rightEye_04','rightEye_05','rightEye_06','rightEye_07','rightEye_08',...
+    'rightEye_09','rightEye_10','rightEye_11','rightEye_12',...
+    'rightEye_13','rightEye_14','rightEye_15','rightEye_16','rightEye_17','rightEye_18','rightEye_19','rightEye_20',...
     'leftEye_01','leftEye_02','leftEye_03','leftEye_04','leftEye_05','leftEye_06','leftEye_07','leftEye_08',...
+    'leftEye_09','leftEye_10','leftEye_11','leftEye_12','leftEye_13','leftEye_14','leftEye_15','leftEye_16',...
+    'leftEye_17','leftEye_18','leftEye_19','leftEye_20','leftEye_21','leftEye_22','leftEye_23','leftEye_24',...
     };
 
 nAcq = length(stimLabels);
 
-% We set the "on" stimulus period to 0, and the "off" period to "1". This
-% is because the BOLD fMRI response is inverted in these measurements
-% conducted with 100% 02 ventilation. By switching the phase of the
-% stimulus vector, we can make use of the mtSinai model machinery that
-% searches for HRFs with a positive form.
-stimVector = zeros(1,nTRsPerAcq);
+% We set the "on" stimulus period to 1, and the "off" period to "0". 
+% Although the BOLD fMRI response is inverted in these measurements
+% conducted with 100% 02 ventilation, we provide parameters of an HRF that
+% are themselves inverted.
+stimVector = ones(1,nTRsPerAcq);
 for ii=1:nBlocks
-    stimVector(1,(ii-1)*blockLength+5:(ii-1)*blockLength+8) = 1;
+    stimVector(1,(ii-1)*blockLength+5:(ii-1)*blockLength+8) = 0;
 end
 
 % Assemble the cell array of stimulus matrices
-fullMatrix = zeros(nAcq,144);
+fullMatrix = zeros(nAcq,nTRsPerAcq);
 stimulus = {};
 for ii=1:nAcq
     thisMatrix = fullMatrix;
@@ -62,18 +65,15 @@ for ii=1:nAcq
 end
 
 % Save the stimulus file to a tmp location
-fileName = fullfile(tempdir,'photoFlickerStimulusMtSinaiModel_LF.mat');
+fileName = fullfile(tempdir,'foveaLocalizer.mat');
 save(fileName,'stimulus');
 
-% Get the flywheel key
-flywheelAPIkey = getpref('flywheelMRSupport', 'flywheelAPIKey');
-
-% Upload the stimulus file to Flywheel
-system(['fw login' ' ' flywheelAPIkey ';' ' ' 'fw upload' ' ' fileName ' ' 'fw://gkaguirrelab/canineFovea/'])
-
+% Instantiate the flywheel object
+projectName = 'flywheelMRSupport';
+fw = flywheel.Flywheel(getpref(projectName,'flywheelAPIKey'));
 
 % Initiate the modelOpts text string
-modelOpts = '(polyDeg),13,(stimLabels),{ ';
+modelOpts = '(polyDeg),10,(hrfParams),[-0.7981, 0.6827, 0.2380],(stimLabels),{ ';
 
 % Add in the stimulus labels
 for ii=1:length(stimLabels)
@@ -86,13 +86,12 @@ modelOpts = [modelOpts(1:end-1) ' },' ];
 % Create and add the avgAcqIdx. Average over eyes and acquisitions to
 % show time-series for a given photoreceptor direction. This output is in
 % the form of text that can be supplied to the forwardModelWrapper
-avgGuide = {[1],[2],[3],[4],[5],[6]};
 modelOpts = [modelOpts '(avgAcqIdx),{ '];
-for ii = 1:length(avgGuide)
+for ii = 1:nAcq
     thisVector = [];
-    thisSet = arrayfun(@(thisIdx) [(thisIdx-1)*nTRsPerAcq+1 thisIdx*nTRsPerAcq],avgGuide{ii},'UniformOutput',false);
-    thisSet = cell2mat(thisSet);    
-    modelOpts = [modelOpts sprintf('[%d:%d,%d:%d,%d:%d],',thisSet)];
+    thisSet = arrayfun(@(thisIdx) [(thisIdx-1)*nTRsPerAcq+1 thisIdx*nTRsPerAcq],ii,'UniformOutput',false);
+    thisSet = cell2mat(thisSet);
+    modelOpts = [modelOpts sprintf('[%d:%d],',thisSet)];
 end
 
 % Remove trailing comma  and cap with bracket
