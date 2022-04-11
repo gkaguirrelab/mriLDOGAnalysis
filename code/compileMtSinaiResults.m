@@ -41,6 +41,7 @@ groupNames = {'WT','RCD1','XLPRA2','RHOT4R-pre1','RHOT4R-pre2','RHOT4R-post'};
 groupColors = {[0.5 0.5 0.5],[0 0 1],[1 0 0],[0 0.5 0],[0 0.5 0],[0 1 0]};
 nGroups = length(groupNames);
 jitterFactor = 0.1;
+paramSets = {[1:6],[7:12],[13:18]};
 
 % Some properties of the data and analyses
 stimulusDirections = {'L+S','L-S','LF'};
@@ -89,12 +90,33 @@ for ss=1:nSessions
         voxelIdx = results.meta.vxs(1);
         params{ss,aa} = results.params(voxelIdx,1:18);
     end
+        % Some of the analyses were required to enter a duplicate fMRI scan
+        % if one was missing to allow the machinery to run. We detect these
+        % duplicates here and account for this in the subsequent
+        % calculation of param SEM. We consider any params that match at 10
+        % decimal places to be a match.
+        [C,ia,ic]= unique(round(params{ss,1},10));
+        if length(C)<18
+            trimmedParamSets = paramSets;
+            idxToRemove = find(diff(ic)==0);
+            for ii=1:length(idxToRemove)
+                trimmedParamSets = cellfun(@(x) x(x~=idxToRemove(ii)),trimmedParamSets,'UniformOutput',false);
+            end
+            paramSetsBySession{ss} = trimmedParamSets;
+            warning('Duplicate param in session %d',ss)
+        else
+            paramSetsBySession{ss} = paramSets;
+        end
 end
 
 % Extract the data from the params
-dataMeans = cell2mat(cellfun(@(x) [mean(x(1:6)),mean(x(7:12)),mean(x(13:18))],params,'UniformOutput',false));
-dataSEMs = cell2mat(cellfun(@(x) [std(x(1:6))/sqrt(6),std(x(7:12))/sqrt(6),std(x(13:18))/sqrt(6)],params,'UniformOutput',false));
-
+dataMeans = []; dataSEMS = [];
+for ss=1:nSessions
+    for aa=1:nROIs
+        dataMeans(ss,(aa-1)*nROIs+1:aa*nROIs) = [mean(params{ss,aa}(paramSetsBySession{ss}{1})), mean(params{ss,aa}(paramSetsBySession{ss}{2})), mean(params{ss,aa}(paramSetsBySession{ss}{3})) ];
+        dataSEMs(ss,(aa-1)*nROIs+1:aa*nROIs) = [std(params{ss,aa}(paramSetsBySession{ss}{1}))/sqrt(length(paramSetsBySession{ss}{1})), std(params{ss,aa}(paramSetsBySession{ss}{2}))/sqrt(length(paramSetsBySession{ss}{2})), std(params{ss,aa}(paramSetsBySession{ss}{3}))/sqrt(length(paramSetsBySession{ss}{3})) ];
+    end
+end
 % Variable names for the table
 varNames =[];
 for xx=1:length(ROIs)
@@ -121,7 +143,7 @@ for xx=1:nGroups
                 hold on
                 plot([xx+(ss-1)*jitterFactor xx+(ss-1)*jitterFactor],[thisMean-thisSEM,thisMean+thisSEM],'-','Color',groupColors{xx});
             end
-            plot([0.5 3.5],[0 0],':k')
+            plot([0.5 nGroups+0.5],[0 0],':k')
             xticks([1:nGroups]);
             xticklabels(groupNames);
             title([ROIs{zz} '.' stimulusDirections{yy}])
