@@ -1,5 +1,8 @@
 % Compile results from Flywheel forwardModel analyses
 
+% House keeping
+clear
+close all
 
 %% Variable declaration
 scratchSaveDir = tempdir;
@@ -18,12 +21,11 @@ projectID = '5bb4ade9e849c300150d0d99';
 
 % session IDs
 sessionIDs = {...
-    '606f4e3a23a4b1585ea16b77','61f8259d9c5e882ac6ff49da','618eaf46cc13a7db50926d34',...
-    '5fbc010f007a24bdb2631e2a','5ff8a949a8232b19464b0926','5ffc9af3a2719d913b740e51',...
-    '5fa5bbded20d5c2d63f359aa','5fa9611917ddac02d6e32d8d','5fb6c55208da2c5a2aa08e75',...
-    '60146008afe25f7a6015acd6','604a6351e9a059778e89359b',...
-    '609ac9b8267f663f4f609a9e','60a6ad7839ca5ed906a2557f',...
-    '611557d3c45699f4bee0f829','6127e127999da0d2e6c708f4',...
+    {'606f4e3a23a4b1585ea16b77'},{'61f8259d9c5e882ac6ff49da'},{'618eaf46cc13a7db50926d34'},...
+    {'5fbc010f007a24bdb2631e2a'},{'5ff8a949a8232b19464b0926'},{'5ffc9af3a2719d913b740e51'},...
+    {'5fa5bbded20d5c2d63f359aa'},{'5fa9611917ddac02d6e32d8d'},{'5fb6c55208da2c5a2aa08e75'},...
+    {'60146008afe25f7a6015acd6','609ac9b8267f663f4f609a9e'},{'604a6351e9a059778e89359b','60a6ad7839ca5ed906a2557f'},...
+    {'611557d3c45699f4bee0f829'},{'6127e127999da0d2e6c708f4'},...
     };
 nSessions = length(sessionIDs);
 
@@ -33,13 +35,14 @@ subjectNames = {...
     'Z663','Z665','Z666',...
     'EM529','EM543',...
     'EM529','EM543',...
-    'EM529','EM543',...
     };
 
-groupIdx = {[1 2 3],[4  6],[7 8 9],[10 11],[11 12],[13 14]};
-groupNames = {'WT','RCD1','XLPRA2','RHOT4R-pre1','RHOT4R-pre2','RHOT4R-post'};
-groupColors = {[0.5 0.5 0.5],[0 0 1],[1 0 0],[0 0.5 0],[0 0.5 0],[0 1 0]};
+groupIdx = {[1 2 3],[4  6],[7 8 9],[10 11],[12 13]};
+groupNames = {'WT','RCD1','XLPRA2','RHOT4R-pre','RHOT4R-post'};
+groupColors = {[0.5 0.5 0.5],[0 0 1],[1 0 0],[0 0.5 0],[0 1 0]};
 nGroups = length(groupNames);
+
+
 jitterFactor = 0.1;
 paramSets = {[1:6],[7:12],[13:18]};
 
@@ -61,19 +64,21 @@ yLimVals = {...
 
 % Obtain the list of mtSinai analysis IDs
 for ss = 1:length(sessionIDs)
-    analysisList = fw.getSessionAnalyses(sessionIDs{ss});
-    stillSearching = true(size(ROIs));
-    idx = length(analysisList);
-    while any(stillSearching)
-        thisLabel = analysisList{idx}.label;
-        roiMatches = cellfun(@(x) and(contains(thisLabel,x),contains(thisLabel,theModelUsed)),ROIs);
-        if any(roiMatches)
-            analysisIDs{ss,find(roiMatches)} = analysisList{idx}.id;
-            stillSearching(find(roiMatches)) = false;
-        end
-        idx=idx-1;
-        if idx==0
-            error('Unable to find all of the analyses for this session')
+    for rr = 1:length(sessionIDs{ss})
+        analysisList = fw.getSessionAnalyses(sessionIDs{ss}{rr});
+        stillSearching = true(size(ROIs));
+        idx = length(analysisList);
+        while any(stillSearching)
+            thisLabel = analysisList{idx}.label;
+            roiMatches = cellfun(@(x) and(contains(thisLabel,x),contains(thisLabel,theModelUsed)),ROIs);
+            if any(roiMatches)
+                analysisIDs{ss,find(roiMatches)}{rr} = analysisList{idx}.id;
+                stillSearching(find(roiMatches)) = false;
+            end
+            idx=idx-1;
+            if idx==0
+                error('Unable to find all of the analyses for this session')
+            end
         end
     end
 end
@@ -82,31 +87,43 @@ end
 % forwardModel output
 params=[];
 for ss=1:nSessions
+    thisParamSet = paramSets;
     for aa=1:length(ROIs)
         resultsFileName = [subjectNames{ss},'_',theModelUsed,'_results.mat'];
         saveLocation = fullfile(saveDir,resultsFileName);
-        fw.downloadOutputFromAnalysis(analysisIDs{ss,aa},resultsFileName,saveLocation);
-        load(saveLocation,'results');
-        voxelIdx = results.meta.vxs(1);
-        params{ss,aa} = results.params(voxelIdx,1:18);
-    end
-        % Some of the analyses were required to enter a duplicate fMRI scan
-        % if one was missing to allow the machinery to run. We detect these
-        % duplicates here and account for this in the subsequent
-        % calculation of param SEM. We consider any params that match at 10
-        % decimal places to be a match.
-        [C,ia,ic]= unique(round(params{ss,1},10));
-        if length(C)<18
-            trimmedParamSets = paramSets;
-            idxToRemove = find(diff(ic)==0);
-            for ii=1:length(idxToRemove)
-                trimmedParamSets = cellfun(@(x) x(x~=idxToRemove(ii)),trimmedParamSets,'UniformOutput',false);
+        for rr=1:length(analysisIDs{ss,aa})
+            fw.downloadOutputFromAnalysis(analysisIDs{ss,aa}{rr},resultsFileName,saveLocation);
+            load(saveLocation,'results');
+            voxelIdx = results.meta.vxs(1);
+            if rr == 1
+                params{ss,aa} = results.params(voxelIdx,1:18);
+            else
+                params{ss,aa} = [params{ss,aa}(:)' results.params(voxelIdx,1:18)];
+                if aa==1
+                    % THIS IS A HACK, AND WILL FAIL IF rr>2
+                    thisParamSet = cellfun(@(x) [x x+18],thisParamSet,'UniformOutput',false);
+                    if rr>2
+                        error('You have encountered a hack. Need to fix this.')
+                    end
+                end
             end
-            paramSetsBySession{ss} = trimmedParamSets;
-            warning('Duplicate param in session %d',ss)
-        else
-            paramSetsBySession{ss} = paramSets;
         end
+    end
+    % Some of the analyses were required to enter a duplicate fMRI scan
+    % if one was missing to allow the machinery to run. We detect these
+    % duplicates here and account for this in the subsequent
+    % calculation of param SEM. We consider any params that match at 10
+    % decimal places to be a match.
+    [C,ia,ic]= unique(round(params{ss,1},10));
+    if length(C)<length(params{ss,1})
+        idxToRemove = find(diff(ic)==0);
+        for ii=1:length(idxToRemove)
+            thisParamSet = cellfun(@(x) x(x~=idxToRemove(ii)),thisParamSet,'UniformOutput',false);
+        end
+        paramSetsBySession{ss} = thisParamSet;
+        warning('Duplicate param in session %d',ss)
+    end
+    paramSetsBySession{ss} = thisParamSet;
 end
 
 % Extract the data from the params
@@ -163,7 +180,9 @@ for xx=1:size(dataMeans,1)
     end
 end
 T = array2table(string(dataStr));
+
 % Row names combine subject name and group
+rowName = [];
 for ss=1:nSessions
     rowName{ss} = [subjectNames{ss} '_' groupNames{cellfun(@(x) any(x==ss),groupIdx)}];
 end
