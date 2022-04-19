@@ -2,7 +2,7 @@
 	"name": "ldogfix",
 	"label": "ldogFix: archiving ldogfunc outputs",
 	"description": "This gear packages multiple ldogfunc outputs into one archive, regresses out motion confounds and does smoothing(optional)",
-	"version": "0",
+	"version": "0.3.1",
 	"inputs": {
 		"EPI_01": {
 			"base": "file",
@@ -233,7 +233,7 @@
 		},
 		"regressGlobalSignal": {
 			"default": "false",
-			"description": "Regress globab signal from the  data",
+			"description": "Remove global signal from the  data",
 			"type": "string"
 		},
 		"smoothingSigma": {
@@ -242,12 +242,15 @@
 			"type": "string"
 		}
 	},
-	"author": "Ozzy Taskin",
-	"maintainer": "Ozzy Taskin",
+	"author": "Ozenc Taskin",
+	"maintainer": "Ozenc Taskin",
 	"license": "Other",
 	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
 	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
 	"custom": {
+		"flywheel": {
+			"suite": "GKAguirreLab"
+		},
 		"gear-builder": {
 			"category": "analysis",
 			"image": "gkaguirrelab/ldogfix:0.3.1"
