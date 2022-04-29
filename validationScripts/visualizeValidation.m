@@ -199,30 +199,45 @@ else
         % Mesured Background SPD values
         valBackgroundSPDAll = [AllDirections.(fn{1,ii}).describe.validation.SPDbackground];
         preValBackgroundSPDMeasuredAveraged = (valBackgroundSPDAll(1).measuredSPD + valBackgroundSPDAll(2).measuredSPD +valBackgroundSPDAll(3).measuredSPD +valBackgroundSPDAll(4).measuredSPD +valBackgroundSPDAll(5).measuredSPD) / 5;
-        postValBackgroundSPDMeasuredAveraged = (valBackgroundSPDAll(6).measuredSPD + valBackgroundSPDAll(7).measuredSPD +valBackgroundSPDAll(8).measuredSPD +valBackgroundSPDAll(9).measuredSPD +valBackgroundSPDAll(10).measuredSPD) / 5;
+        if isequal(length(valBackgroundSPDAll),10)
+            postValBackgroundSPDMeasuredAveraged = (valBackgroundSPDAll(6).measuredSPD + valBackgroundSPDAll(7).measuredSPD +valBackgroundSPDAll(8).measuredSPD +valBackgroundSPDAll(9).measuredSPD +valBackgroundSPDAll(10).measuredSPD) / 5;
+        end
         
         % Predicted Background SPD values
         preValBackgroundSPDPredictedAveraged = (valBackgroundSPDAll(1).predictedSPD + valBackgroundSPDAll(2).predictedSPD +valBackgroundSPDAll(3).predictedSPD +valBackgroundSPDAll(4).predictedSPD +valBackgroundSPDAll(5).measuredSPD) / 5;
-        postValBackgroundSPDPredictedAveraged = (valBackgroundSPDAll(6).predictedSPD + valBackgroundSPDAll(7).predictedSPD +valBackgroundSPDAll(8).predictedSPD +valBackgroundSPDAll(9).predictedSPD +valBackgroundSPDAll(10).measuredSPD) / 5;
+        if isequal(length(valBackgroundSPDAll),10)
+            postValBackgroundSPDPredictedAveraged = (valBackgroundSPDAll(6).predictedSPD + valBackgroundSPDAll(7).predictedSPD +valBackgroundSPDAll(8).predictedSPD +valBackgroundSPDAll(9).predictedSPD +valBackgroundSPDAll(10).measuredSPD) / 5;
+        end
         
         % Mesured Mirror on/off SPD conditions
         valArmSPDAll = [AllDirections.(fn{1,ii}).describe.validation.SPDcombined];
         preValPositiveArmSPDMeasuredAveraged = (valArmSPDAll(1).measuredSPD + valArmSPDAll(3).measuredSPD +valArmSPDAll(5).measuredSPD +valArmSPDAll(7).measuredSPD +valArmSPDAll(9).measuredSPD) / 5;
-        postValPositiveArmSPDMeasuredAveraged = (valArmSPDAll(11).measuredSPD + valArmSPDAll(13).measuredSPD +valArmSPDAll(15).measuredSPD +valArmSPDAll(17).measuredSPD +valArmSPDAll(19).measuredSPD) / 5;
+        if isequal(length(valBackgroundSPDAll),10)
+            postValPositiveArmSPDMeasuredAveraged = (valArmSPDAll(11).measuredSPD + valArmSPDAll(13).measuredSPD +valArmSPDAll(15).measuredSPD +valArmSPDAll(17).measuredSPD +valArmSPDAll(19).measuredSPD) / 5;
+        end
         preValNegativeArmSPDMeasuredAveraged = (valArmSPDAll(2).measuredSPD + valArmSPDAll(4).measuredSPD +valArmSPDAll(6).measuredSPD +valArmSPDAll(8).measuredSPD +valArmSPDAll(10).measuredSPD) / 5;
-        postValNegativeArmSPDMeasuredAveraged = (valArmSPDAll(12).measuredSPD + valArmSPDAll(14).measuredSPD +valArmSPDAll(16).measuredSPD +valArmSPDAll(18).measuredSPD +valArmSPDAll(20).measuredSPD) / 5;
+        if isequal(length(valBackgroundSPDAll),10)
+            postValNegativeArmSPDMeasuredAveraged = (valArmSPDAll(12).measuredSPD + valArmSPDAll(14).measuredSPD +valArmSPDAll(16).measuredSPD +valArmSPDAll(18).measuredSPD +valArmSPDAll(20).measuredSPD) / 5;
+        end
         
         % Predicted Mirror on/off SPD conditions
         preValPositiveArmSPDPredictedAveraged = (valArmSPDAll(1).predictedSPD + valArmSPDAll(3).predictedSPD +valArmSPDAll(5).predictedSPD +valArmSPDAll(7).predictedSPD +valArmSPDAll(9).predictedSPD) / 5;
-        postValPositiveArmSPDPredictedAveraged = (valArmSPDAll(11).predictedSPD + valArmSPDAll(13).predictedSPD +valArmSPDAll(15).predictedSPD +valArmSPDAll(17).predictedSPD +valArmSPDAll(19).predictedSPD) / 5;
+        if isequal(length(valBackgroundSPDAll),10)
+            postValPositiveArmSPDPredictedAveraged = (valArmSPDAll(11).predictedSPD + valArmSPDAll(13).predictedSPD +valArmSPDAll(15).predictedSPD +valArmSPDAll(17).predictedSPD +valArmSPDAll(19).predictedSPD) / 5;
+        end
         preValNegativeArmSPDPredictedAveraged = (valArmSPDAll(2).predictedSPD + valArmSPDAll(4).predictedSPD +valArmSPDAll(6).predictedSPD +valArmSPDAll(8).predictedSPD +valArmSPDAll(10).predictedSPD) / 5;
-        postValNegativeArmSPDPredictedAveraged = (valArmSPDAll(12).predictedSPD + valArmSPDAll(14).predictedSPD +valArmSPDAll(16).predictedSPD +valArmSPDAll(18).predictedSPD +valArmSPDAll(20).predictedSPD) / 5;
-        
+        if isequal(length(valBackgroundSPDAll),10)
+            postValNegativeArmSPDPredictedAveraged = (valArmSPDAll(12).predictedSPD + valArmSPDAll(14).predictedSPD +valArmSPDAll(16).predictedSPD +valArmSPDAll(18).predictedSPD +valArmSPDAll(20).predictedSPD) / 5;
+        end
         % Get the wavelengths;
         wavelengths = AllDirections.(fn{1,ii}).calibration.describe.S(1):AllDirections.(fn{1,ii}).calibration.describe.S(2): AllDirections.(fn{1,ii}).calibration.describe.S(1) + AllDirections.(fn{1,ii}).calibration.describe.S(2)*AllDirections.(fn{1,ii}).calibration.describe.S(3) - AllDirections.(fn{1,ii}).calibration.describe.S(2);
         
         % Find the maximum value in all SPDs to set the max X value
-        allvals = [preValBackgroundSPDMeasuredAveraged postValBackgroundSPDMeasuredAveraged preValBackgroundSPDPredictedAveraged postValBackgroundSPDPredictedAveraged preValPositiveArmSPDMeasuredAveraged postValPositiveArmSPDMeasuredAveraged preValNegativeArmSPDMeasuredAveraged postValNegativeArmSPDMeasuredAveraged preValPositiveArmSPDPredictedAveraged postValPositiveArmSPDPredictedAveraged preValNegativeArmSPDPredictedAveraged postValNegativeArmSPDPredictedAveraged];
+        if isequal(length(valBackgroundSPDAll),10)
+            allvals = [preValBackgroundSPDMeasuredAveraged postValBackgroundSPDMeasuredAveraged preValBackgroundSPDPredictedAveraged postValBackgroundSPDPredictedAveraged preValPositiveArmSPDMeasuredAveraged postValPositiveArmSPDMeasuredAveraged preValNegativeArmSPDMeasuredAveraged postValNegativeArmSPDMeasuredAveraged preValPositiveArmSPDPredictedAveraged postValPositiveArmSPDPredictedAveraged preValNegativeArmSPDPredictedAveraged postValNegativeArmSPDPredictedAveraged];
+        else
+            allvals = [preValBackgroundSPDMeasuredAveraged preValBackgroundSPDPredictedAveraged preValPositiveArmSPDMeasuredAveraged preValNegativeArmSPDMeasuredAveraged preValPositiveArmSPDPredictedAveraged preValNegativeArmSPDPredictedAveraged];
+        end   
         maximum = max(max(allvals));
         
         % Plot stuff for each direction
@@ -241,18 +256,20 @@ else
             title(fn{1,ii})
             
             % visualize SPDs;
-            set(0,'CurrentFigure',postvalfig)
-            subplot(2,2,ii);
-            suptitle('Post-validation Measured BG/on/off')
-            hold on;
-            plot(wavelengths, postValBackgroundSPDMeasuredAveraged);
-            plot(wavelengths, postValPositiveArmSPDMeasuredAveraged);
-            plot(wavelengths, postValNegativeArmSPDMeasuredAveraged);
-            legend('BG', 'AllOn', 'AllOff', 'Location', 'best');
-            xlabel('Wavelength')
-            ylabel('Power')
-            ylim([0 maximum])            
-            title(fn{1,ii})
+            if isequal(length(valBackgroundSPDAll),10)
+                set(0,'CurrentFigure',postvalfig)
+                subplot(2,2,ii);
+                suptitle('Post-validation Measured BG/on/off')
+                hold on;
+                plot(wavelengths, postValBackgroundSPDMeasuredAveraged);
+                plot(wavelengths, postValPositiveArmSPDMeasuredAveraged);
+                plot(wavelengths, postValNegativeArmSPDMeasuredAveraged);
+                legend('BG', 'AllOn', 'AllOff', 'Location', 'best');
+                xlabel('Wavelength')
+                ylabel('Power')
+                ylim([0 maximum])            
+                title(fn{1,ii})
+            end
         elseif strcmp(p.Results.whatToPlot, 'measuredVsPredictedBG')
             set(0,'CurrentFigure',prevalfig)
             subplot(2,2,ii);
@@ -266,17 +283,19 @@ else
             ylim([0 maximum])            
             title(fn{1,ii})
             
-            set(0,'CurrentFigure',postvalfig)
-            subplot(2,2,ii);
-            suptitle('Post-validation MesuredVsPredicted BG')
-            hold on;
-            plot(wavelengths, postValBackgroundSPDMeasuredAveraged);
-            plot(wavelengths, postValBackgroundSPDPredictedAveraged);
-            legend('MeasuredBG', 'PredictedBG', 'Location', 'best');
-            xlabel('Wavelength')
-            ylabel('Power')
-            ylim([0 maximum])            
-            title(fn{1,ii})
+            if isequal(length(valBackgroundSPDAll),10)
+                set(0,'CurrentFigure',postvalfig)
+                subplot(2,2,ii);
+                suptitle('Post-validation MesuredVsPredicted BG')
+                hold on;
+                plot(wavelengths, postValBackgroundSPDMeasuredAveraged);
+                plot(wavelengths, postValBackgroundSPDPredictedAveraged);
+                legend('MeasuredBG', 'PredictedBG', 'Location', 'best');
+                xlabel('Wavelength')
+                ylabel('Power')
+                ylim([0 maximum])            
+                title(fn{1,ii})
+            end
         elseif strcmp(p.Results.whatToPlot, 'measuredVsPredictedPositiveArm')
             set(0,'CurrentFigure',prevalfig)
             subplot(2,2,ii);
@@ -290,17 +309,19 @@ else
             ylim([0 maximum])            
             title(fn{1,ii})
             
-            set(0,'CurrentFigure',postvalfig)
-            subplot(2,2,ii);
-            suptitle('Post-validation MesuredVsPredicted PositiveArm')
-            hold on;
-            plot(wavelengths, postValPositiveArmSPDMeasuredAveraged);
-            plot(wavelengths, postValPositiveArmSPDPredictedAveraged);
-            legend('MeasuredOn', 'PredictedOn', 'Location', 'best');
-            xlabel('Wavelength')
-            ylabel('Power')
-            ylim([0 maximum])            
-            title(fn{1,ii})
+            if isequal(length(valBackgroundSPDAll),10)
+                set(0,'CurrentFigure',postvalfig)
+                subplot(2,2,ii);
+                suptitle('Post-validation MesuredVsPredicted PositiveArm')
+                hold on;
+                plot(wavelengths, postValPositiveArmSPDMeasuredAveraged);
+                plot(wavelengths, postValPositiveArmSPDPredictedAveraged);
+                legend('MeasuredOn', 'PredictedOn', 'Location', 'best');
+                xlabel('Wavelength')
+                ylabel('Power')
+                ylim([0 maximum])            
+                title(fn{1,ii})
+            end
         elseif strcmp(p.Results.whatToPlot, 'measuredVsPredictedNegativeArm')
             set(0,'CurrentFigure',prevalfig)
             subplot(2,2,ii);
@@ -314,17 +335,19 @@ else
             ylim([0 maximum])            
             title(fn{1,ii})
             
-            set(0,'CurrentFigure',postvalfig)
-            subplot(2,2,ii);
-            suptitle('Post-validation MesuredVsPredicted Negative Arm')
-            hold on;
-            plot(wavelengths, postValNegativeArmSPDMeasuredAveraged);
-            plot(wavelengths, postValNegativeArmSPDPredictedAveraged);
-            legend('MeasuredOff', 'PredictedOff', 'Location', 'best');
-            xlabel('Wavelength')
-            ylabel('Power')
-            ylim([0 maximum])            
-            title(fn{1,ii})
+            if isequal(length(valBackgroundSPDAll),10)
+                set(0,'CurrentFigure',postvalfig)
+                subplot(2,2,ii);
+                suptitle('Post-validation MesuredVsPredicted Negative Arm')
+                hold on;
+                plot(wavelengths, postValNegativeArmSPDMeasuredAveraged);
+                plot(wavelengths, postValNegativeArmSPDPredictedAveraged);
+                legend('MeasuredOff', 'PredictedOff', 'Location', 'best');
+                xlabel('Wavelength')
+                ylabel('Power')
+                ylim([0 maximum])            
+                title(fn{1,ii})
+            end
         end
         
         % Save some stuff if a path is specified
