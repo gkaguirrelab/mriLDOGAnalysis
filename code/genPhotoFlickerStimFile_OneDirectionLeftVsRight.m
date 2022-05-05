@@ -113,7 +113,7 @@ for ii = 1:length(avgGuide)
     thisVector = [];
     thisSet = arrayfun(@(thisIdx) [(thisIdx-1)*nTRsPerAcq+1 thisIdx*nTRsPerAcq],avgGuide{ii},'UniformOutput',false);
     thisSet = cell2mat(thisSet);    
-    modelOpts = [modelOpts sprintf('[%d:%d,%d:%d,%d:%d],',thisSet)];
+    modelOpts = [modelOpts sprintf('[%d:%d,%d:%d],',thisSet)];
 end
 
 % Remove trailing comma  and cap with bracket
