@@ -2,7 +2,7 @@
 	"name": "ldogfunc",
 	"label": "ldogFunc: functional pre-processing for the LDOG project",
 	"description": "This gear performs preprocessing of the functional scans for the LDOG project.",
-	"version": "0.3.1",
+	"version": "0.3.2",
 	"inputs": {
 		"StructZip": {
 			"base": "file",
@@ -46,26 +46,6 @@
 		}
 	},
 	"config": {
-		"additionalWarpConvergence": {
-			"default": "50x10",
-			"description": "Convergence for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
-			"type": "string"
-		},
-		"additionalWarpShrinkFactors": {
-			"default": "2x1",
-			"description": "Shrink Factors for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
-			"type": "string"
-		},
-		"additionalWarpSmoothingSigmas": {
-			"default": "1x0vox",
-			"description": "Smoothing Sigmas for additional SyN registration step. Is not used if additionalWarpToTemplate is unchecked",
-			"type": "string"
-		},
-		"additionalWarpToTemplate": {
-			"default": false,
-			"description": "This does does an extra constrained warp to the EPI image",
-			"type": "boolean"
-		},
 		"fMRIName": {
 			"default": "NA",
 			"description": "Output name for preprocessed data",
