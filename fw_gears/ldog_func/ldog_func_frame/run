@@ -160,7 +160,7 @@ def registerToScout(image_name, epi_image, scout_image, output_folder, fsl_path 
     # Calculate a linear registration between the motion corrected image and scout    
     os.system('%s --verbose 1 --dimensionality 3 --float 0 --collapse-output-transforms 1 '
               '--output [ %s/toScout,%s/toScoutWarped.nii.gz,%s/toScoutInverseWarped.nii.gz ] '
-              '--interpolation Linear --winsorize-image-intensities [ 0.005,0.995 ] --use-histogram-matching 0'
+              '--interpolation Linear --winsorize-image-intensities [ 0.005,0.995 ] --use-histogram-matching 1'
               '--initial-moving-transform [ %s,%s,1 ] --transform Rigid[ 0.01 ] '
               '--metric MI[ %s,%s,1,32,Regular,0.2 ] --convergence [ 1000x500x250x100,1e-6,10 ] '
               '--shrink-factors 8x4x2x1 --smoothing-sigmas 3x2x1x0vox ' % (os.path.join(ants_path, 'antsRegistration'),
