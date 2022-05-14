@@ -1,0 +1,15 @@
+1- To make pseudo hemispheres we first flip the X direction: 
+
+fslswapdim invivoTemplate.nii.gz -x y z flipped_invivoTemplate.nii.gz
+
+2- Then we modify the qform and sform from the original invivo template so that the headers will be the same for both flipped and original template but the actual image will be flipped:
+
+fslorient -setqform -0.42 0 -0 53.76 0 0.42 -0 -53.76 0 0 1 -54 0 0 0 1 flipped_invivoTemplate.nii.gz
+
+fslorient -setsform -0.42 0 -0 53.76 0 0.42 -0 -53.76 0 0 1 -54 0 0 0 1 flipped_invivoTemplate.nii.gz
+
+The codes for the resampled template are:
+-2 0 -0 53.76 0 2 -0 -53.76 0 0 2 -54 0 0 0 1 
+
+use those for the fmri 
+
