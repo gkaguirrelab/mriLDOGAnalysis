@@ -10,7 +10,9 @@ RUN mkdir -p ${FLYWHEEL}
 COPY manifest.json run ${FLYWHEEL}
 RUN chmod +x /flywheel/v0/run
 COPY regressMotion/ /opt/regressMotion 
+COPY 2x2x2resampled_invivoTemplate.nii.gz /opt/2x2x2resampled_invivoTemplate.nii.gz
 RUN chmod +x /opt/regressMotion/*  
+COPY pseudoHemiRegistrations/ /opt/pseudoHemiRegistrations
 
 RUN apt-get update \
     && apt-get install -y build-essential git libexpat1-dev libssl-dev zlib1g-dev \
@@ -36,7 +38,8 @@ RUN apt-get update \
     python3-pip \
     zip \
     unzip \
-    fsl-core
+    fsl-core \
+    ants
 
 # Download and install MCR on call
 RUN wget https://ssd.mathworks.com/supportfiles/downloads/R2020a/Release/5/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2020a_Update_5_glnxa64.zip
@@ -45,8 +48,8 @@ RUN unzip MATLAB_Runtime_R2020a_Update_5_glnxa64.zip -d /matlabins/
 RUN /matlabins/install -mode silent -agreeToLicense yes
 
 RUN python3.7 -m pip install --upgrade pip
-RUN pip install numpy
-RUN python3.7 -m pip install 'nibabel==2.5.1' 'numpy==1.18.1'
+RUN pip install numpy 
+RUN python3.7 -m pip install 'nibabel==2.5.1' 'numpy==1.18.1' imageio matplotlib
 
 # Set the entrypoint  
 ENTRYPOINT /flywheel/v0/run

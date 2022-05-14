@@ -4,6 +4,8 @@ import os
 import json
 import nibabel as nb
 import numpy as np
+import imageio
+import matplotlib.pyplot as plt
 
 ###################### Define the Paths and parameters ###########################
 
@@ -16,6 +18,9 @@ final_output_dir = os.path.join(flywheel_base, 'output')
 manifest_file = os.path.join(flywheel_base, 'manifest.json')
 config_path = os.path.join(flywheel_base, 'config.json')
 os.system('mkdir %s'%first_output_dir)
+fsl_path = 'FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0'
+ants_path = '/usr/lib/ants/'
+resampled_template_path = '/opt/2x2x2resampled_invivoTemplate.nii.gz'
 
 ################### Parse config ##############################################
 
@@ -28,8 +33,46 @@ archiveName = config['archiveName']
 convertToPercentChangeSignal = config['convertToPercentChangeSignal']
 makePseudoHemisphere = config['makePseudoHemisphere']
 regressGlobalSignal  = config['regressGlobalSignal']
-################### Run Algorithm ################################
 
+################### Run Algorithm ################################
+def make_plot(subject_id, base_image, overlay, title, subtitle, filename, x, y, z, output_folder):
+    
+    # This function simply gets two MRI images as inputs and overlays them 
+    #using different colors for each image. Used as a diagnostic method.
+        
+    fig, (ax1, ax2, ax3) = plt.subplots(1,3)
+    fig.suptitle(title, fontsize=20)
+    ax2.title.set_text(subtitle)
+    
+    epi_img = nb.load(base_image)
+    epi_img_data = epi_img.get_fdata()
+    ax1.imshow(epi_img_data[x,:,:], cmap="gray")
+    ax2.imshow(epi_img_data[:,y,:], cmap="gray")
+    ax3.imshow(epi_img_data[:,:,z], cmap="gray")
+    ax1.axis('off')
+    ax2.axis('off')
+    ax3.axis('off')  
+    
+    if overlay != 'NA':
+        epi_img = nb.load(overlay)
+        epi_img_data = epi_img.get_fdata()
+        ax1.imshow(epi_img_data[x,:,:], cmap="hot", alpha=0.4)
+        ax2.imshow(epi_img_data[:,y,:], cmap="hot", alpha=0.4)
+        ax3.imshow(epi_img_data[:,:,z], cmap="hot", alpha=0.4)
+        ax1.axis('off')
+        ax2.axis('off')
+        ax3.axis('off')
+
+    plt.savefig(os.path.join(output_folder, subject_id + '_' + filename))    
+    
+    return (output_folder)
+
+def make_gif(image_folder, gif_name, output_folder):
+    images = []
+    for filename in os.listdir(image_folder):
+        images.append(imageio.imread(os.path.join(image_folder, filename)))
+        imageio.mimsave('/%s/%s.gif' % (output_folder, gif_name), images, duration=0.9)
+        
 # Get stim file input
 stim_folder = os.path.join(flywheel_base, 'input/stimFile/')
 if os.path.exists(stim_folder):
@@ -62,7 +105,7 @@ for i in num_img:
         new_image_location = os.path.join(tmp_working_dir, os.listdir(tmp_working_dir)[0])
                     
         if smoothingSigma != 'NA':                    
-            # Get the zero indexes                    
+            # Get the zero indexes in the raw image                 
             image_raw = nb.load(new_image_location)
             image_data = image_raw.get_data()
             volume_num = np.shape(image_data)[3]
@@ -78,25 +121,81 @@ for i in num_img:
             averaged_image = np.nan_to_num(averaged_image, nan=0)
             zeroindexes = np.where(averaged_image == 0)               
                     
-            # Smooth
-            os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmaths %s -kernel gauss %s -fmean %s' % (new_image_location, float(smoothingSigma), new_image_location))                
+            # Smooth the image
+            os.system('%s %s -kernel gauss %s -fmean %s' % (os.path.join(fsl_path, 'fslmaths'),new_image_location, float(smoothingSigma), new_image_location))                
                        
+            # Load the smooth image and set zero values
             smooth_image_raw = nb.load(new_image_location)
             smooth_image_data = smooth_image_raw.get_data()
                     
             smooth_image_data[zeroindexes] = 0
             nb.save(smooth_image_raw, new_image_location)
-                        
-            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s 'makePseudoHemi' %s 'regressGlobalSignal' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file, makePseudoHemisphere, regressGlobalSignal)
-            os.system(cmd)
-            final_image_path = os.path.join(new_folder_path, os.listdir(new_folder_path)[0])
-            new_name = final_image_path.replace('MoReg','MoRegSmooth')
-            os.system('mv %s %s' % (final_image_path, new_name))
+             
+            # Run motion regression
+            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s 'regressGlobalSignal' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file, regressGlobalSignal)
+            os.system(cmd)    
         else:
-            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s 'makePseudoHemi' %s 'regressGlobalSignal' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file, makePseudoHemisphere, regressGlobalSignal)
+            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s 'regressGlobalSignal' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file, regressGlobalSignal)
             os.system(cmd)                    
+        
+        # Make pseudo hemispheres if requested
+        if makePseudoHemisphere == 'true':
             
-        os.system('mv %s/*.png %s' % (new_folder_path, final_output_dir))
+            # Get registrations between flipped and original template
+            affine_pseudo = '/opt/pseudoHemiRegistrations/flipped2Orig0GenericAffine.mat'
+            warp_pseudo = '/opt/pseudoHemiRegistrations/flipped2Orig1Warp.nii.gz'  
+            
+            # First start by making a pseudohemi with the raw image so that 
+            # we can make some diagnostic plots. We do this wit the raw image 
+            # because we just want to use plots for checking if pseudo operation
+            # worked well and percentage change operation when used makes it 
+            # hard to judge
+            
+            # Set plot folder
+            subject_id = os.path.split(image_file)[1][:-7]
+            plot_folder = os.path.join(tmp_working_dir + 'image')
+            os.system('mkdir %s' % (plot_folder))
+            
+            # Take the first TR of raw image and plot it
+            single_image = '/tmp/singleTR.nii.gz'
+            os.system('%s %s %s 0 1' % (os.path.join(fsl_path, 'fslroi'), image_file, single_image))
+            make_plot(subject_id, single_image, 'NA', 'Original image and Pseudo hemi' , 'original', 'original.png', 26, 23, 26, plot_folder)
+            
+            # Flip the raw image
+            plot_flipped = '/tmp/flipped.nii.gz'
+            os.system('%s %s -x y z %s' % (os.path.join(fsl_path, 'fslswapdim'), image_file, plot_flipped))
+            
+            # Register the flipped image
+            plot_registered = '/tmp/registered.nii.gz'
+            os.system('%s -i %s -r %s -t %s -t %s -o %s -e 3' % (os.path.join(ants_path, 'antsApplyTransforms'), plot_flipped, resampled_template_path, warp_pseudo, affine_pseudo, plot_registered))   
+            
+            # Average the raw and registered
+            plot_averaged = '/tmp/averaged.nii.gz'
+            os.system('%s %s -add %s -div 2 %s' % (os.path.join(fsl_path, 'fslmaths'), image_file, plot_registered, plot_averaged))
+            
+            # Get a single TR and plot it
+            os.system('%s %s %s 0 1' % (os.path.join(fsl_path, 'fslroi'), plot_averaged, single_image))
+            make_plot(subject_id, single_image, 'NA', 'riginal image and Pseudo hemi', 'pseudo', 'pseudo.png', 26, 23, 26, plot_folder)
+            
+            # Make a gif from raw and pseudo image
+            make_gif(plot_folder, os.path.split(image_file)[1][:-7], final_output_dir)
+            
+            ######## Do it for real now on the processed image ################
+           
+            # Create folder
+            pseudo_hemi_folder = os.path.join(tmp_working_dir, 'pseudoHemi')
+            os.system('mkdir %s' % pseudo_hemi_folder)
+            
+            # Flip the image
+            processed_image_path = os.path.join(new_folder_path, os.listdir(new_folder_path)[0])
+            flipped_image = os.path.join(pseudo_hemi_folder, 'flipped.nii.gz')
+            os.system('%s %s -x y z %s' % (os.path.join(fsl_path, 'fslswapdim'), processed_image_path, flipped_image))
+            
+            # Apply the flip to orig registration we calculated on the template
+            registered_flipped = os.path.join(pseudo_hemi_folder, 'registered_flipped.nii.gz')
+            os.system('%s -i %s -r %s -t %s -t %s -o %s -e 3' % (os.path.join(ants_path, 'antsApplyTransforms'), flipped_image, resampled_template_path, warp_pseudo, affine_pseudo, registered_flipped))   
+            os.system('%s %s -add %s -div 2 %s' % (os.path.join(fsl_path, 'fslmaths'), processed_image_path, registered_flipped, processed_image_path))          
+            
 ################## Zip everything and output ##################################
 
 # Zip and move the maps

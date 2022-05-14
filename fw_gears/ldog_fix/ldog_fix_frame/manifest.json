@@ -44,7 +44,7 @@
 			"default": "false",
 			"description": "Regress globab signal from the  data",
 			"type": "string"
-		}			
+		}					
 	},
 	"inputs": {
 		"stimFile": {

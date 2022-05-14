@@ -47,7 +47,6 @@ p.addRequired('outputFolder',@isstr);
 p.addParameter('regressGlobalSignal', "false",@isstr)
 p.addParameter('convertToPercentChangeSignal', "false",@isstr)
 p.addParameter('stimFile', "Na" ,@isstr)
-p.addParameter('makePseudoHemi',"false", @isstr)
 p.addParameter('saveAveragingPlots', "true", @isstr)
 
 % Parse
@@ -65,23 +64,6 @@ originalShape = size(thisAcqData.vol);
 
 % Get the volume
 data = thisAcqData.vol;
-
-% Plot the first volume. This is for comparing the results to pseudo hemi
-plotVol = reshape(thisAcqData.vol, originalShape);
-if strcmp(p.Results.makePseudoHemi,"true")
-    f = figure('visible', 'off');
-    subplot(1,3,1)
-    imagesc(squeeze(plotVol(25,:,:,1)))
-    colormap gray
-    axis square
-    subplot(1,3,2)
-    imagesc(squeeze(plotVol(:,25,:,1)))
-    axis square
-    subplot(1,3,3)
-    imagesc(squeeze(plotVol(:,:,25,1)))
-    axis square
-    saveas(f, fullfile(outputFolder, [acqusitionName, 'fMRI_before_pseudo.png']))
-end
     
 % Reshape into a matrix
 data = single(data);
@@ -151,26 +133,6 @@ warningState = warning;
 % Silence warnings.
 warning('off','MATLAB:rankDeficientMatrix');
 
-% Make a pseudohemi here before motion and percentage change for plotting
-if strcmp(p.Results.makePseudoHemi,"true")
-    slice = squeeze(thisAcqData.vol(:,:,:,1));  % Just get the first volume
-    Vflip = flip(slice,2); % Flip across the midline
-    Vflip = circshift(Vflip,2,2);      
-    Vpseudo = (slice+Vflip)./2;
-    f = figure('visible', 'off');
-    subplot(1,3,1)
-    imagesc(squeeze(Vpseudo(25,:,:)))
-    colormap gray
-    axis square
-    subplot(1,3,2)
-    imagesc(squeeze(Vpseudo(:,25,:)))
-    axis square
-    subplot(1,3,3)
-    imagesc(squeeze(Vpseudo(:,:,25)))
-    axis square
-    saveas(f, fullfile(outputFolder, [acqusitionName 'fMRI_after_pseudo.png']))
-end
-
 % Loop through the voxels and regress out the motion component
 for vv = 1:size(data,1)
     datats = data(vv,:)';
@@ -198,19 +160,8 @@ warning(warningState);
 thisAcqData.vol = data;
 thisAcqData.vol = reshape(thisAcqData.vol, originalShape);
 
-% Make pseudo hemisphere if requested
-if strcmp(p.Results.makePseudoHemi,"true") 
-    for ii = 1:length(thisAcqData.vol)
-    	slice = squeeze(thisAcqData.vol(:,:,:,ii));  % Just get the first volume
-        Vflip = flip(slice,2); % Flip across the midline
-        Vflip = circshift(Vflip,2,2);      
-        Vpseudo = (slice+Vflip)./2;
-        thisAcqData.vol(:,:,:,ii) = Vpseudo;
-    end    
-end
-
 % Set the save name
-newName = strrep(acqusitionName, '_preprocessed_','_preprocessedMoReg_');
+newName = strrep(acqusitionName, '_warped_epi_','_preprocessed_');
 
 % Save the motion corrected fMRI data
 correctedFuncPath = fullfile(outputFolder,newName);
