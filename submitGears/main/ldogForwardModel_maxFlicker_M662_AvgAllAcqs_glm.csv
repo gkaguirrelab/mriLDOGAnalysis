@@ -1,0 +1,13 @@
+projectLabel,canineFovea,gearName,forwardModel,versionNum,,rootSession,funcZip01,ConfigKeys,"{'averageAcquisitions','averageVoxels','pseudoHemiAnalysis','convertToPercentChange','dataFileType','dataSourceType','modelClass','modelOpts','tr','padTruncatedTRs'}",ConfigVals,"{'1','0','0','0','volumetric','ldogfix','glm',modelOpts,'3.0',padTruncatedTRs}",,,,,,
+Inputs,structZip,maskFile,funcZip01,funcZip02,funcZip03,funcZip04,funcZip05,funcZip06,funcZip07,funcZip08,funcZip09,funcZip10,stimFile,modelOpts,padTruncatedTRs,analysisSubmissionTag,
+DefaultLabel,,,,,,,,,,,,,,,,,
+FileSuffix,zip,,zip,,,,,,,,,,mat,,,,
+ContainerType,analysis,project,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,analysis,project,config,config,,
+ExactStringMatch,0,0,0,,,,,,,,,,0,,,,Notes
+,,,,,,,,,,,,,,,,,
+M662,M662/foveaLocalizer_2.1/ldogstruct/preprocessedStruct.zip,2x2x2resampled_invivoTemplate.nii.gz,M662/foveaLocalizer_1.2/ldogfix/M662_foveaLocalizer_1_rightEyeStim.zip,M662/foveaLocalizer_2.1/ldogfix/M662_foveaLocalizer_2_rightEyeStim.zip,M662/foveaLocalizer_3.1/ldogfix/M662_foveaLocalizer_3_rightEyeStim.zip,M662/foveaLocalizer_1.1/ldogfix/M662_foveaLocalizer_1_leftEyeStim.zip,M662/foveaLocalizer_2.1/ldogfix/M662_foveaLocalizer_2_leftEyeStim.zip,M662/foveaLocalizer_3.1/ldogfix/M662_foveaLocalizer_3_leftEyeStim.zip,,,,,lightFluxFlicker_1x112_On=1.mat,"'(polyDeg), 10,(hrfParams),[-0.7981, 0.6827, 0.2380]'",'0',M662_foveaLocalizer_allSessions_L+R,
+,,,,,,,,,,,,,,,,,
+stop,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+"This analysis combines all of the data from the 3 sessions for M662, combining left and right eye stimulation, with the goal of creating the largest possible map of cortical and LGN responses to visual stimulation.",,,,,,,,,,,,,,,,,
+We used the responses from this analysis to define regions of interest that are subsequently used in the analysis of the photoflicker data from other animals.,,,,,,,,,,,,,,,,,
