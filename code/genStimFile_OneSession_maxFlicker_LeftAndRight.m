@@ -1,4 +1,4 @@
-% genStimFile_M662_maxFlicker_LeftAndRight.m
+% genStimFile_OneSession_maxFlicker_LeftAndRight.m
 %
 % This routine produces output needed to conduct forwardModel analyses of
 % the LDOG photoFlicker MRI experiments. We analyze the data using the
@@ -39,18 +39,11 @@ nTRsPerAcq = nBlocks*blockLength;
 % analysis outputs, the stimLabels reflect this ordering.
 
 stimLabels = {...
-    'rightEye_01','rightEye_02','rightEye_03','rightEye_04','rightEye_05','rightEye_06','rightEye_07','rightEye_08',... % foveaLocalizer 1_2
-    'rightEye_09','rightEye_10','rightEye_11','rightEye_12',...                                                         % foveaLocalizer 2_1
-    'rightEye_13','rightEye_14','rightEye_15','rightEye_16','rightEye_17','rightEye_18','rightEye_19','rightEye_20',... % foveaLocalizer 3_1
-    'leftEye_01','leftEye_02','leftEye_03','leftEye_04','leftEye_05','leftEye_06','leftEye_07','leftEye_08',...         % foveaLocalizer 1_1
-    'leftEye_09','leftEye_10','leftEye_11','leftEye_12','leftEye_13','leftEye_14','leftEye_15','leftEye_16',...         % foveaLocalizer 2_1
-    'leftEye_17','leftEye_18','leftEye_19','leftEye_20','leftEye_21','leftEye_22','leftEye_23','leftEye_24',...         % foveaLocalizer 3_1
+    'rightEye_01','rightEye_02','rightEye_03','rightEye_04','rightEye_05','rightEye_06','rightEye_07','rightEye_08',... 
+    'leftEye_01','leftEye_02','leftEye_03','leftEye_04','leftEye_05','leftEye_06','leftEye_07','leftEye_08'...
     };
 
-avgGuide = {[1,21],[2,22],[3,23],[4,24],[5,25],[6,26],[7,27],[8,28],... % session 1_1 and 1_2
-    [9,29],[10,30],[11,31],[12,32],...                                  % session 2_1, first four acquisitions that have paired left and right
-    [33,34],[35,36],...                                                 % session 2_1, last four left eye stims, paired together as a hack
-    [13,37],[14,38],[15,39],[16,40],[17,41],[18,42],[19,43],[20,44]};   % session 3_1
+avgGuide = {[1,9],[2,10],[3,11],[4,12],[5,13],[6,14],[7,15],[8,16]};
 
 nAcq = length(stimLabels);
 
@@ -73,7 +66,7 @@ for ii=1:nAcq
 end
 
 % Save the stimulus file to a tmp location
-fileName = fullfile(tempdir,'stimFile_M662_maxFlicker_LeftAndRight.mat');
+fileName = fullfile(tempdir,'stimFile_OneSession_maxFlicker_LeftAndRight.mat');
 save(fileName,'stimulus');
 
 % Instantiate the flywheel object
