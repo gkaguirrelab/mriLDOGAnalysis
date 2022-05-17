@@ -39,13 +39,18 @@ nTRsPerAcq = nBlocks*blockLength;
 % analysis outputs, the stimLabels reflect this ordering.
 
 stimLabels = {...
-    'rightEye_01','rightEye_02','rightEye_03','rightEye_04','rightEye_05','rightEye_06','rightEye_07','rightEye_08',...
-    'rightEye_09','rightEye_10','rightEye_11','rightEye_12',...
-    'rightEye_13','rightEye_14','rightEye_15','rightEye_16','rightEye_17','rightEye_18','rightEye_19','rightEye_20',...
-    'leftEye_01','leftEye_02','leftEye_03','leftEye_04','leftEye_05','leftEye_06','leftEye_07','leftEye_08',...
-    'leftEye_09','leftEye_10','leftEye_11','leftEye_12','leftEye_13','leftEye_14','leftEye_15','leftEye_16',...
-    'leftEye_17','leftEye_18','leftEye_19','leftEye_20','leftEye_21','leftEye_22','leftEye_23','leftEye_24',...
+    'rightEye_01','rightEye_02','rightEye_03','rightEye_04','rightEye_05','rightEye_06','rightEye_07','rightEye_08',... % foveaLocalizer 1_2
+    'rightEye_09','rightEye_10','rightEye_11','rightEye_12',...                                                         % foveaLocalizer 2_1
+    'rightEye_13','rightEye_14','rightEye_15','rightEye_16','rightEye_17','rightEye_18','rightEye_19','rightEye_20',... % foveaLocalizer 3_1
+    'leftEye_01','leftEye_02','leftEye_03','leftEye_04','leftEye_05','leftEye_06','leftEye_07','leftEye_08',...         % foveaLocalizer 1_1
+    'leftEye_09','leftEye_10','leftEye_11','leftEye_12','leftEye_13','leftEye_14','leftEye_15','leftEye_16',...         % foveaLocalizer 2_1
+    'leftEye_17','leftEye_18','leftEye_19','leftEye_20','leftEye_21','leftEye_22','leftEye_23','leftEye_24',...         % foveaLocalizer 3_1
     };
+
+avgGuide = {[1,21],[2,22],[3,23],[4,24],[5,25],[6,26],[7,27],[8,28],... % session 1_1 and 1_2
+    [9,29],[10,30],[11,31],[12,32],...                                  % session 2_1, first four acquisitions that have paired left and right
+    [33,34],[35,36],...                                                 % session 2_1, last four left eye stims, paired together as a hack
+    [13,37],[14,38],[15,39],[16,40],[17,41],[18,42],[19,43],[20,44]};   % session 3_1
 
 nAcq = length(stimLabels);
 
@@ -68,7 +73,7 @@ for ii=1:nAcq
 end
 
 % Save the stimulus file to a tmp location
-fileName = fullfile(tempdir,'foveaLocalizer.mat');
+fileName = fullfile(tempdir,'stimFile_M662_maxFlicker_LeftAndRight.mat');
 save(fileName,'stimulus');
 
 % Instantiate the flywheel object
@@ -89,7 +94,6 @@ modelOpts = [modelOpts(1:end-1) ' },' ];
 % Create and add the avgAcqIdx. Average over eyes and acquisitions to
 % show time-series for a given photoreceptor direction. This output is in
 % the form of text that can be supplied to the forwardModelWrapper
-avgGuide = {[1,21],[2,5],[3,6],[7,10],[8,11],[9,12],[13,16],[14,17],[15,18]};
 modelOpts = [modelOpts '(avgAcqIdx),{ '];
 for ii = 1:length(avgGuide)
     thisVector = [];
@@ -97,7 +101,6 @@ for ii = 1:length(avgGuide)
     thisSet = cell2mat(thisSet);    
     modelOpts = [modelOpts sprintf('[%d:%d,%d:%d],',thisSet)];
 end
-
 
 % Remove trailing comma  and cap with bracket
 modelOpts = [modelOpts(1:end-1) ' }\n' ];
