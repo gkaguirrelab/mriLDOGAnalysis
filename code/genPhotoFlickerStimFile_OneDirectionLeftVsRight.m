@@ -58,15 +58,9 @@ nAcq = length(stimLabels);
 % conducted with 100% 02 ventilation. By switching the phase of the
 % stimulus vector, we can make use of the mtSinai model machinery that
 % searches for HRFs with a positive form.
-%
-% Additionally, we flip the assignment of on and off periods for the right
-% eye acquisitions. This way, the analysis constitutes a contrast betweeen
-% left and right.
-stimVectorLeft = zeros(1,nTRsPerAcq);
-stimVectorRight = ones(1,nTRsPerAcq);
+stimVector = ones(1,nTRsPerAcq);
 for ii=1:nBlocks
-    stimVectorLeft(1,(ii-1)*blockLength+5:(ii-1)*blockLength+8) = 1;
-    stimVectorRight(1,(ii-1)*blockLength+5:(ii-1)*blockLength+8) = 0;
+    stimVector(1,(ii-1)*blockLength+5:(ii-1)*blockLength+8) = 0;
 end
 
 % Assemble the cell array of stimulus matrices.
@@ -74,16 +68,12 @@ fullMatrix = zeros(nAcq,144);
 stimulus = {};
 for ii=1:nAcq
     thisMatrix = fullMatrix;
-    if contains(stimLabels{ii},'right')
-        thisMatrix(ii,:) = stimVectorRight;
-    else
-        thisMatrix(ii,:) = stimVectorLeft;
-    end
+    thisMatrix(ii,:) = stimVector;
     stimulus{ii} = thisMatrix;
 end
 
 % Save the stimulus file to a tmp location
-fileName = fullfile(tempdir,'photoFlickerStimulusMtSinaiModel_LFLeftVsRight.mat');
+fileName = fullfile(tempdir,'photoFlickerStimulusMtSinaiModel_LFLeftAndRight.mat');
 save(fileName,'stimulus');
 
 % Get the flywheel key
