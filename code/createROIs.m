@@ -7,7 +7,7 @@ sizer = size(V.vol);
 
 seedNames = {'LGN','antV1','postV1'};
 seedCoords = {[33,27,23],[29,16,21],[29,19,16]};
-maxDiffs = {0.4,0.2,0.125};
+maxDiffs = {0.4,0.15,0.1};
 thresh = {0.2,0.3,0.3};
 
 result=[];
