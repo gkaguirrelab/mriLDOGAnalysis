@@ -307,8 +307,28 @@ if fMRIName != 'NA':
     subject_id = subject_id + '_' + fMRIName
 
 ###################Run Algorithm################################
+
+# We want to skip topup if AP or PA image do not exist
+if os.path.exists(fMRIScoutAP_folder) and not os.path.exists(fMRIScoutPA_folder):
+    single_target = fMRIScoutAP
+elif not os.path.exists(fMRIScoutAP_folder) and os.path.exists(fMRIScoutPA_folder):
+    single_target = fMRIScoutPA
+    
 # Topup
-(image_name, scout_topuped, corrected_epi) = topup(fMRITimeSeries_name, 0.0217349, 0.0217349, scout_folder, first_output_dir, fsl_path=fsl_path, ants_path=ants_path)
+if os.path.exists(fMRIScoutAP_folder) and os.path.exists(fMRIScoutPA_folder):
+    (image_name, scout_topuped, corrected_epi) = topup(fMRITimeSeries_name, 0.0217349, 0.0217349, scout_folder, first_output_dir, fsl_path=fsl_path, ants_path=ants_path)
+else:
+    image_name = os.path.split(fMRITimeSeries_name)[1][:-7]
+    scout_topuped = single_target
+    unrestricted_loc = '/opt/unrestricted' # We create this as moco cannot create temproray files in the input directory
+    os.system('mkdir %s' % unrestricted_loc)
+    corrected_epi = os.path.join(unrestricted_loc, image_name + '.nii.gz')
+    os.system('cp %s %s' % (fMRITimeSeries_name, corrected_epi))
+    scout_folder = os.path.join(unrestricted_loc, 'scout_folder')
+    os.system('mkdir %s' % scout_folder)
+    os.system('cp %s %s' % (single_target, scout_folder))
+    scout_topuped = os.path.join(scout_folder, os.listdir(scout_folder)[0])
+    
 # Moco
 (motion_corrected_image, confound_file) = moco(subject_id, image_name, corrected_epi, first_output_dir, fsl_path=fsl_path)
 # register to topuped scout image
