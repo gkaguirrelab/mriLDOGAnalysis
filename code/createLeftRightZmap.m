@@ -4,9 +4,7 @@ outDir = '/Users/aguirre/Downloads/';
 
 fw = flywheel.Flywheel(getpref('flywheelMRSupport','flywheelAPIKey'));
 
-jobID = '628418f9f661a2ea13c73327';
-theJob = fw.getJob(jobID);
-analysisID = theJob.destination.id;
+analysisID = '628418f9f661a2ea13c73327';
 theAnalysis = fw.getAnalysis(analysisID);
 
 % Grab the results.mat file
