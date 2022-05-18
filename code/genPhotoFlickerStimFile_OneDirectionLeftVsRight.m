@@ -53,15 +53,16 @@ stimLabels = {...
 
 nAcq = length(stimLabels);
 
-% We set the "on" stimulus period to 0, and the "off" period to "1". This
-% is because the BOLD fMRI response is inverted in these measurements
-% conducted with 100% 02 ventilation. By switching the phase of the
-% stimulus vector, we can make use of the mtSinai model machinery that
-% searches for HRFs with a positive form.
-stimVector = ones(1,nTRsPerAcq);
+% We set the "on" stimulus period to 0, and the "off" period to "1". 
+% This is to account for the inversion of the cortical BOLD fMRI response
+% with 100% 02 ventilation. The analysis is constrained to have a positive
+% HRF, so this arrangement causes the cortex to have a positive response to
+% stimulation.
+stimVector = zeros(1,nTRsPerAcq);
 for ii=1:nBlocks
-    stimVector(1,(ii-1)*blockLength+5:(ii-1)*blockLength+8) = 0;
+    stimVector(1,(ii-1)*blockLength+5:(ii-1)*blockLength+8) = 1;
 end
+
 
 % Assemble the cell array of stimulus matrices.
 fullMatrix = zeros(nAcq,144);

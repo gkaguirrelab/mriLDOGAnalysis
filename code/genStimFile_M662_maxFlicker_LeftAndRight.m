@@ -54,13 +54,14 @@ avgGuide = {[1,21],[2,22],[3,23],[4,24],[5,25],[6,26],[7,27],[8,28],... % sessio
 
 nAcq = length(stimLabels);
 
-% We set the "on" stimulus period to 1, and the "off" period to "0". 
-% Although the BOLD fMRI response is inverted in these measurements
-% conducted with 100% 02 ventilation, we provide parameters of an HRF that
-% are themselves inverted.
-stimVector = ones(1,nTRsPerAcq);
+% We set the "on" stimulus period to 0, and the "off" period to "1". 
+% This is to account for the inversion of the cortical BOLD fMRI response
+% with 100% 02 ventilation. The analysis is constrained to have a positive
+% HRF, so this arrangement causes the cortex to have a positive response to
+% stimulation.
+stimVector = zeros(1,nTRsPerAcq);
 for ii=1:nBlocks
-    stimVector(1,(ii-1)*blockLength+5:(ii-1)*blockLength+8) = 0;
+    stimVector(1,(ii-1)*blockLength+5:(ii-1)*blockLength+8) = 1;
 end
 
 % Assemble the cell array of stimulus matrices
