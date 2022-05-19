@@ -5,6 +5,7 @@ outDir = '/Users/aguirre/Downloads/';
 fw = flywheel.Flywheel(getpref('flywheelMRSupport','flywheelAPIKey'));
 
 analysisIDs = {...
+    '628503035281810451421d78',... % M662 all sessions
     '628501f4d761c6b839dd67f7',... % WT photoFlicker LF
     '62850196172a1813c00ba821',...
     '628501a5bcc8f465c7e22862',...
@@ -12,7 +13,7 @@ analysisIDs = {...
     '628501c06fbeeefb3597857b',...
     '628501cf22d8db0f25ed0bd2'};
 
-for aa = 1:length(analysisIDs)
+for aa = 1:1 %length(analysisIDs)
 
     thisAnalysisID = analysisIDs{aa};
     theAnalysis = fw.getAnalysis(thisAnalysisID);
