@@ -5,6 +5,7 @@ FileSuffix,nifti,nifti,nifti,nifti,nifti,,,,,,,
 ContainerType,acquisition,acquisition,acquisition,acquisition,acquisition,config,config,config,config,config,,Notes
 ExactStringMatch,0,0,0,0,0,,,,,,,
 ,,,,,,,,,,,,
+2346,2346/photoFlicker_1,2346/photoFlicker_1,,,,102,46,89,'skullStrippedMprage-skullStrippedTemplate',0.2,2346_photoFlicker_1,
 N347,N347/photoFlicker_1,N347/photoFlicker_1,,,,86,54,93,'skullStrippedMprage-skullStrippedTemplate',0.2,N347_photoFlicker_1,
 N349,N349/photoFlicker_1,N349/photoFlicker_1,,,,97,43,88,'skullStrippedMprage-skullStrippedTemplate',0.2,N349_photoFlicker_1,
 EM404,EM404/maxFlicker,EM404/maxFlicker,,,,96,64,78,'skullStrippedMprage-skullStrippedTemplate',0.2,EM404_maxFlicker,
