@@ -154,9 +154,9 @@ for xx=1:nGroups
                 if strcmp(ROIs(zz),'LGN')
                     thisMean = -thisMean;
                 end
-                plot(xx+(ss-1)*jitterFactor,thisMean,'o','MarkerEdgeColor','k','MarkerFaceColor',groupColors{xx});
+                plot([xx+(ss-1)*jitterFactor xx+(ss-1)*jitterFactor],[thisMean-thisSEM,thisMean+thisSEM],'-','Color',groupColors{xx},'LineWidth',1);
                 hold on
-                plot([xx+(ss-1)*jitterFactor xx+(ss-1)*jitterFactor],[thisMean-thisSEM,thisMean+thisSEM],'-','Color',groupColors{xx});
+                plot(xx+(ss-1)*jitterFactor,thisMean,'o','MarkerSize',4,'MarkerEdgeColor','k','MarkerFaceColor',groupColors{xx});
             end
             plot([0.5 nGroups+0.5],[0 0],':k')
             xticks([1:nGroups]);
