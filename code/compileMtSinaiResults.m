@@ -49,7 +49,7 @@ paramSets = {[1:6],[7:12],[13:18]};
 % Some properties of the data and analyses
 stimulusDirections = {'L+S','L-S','LF'};
 nStimuli = length(stimulusDirections);
-ROIs = {'antV1','postV1','LGN'};
+ROIs = {'centV1','periphV1','LGN'};
 nROIs = length(ROIs);
 theModelUsed = 'mtSinai';
 analysisIDs = [];
