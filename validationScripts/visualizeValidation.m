@@ -120,7 +120,7 @@ else
         prevalfig = figure;
         postvalfig = figure;
     elseif strcmp(p.Results.whatToPlot, 'noSPD')
-        fprintf('Not plotting any SPDs')
+        fprintf('Not plotting any SPDs\n')
     else
         error("Unknown plotting method passed")
     end
@@ -137,21 +137,40 @@ else
         validationNum = size(LightFluxDirection.describe.validation,2);
 
         % Get the pre and post val cells
-        precellGotValidation = {AllDirections.(fn{1,ii}).describe.validation(1:(validationNum/2)).luminanceActual};
-        postcellGotValidation = {AllDirections.(fn{1,ii}).describe.validation((validationNum/2+1):validationNum).luminanceActual};
-
+        if isequal(validationNum, 10)
+            precellGotValidation = {AllDirections.(fn{1,ii}).describe.validation(1:(validationNum/2)).luminanceActual};
+            postcellGotValidation = {AllDirections.(fn{1,ii}).describe.validation((validationNum/2+1):validationNum).luminanceActual};
+        elseif isequal(validationNum, 5)
+            precellGotValidation = {AllDirections.(fn{1,ii}).describe.validation(1:end).luminanceActual};
+            postcellGotValidation = [];
+        else
+            error('There are usually 5 or 10 validations depending on whether there is a post validation or not. You have a different amount. Check if everything is okay with your validation')
+        end
+        
         % Get the same thing for the contrasts if not maxFlash
         if ~exist('modDirection','var')
-            precellGotContrast = {AllDirections.(fn{1,ii}).describe.validation(1:(validationNum/2)).contrastActual};
-            postcellGotContrast = {AllDirections.(fn{1,ii}).describe.validation((validationNum/2+1):validationNum).contrastActual};
-            precellDesiredContrast = {AllDirections.(fn{1,ii}).describe.validation(1:(validationNum/2)).contrastDesired};
-            postcellDesiredContrast = {AllDirections.(fn{1,ii}).describe.validation((validationNum/2+1):validationNum).contrastDesired};
+            if isequal(validationNum, 10)
+                precellGotContrast = {AllDirections.(fn{1,ii}).describe.validation(1:(validationNum/2)).contrastActual};
+                postcellGotContrast = {AllDirections.(fn{1,ii}).describe.validation((validationNum/2+1):validationNum).contrastActual};
+                precellDesiredContrast = {AllDirections.(fn{1,ii}).describe.validation(1:(validationNum/2)).contrastDesired};
+                postcellDesiredContrast = {AllDirections.(fn{1,ii}).describe.validation((validationNum/2+1):validationNum).contrastDesired};
+            elseif isequal(validationNum, 5)
+                precellGotContrast = {AllDirections.(fn{1,ii}).describe.validation(1:end).contrastActual};
+                postcellGotContrast = [];
+                precellDesiredContrast = {AllDirections.(fn{1,ii}).describe.validation(1:end).contrastDesired};
+                postcellDesiredContrast = [];
+            end
         end
 
         % Create luminance table values and the luminance table
         Vals = ["medianLuminance"]; 
         PreValidation = [median(cellfun(@(v)v(1),precellGotValidation))];
-        PostValidation = [median(cellfun(@(v)v(1),postcellGotValidation))];        
+        if isequal(validationNum, 10)
+            PostValidation = [median(cellfun(@(v)v(1),postcellGotValidation))];   
+        elseif isequal(validationNum, 5)
+            PostValidation = 0;
+        end
+            
         baseNameVals = "Luminance";
         for v = 1:validationNum
             nameToAddToType = strcat('Validation_', num2str(v), '_', baseNameVals);
@@ -186,14 +205,18 @@ else
             median(cellfun(@(v)v(3,2),precellGotContrast)) median(cellfun(@(v)v(3,2),precellDesiredContrast));...
             median(cellfun(@(v)v(4,1),precellGotContrast)) median(cellfun(@(v)v(4,1),precellDesiredContrast));...
             median(cellfun(@(v)v(4,2),precellGotContrast)) median(cellfun(@(v)v(4,2),precellDesiredContrast))];
-        contrastPostVal_actual_vs_desired = [median(cellfun(@(v)v(1,1),postcellGotContrast)) median(cellfun(@(v)v(1,1),postcellDesiredContrast));...
-            median(cellfun(@(v)v(1,2),postcellGotContrast)) median(cellfun(@(v)v(1,2),postcellDesiredContrast));...
-            median(cellfun(@(v)v(2,1),postcellGotContrast)) median(cellfun(@(v)v(2,1),postcellDesiredContrast));...
-            median(cellfun(@(v)v(2,2),postcellGotContrast)) median(cellfun(@(v)v(2,2),postcellDesiredContrast));...
-            median(cellfun(@(v)v(3,1),postcellGotContrast)) median(cellfun(@(v)v(3,1),postcellDesiredContrast));...
-            median(cellfun(@(v)v(3,2),postcellGotContrast)) median(cellfun(@(v)v(3,2),postcellDesiredContrast));...
-            median(cellfun(@(v)v(4,1),postcellGotContrast)) median(cellfun(@(v)v(4,1),postcellDesiredContrast));...
-            median(cellfun(@(v)v(4,2),postcellGotContrast)) median(cellfun(@(v)v(4,2),postcellDesiredContrast))];
+        if ~isempty(postcellGotContrast)
+            contrastPostVal_actual_vs_desired = [median(cellfun(@(v)v(1,1),postcellGotContrast)) median(cellfun(@(v)v(1,1),postcellDesiredContrast));...
+                median(cellfun(@(v)v(1,2),postcellGotContrast)) median(cellfun(@(v)v(1,2),postcellDesiredContrast));...
+                median(cellfun(@(v)v(2,1),postcellGotContrast)) median(cellfun(@(v)v(2,1),postcellDesiredContrast));...
+                median(cellfun(@(v)v(2,2),postcellGotContrast)) median(cellfun(@(v)v(2,2),postcellDesiredContrast));...
+                median(cellfun(@(v)v(3,1),postcellGotContrast)) median(cellfun(@(v)v(3,1),postcellDesiredContrast));...
+                median(cellfun(@(v)v(3,2),postcellGotContrast)) median(cellfun(@(v)v(3,2),postcellDesiredContrast));...
+                median(cellfun(@(v)v(4,1),postcellGotContrast)) median(cellfun(@(v)v(4,1),postcellDesiredContrast));...
+                median(cellfun(@(v)v(4,2),postcellGotContrast)) median(cellfun(@(v)v(4,2),postcellDesiredContrast))];
+        else 
+            contrastPostVal_actual_vs_desired = zeros(8,2);
+        end
         summary.(fn{1,ii}).contrastSummaryTable = table(photoReceptor, contrastPreVal_actual_vs_desired, contrastPostVal_actual_vs_desired);
 
         % Mesured Background SPD values
