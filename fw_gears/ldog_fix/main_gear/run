@@ -102,7 +102,10 @@ for i in num_img:
         new_folder_path = os.path.join(first_output_dir, key_name)
         os.system('mkdir %s' % new_folder_path)
         rawFmriDataPath = os.path.join(flywheel_base, 'input', 'raw_' + key_name)
-        rawFmriData = os.path.join(rawFmriDataPath, os.listdir(rawFmriDataPath)[0])
+        if os.path.exists(rawFmriDataPath):
+            rawFmriData = os.path.join(rawFmriDataPath, os.listdir(rawFmriDataPath)[0])
+        else:
+            rawFmriData = 'Na'
         
         motion_params = os.path.join(os.path.join(folder_name, 'files'), [f for f in os.listdir(os.path.join(folder_name, 'files')) if f.endswith('.txt')][0])
         image_file = os.path.join(os.path.join(folder_name, 'files'), [f for f in os.listdir(os.path.join(folder_name, 'files')) if f.endswith('.gz')][0])
@@ -207,13 +210,26 @@ for i in num_img:
             os.system('%s %s -add %s -div 2 %s' % (os.path.join(fsl_path, 'fslmaths'), processed_image_path, registered_flipped, processed_image_path))          
 
         if os.path.exists(rawFmriDataPath):
-            os.system('cd %s; mv confound.png %s' % (os.path.join(new_folder_path, 'spikeSlices'), os.path.join(final_output_dir, key_name + '_confound.png')))     
-            os.system('cd %s; mv spikeDetection.png %s' % (os.path.join(new_folder_path, 'spikeSlices'), os.path.join(final_output_dir, key_name + '_spikePlot.png')))
+            no_spike_dir = '/tmp/noSpikeDirectory'
+            if not os.path.exists(no_spike_dir):
+                os.system('mkdir %s' % no_spike_dir)
+            how_many_spiky = []
+            for i in os.listdir(os.path.join(new_folder_path, 'spikeSlices')):
+                if 'TR' in i:
+                    how_many_spiky.append(i)          
+            if len(how_many_spiky) != 0:
+                os.system('cd %s; mv confound.png %s' % (os.path.join(new_folder_path, 'spikeSlices'), os.path.join(final_output_dir, subj_sess_name + '_confound.png')))     
+                os.system('cd %s; mv spikeDetection.png %s' % (os.path.join(new_folder_path, 'spikeSlices'), os.path.join(final_output_dir, subj_sess_name + '_spikePlot.png')))   
+            else:
+                os.system('cd %s; mv confound.png %s' % (os.path.join(new_folder_path, 'spikeSlices'), os.path.join(no_spike_dir, subj_sess_name + '_confound.png')))     
+                os.system('cd %s; mv spikeDetection.png %s' % (os.path.join(new_folder_path, 'spikeSlices'), os.path.join(no_spike_dir, subj_sess_name + '_spikePlot.png')))                   
             for i in os.listdir(os.path.join(new_folder_path, 'spikeSlices')):
                 if i[-2:] != 'gz':
-                    make_gif(os.path.join(new_folder_path, 'spikeSlices', i), key_name + '_' + i, final_output_dir)
-            # os.system('rm -r %s' % os.path.join(new_folder_path, 'spikeSlices'))
+                    make_gif(os.path.join(new_folder_path, 'spikeSlices', i), subj_sess_name + '_' + i, final_output_dir)
+            os.system('rm -r %s' % os.path.join(new_folder_path, 'spikeSlices'))
 ################## Zip everything and output ##################################
 
 # Zip and move the maps
+if len(os.listdir(no_spike_dir)) != 0:
+    os.system('cd %s; zip -q -r %s *' % (no_spike_dir, os.path.join(final_output_dir, 'allSpikePlots.zip')))
 os.system('cd %s; zip -q -r %s/%s *' % (first_output_dir, final_output_dir, archiveName))
