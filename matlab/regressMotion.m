@@ -18,15 +18,38 @@ function correctedFuncPath = regressMotion(epiPath, motionParamsPath, outputFold
 %                           output of the ldogFunc.
 %   motionParamsPath      - String. Path to a .txt file that contains the
 %                           motion covariates.
+%   outputFolder          - String. Output folder for the processed data.\   
 %
 % Optional key/value pairs:
-%   none
+%   regressGlobalSignal   - String. Regress globabl signal if true. Default
+%                           false. 
 %
 % Outputs:
 %   correctedFuncPath     - String. Full path to the uncompressed
 %                           functional MRI data file that has undergone
 %                           regression to remove the effects of motion.
 %
+%   convertToPercentChangeSignal    - Convert data to percentage change.
+%                                     Default: False
+%   
+%   stimFile              - String. If stimulus files is supplied, regress
+%                           out the effects from the data.
+%
+%   rawFmriData           - String. If a raw fmri data is supplied, outlier
+%                           detection is performed.
+%
+%   voxelMADthreshold     - String. For the spike detection, first an
+%                           outlier detection is performed on all voxels
+%                           and number of outliers are counted. This
+%                           threshold decides how many MADs a voxel should
+%                           be above the mean to be counted as an outlier
+%
+%   meanMADthreshold      - String. 2nd part of spike detection is
+%                           performed on the mean voxel image. This
+%                           threshold decides how many MAD a TR should be
+%                           above a threshold to be considered as an
+%                           outlier.
+%                           
 % Examples:
 %{
     epiPath = 'N292_photoFlicker_1_LplusS_run01_preprocessed__1.3.12.2.1107.5.2.32.35335.2019120511441319299753175.0.0.0.nii.gz';
@@ -47,7 +70,9 @@ p.addRequired('outputFolder',@isstr);
 p.addParameter('regressGlobalSignal', "false",@isstr)
 p.addParameter('convertToPercentChangeSignal', "false",@isstr)
 p.addParameter('stimFile', "Na" ,@isstr)
-p.addParameter('saveAveragingPlots', "true", @isstr)
+p.addParameter('rawFmriData', "Na", @isstr)
+p.addParameter('voxelMADthresh', "5", @isstr)
+p.addParameter('meanMADthresh', "25", @isstr)
 
 % Parse
 p.parse(epiPath, motionParamsPath, outputFolder, varargin{:})
@@ -126,6 +151,72 @@ end
 % coefficients that explain at least 5% of the variance
 [coeff,~,~,~,explained] = pca(X');
 X=coeff(:,1:find(explained<5,1)-1);
+
+% If a raw image is supplied, do spike regression. This includes
+% first performin linear detrending on the data and counting the outlier 
+% voxels in each TR. Outliers are 5 MAD above the median value. Then the 
+% resulting vector is again gone thorugh outlier detection and values above
+% 25 MAD are considered spikes.
+if ~strcmp(p.Results.rawFmriData, 'Na')
+    % Read and reshape
+    rawMRI = MRIread(p.Results.rawFmriData);
+    rawMRIVol = rawMRI.vol; 
+    rawMRISize = size(rawMRIVol);
+    rawMRIReshaped = reshape(rawMRIVol, [rawMRISize(1)*rawMRISize(2)*rawMRISize(3), rawMRISize(4)]);
+    rawMRIReshaped = detrend(rawMRIReshaped',1)';
+    
+    % Find the outliers in each voxel across time
+    outliers = isoutlier(rawMRIReshaped, 2, 'thresholdFactor', str2num(p.Results.voxelMADthresh));
+    
+    % Find number of outliers in each TR
+    outlierCount = sum(outliers);
+    
+    % Threshold this vector again with 10 MAD to detect spikes
+    spikesConfoundAll = isoutlier(outlierCount, 'thresholdFactor', str2num(p.Results.meanMADthresh));
+    
+    % Now make sure each spike has its own column
+    nonZer = find(spikesConfoundAll);
+    spikesConfoundMat = zeros(length(nonZer), length(spikesConfoundAll));
+    for ii = 1:length(nonZer)
+        spikesConfoundMat(ii,nonZer(ii)) = 1;
+    end
+    spikesConfoundMat = spikesConfoundMat';
+    
+    % Make an axial plot of the TRs which have spikes 
+    plot_folder = fullfile(outputFolder, 'spikeSlices');
+    mkdir(plot_folder)
+    spikeIndx = find(spikesConfoundAll);
+    fig = figure('visible', 'off');
+    plot(outlierCount)
+    xlabel('TR')
+    ylabel('number of spiky voxels')
+    title('Spike detection')
+    saveas(fig, fullfile(plot_folder, 'spikeDetection.png'))
+    fig = figure('visible', 'off');
+    plot(spikesConfoundAll)
+    xlabel('TR')
+    ylabel('Confounds')
+    title('Detected confound locations')
+    saveas(fig, fullfile(plot_folder, 'confound.png'))   
+    for ii = 1:length(spikeIndx)
+        subfolder = fullfile(plot_folder, ['TR_' num2str(spikeIndx(ii))]);
+        mkdir(subfolder)
+        spikeVolume = rawMRIVol(:,:,:,spikeIndx(ii));
+        for vv = 1:rawMRISize(3)
+            fig = figure('visible', 'off');
+            colormap(gray)
+            imagesc(spikeVolume(:,:,vv))
+            saveas(fig, fullfile(subfolder, [num2str(vv) '.png']))
+        end
+    end 
+    
+    % Mean center and standardize the vector and add it to the X
+    for ii=1:size(spikesConfoundMat,2)
+        spikesConfoundMat(:,ii) = spikesConfoundMat(:,ii) - mean(spikesConfoundMat(:,ii));
+        spikesConfoundMat(:,ii) = spikesConfoundMat(:,ii) / std(spikesConfoundMat(:,ii));
+    end    
+    X = [X spikesConfoundMat];
+end
 
 % Store the warning state
 warningState = warning;

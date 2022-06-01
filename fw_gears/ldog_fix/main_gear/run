@@ -6,7 +6,8 @@ import nibabel as nb
 import numpy as np
 import imageio
 import matplotlib.pyplot as plt
-
+os.system('pip3 install natsort')
+from natsort import natsorted
 ###################### Define the Paths and parameters ###########################
 
 # Set paths and create some folders
@@ -33,8 +34,11 @@ archiveName = config['archiveName']
 convertToPercentChangeSignal = config['convertToPercentChangeSignal']
 makePseudoHemisphere = config['makePseudoHemisphere']
 regressGlobalSignal  = config['regressGlobalSignal']
+voxelMADthresh = config['voxelMADthresh']
+meanMADthresh = config['meanMADthresh']
 
 ################### Run Algorithm ################################
+
 def make_plot(subject_id, base_image, overlay, title, subtitle, filename, x, y, z, output_folder):
     
     # This function simply gets two MRI images as inputs and overlays them 
@@ -67,11 +71,13 @@ def make_plot(subject_id, base_image, overlay, title, subtitle, filename, x, y, 
     
     return (output_folder)
 
-def make_gif(image_folder, gif_name, output_folder):
+def make_gif(image_folder, gif_name, output_folder, speed=0.3):
+    image_names = os.listdir(image_folder)
+    image_names = natsorted(image_names)
     images = []
-    for filename in os.listdir(image_folder):
+    for filename in image_names:
         images.append(imageio.imread(os.path.join(image_folder, filename)))
-        imageio.mimsave('/%s/%s.gif' % (output_folder, gif_name), images, duration=0.9)
+    imageio.mimsave('/%s/%s.gif' % (output_folder, gif_name), images, duration=speed)
         
 # Get stim file input
 stim_folder = os.path.join(flywheel_base, 'input/stimFile/')
@@ -95,6 +101,8 @@ for i in num_img:
         os.system('unzip -q %s -d %s/files/' % (zip_file, folder_name))
         new_folder_path = os.path.join(first_output_dir, key_name)
         os.system('mkdir %s' % new_folder_path)
+        rawFmriDataPath = os.path.join(flywheel_base, 'input', 'raw_' + key_name)
+        rawFmriData = os.path.join(rawFmriDataPath, os.listdir(rawFmriDataPath)[0])
         
         motion_params = os.path.join(os.path.join(folder_name, 'files'), [f for f in os.listdir(os.path.join(folder_name, 'files')) if f.endswith('.txt')][0])
         image_file = os.path.join(os.path.join(folder_name, 'files'), [f for f in os.listdir(os.path.join(folder_name, 'files')) if f.endswith('.gz')][0])
@@ -132,10 +140,10 @@ for i in num_img:
             nb.save(smooth_image_raw, new_image_location)
              
             # Run motion regression
-            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s 'regressGlobalSignal' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file, regressGlobalSignal)
+            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s 'regressGlobalSignal' %s 'rawFmriData' %s 'voxelMADthresh' %s 'meanMADthresh' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file, regressGlobalSignal, rawFmriData, voxelMADthresh, meanMADthresh)
             os.system(cmd)    
         else:
-            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s 'regressGlobalSignal' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file, regressGlobalSignal)
+            cmd = "%s %s %s %s %s 'convertToPercentChangeSignal' %s 'stimFile' %s 'regressGlobalSignal' %s 'rawFmriData' %s 'voxelMADthresh' %s 'meanMADthresh' %s" % (compiled_matlab_func, mcr_path, new_image_location, motion_params, new_folder_path, convertToPercentChangeSignal, stim_file, regressGlobalSignal, rawFmriData, voxelMADthresh, meanMADthresh)
             os.system(cmd)                    
         
         # Make pseudo hemispheres if requested
@@ -178,7 +186,7 @@ for i in num_img:
             make_plot(subject_id, single_image, 'NA', 'riginal image and Pseudo hemi', 'pseudo', 'pseudo.png', 26, 23, 26, plot_folder)
             
             # Make a gif from raw and pseudo image
-            make_gif(plot_folder, os.path.split(image_file)[1][:-7], final_output_dir)
+            make_gif(plot_folder, os.path.split(image_file)[1][:-7], final_output_dir, speed=0.9)
             
             ######## Do it for real now on the processed image ################
            
@@ -187,7 +195,9 @@ for i in num_img:
             os.system('mkdir %s' % pseudo_hemi_folder)
             
             # Flip the image
-            processed_image_path = os.path.join(new_folder_path, os.listdir(new_folder_path)[0])
+            for i in os.listdir(new_folder_path):
+                if i[-2:] == 'gz':
+                    processed_image_path = os.path.join(new_folder_path, i)
             flipped_image = os.path.join(pseudo_hemi_folder, 'flipped.nii.gz')
             os.system('%s %s -x y z %s' % (os.path.join(fsl_path, 'fslswapdim'), processed_image_path, flipped_image))
             
@@ -195,7 +205,14 @@ for i in num_img:
             registered_flipped = os.path.join(pseudo_hemi_folder, 'registered_flipped.nii.gz')
             os.system('%s -i %s -r %s -t %s -t %s -o %s -e 3' % (os.path.join(ants_path, 'antsApplyTransforms'), flipped_image, resampled_template_path, warp_pseudo, affine_pseudo, registered_flipped))   
             os.system('%s %s -add %s -div 2 %s' % (os.path.join(fsl_path, 'fslmaths'), processed_image_path, registered_flipped, processed_image_path))          
-            
+
+        if os.path.exists(rawFmriDataPath):
+            os.system('cd %s; mv confound.png %s' % (os.path.join(new_folder_path, 'spikeSlices'), os.path.join(final_output_dir, key_name + '_confound.png')))     
+            os.system('cd %s; mv spikeDetection.png %s' % (os.path.join(new_folder_path, 'spikeSlices'), os.path.join(final_output_dir, key_name + '_spikePlot.png')))
+            for i in os.listdir(os.path.join(new_folder_path, 'spikeSlices')):
+                if i[-2:] != 'gz':
+                    make_gif(os.path.join(new_folder_path, 'spikeSlices', i), key_name + '_' + i, final_output_dir)
+            # os.system('rm -r %s' % os.path.join(new_folder_path, 'spikeSlices'))
 ################## Zip everything and output ##################################
 
 # Zip and move the maps

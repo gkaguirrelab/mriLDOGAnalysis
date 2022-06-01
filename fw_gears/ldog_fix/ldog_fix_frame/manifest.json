@@ -44,7 +44,17 @@
 			"default": "false",
 			"description": "Regress globab signal from the  data",
 			"type": "string"
-		}					
+		},
+		"voxelMADthresh": {
+			"default": "6",
+			"description": "For the spike detection, first an outlier detection is performed on all voxels and number of outliers are counted. This threshold decides how many MADs a voxel should be above the mean to be counted as an outlier",
+			"type": "string"
+		},
+		"meanMADthresh": {
+			"default": "25",
+			"description": "2nd part of spike detection is performed on the mean voxel image. This threshold decides how many MAD a TR should be above a threshold to be considered as an outlier.",
+			"type": "string"
+		}				
 	},
 	"inputs": {
 		"stimFile": {
@@ -56,7 +66,7 @@
 					"MATLAB archive"
 				]
 			}
-		},
+		},	
 		"EPI_01": {
 			"description": "EPI archive",
 			"base": "file",
@@ -254,6 +264,206 @@
 			"type": {
 				"enum": [
 					"archive"
+				]
+			}
+		},
+		"raw_EPI_01": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": false,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_02": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_03": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_04": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_05": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_06": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_07": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_08": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_09": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_10": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_11": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_12": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_13": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_14": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_15": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_16": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_17": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_18": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_19": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"raw_EPI_20": {
+			"description": "Raw EPI for spike detection",
+			"base": "file",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
 				]
 			}
 		}
