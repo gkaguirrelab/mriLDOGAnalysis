@@ -270,7 +270,7 @@
 		"raw_EPI_01": {
 			"description": "Raw EPI for spike detection",
 			"base": "file",
-			"optional": false,
+			"optional": true,
 			"type": {
 				"enum": [
 					"nifti"
