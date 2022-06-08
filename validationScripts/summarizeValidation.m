@@ -13,10 +13,14 @@ dropboxBaseDir = getpref('pupilLDOGAnalysis','dropboxBaseDir');
 experiment = {'MRFlickerLDOG', 'MRScotoLDOG'};
 
 % Loop through validation directionObjects and organize tables 
-for ii = 1:length(experiment)
+for ee = 1:length(experiment)
+    
+    % Create a summary cells 
+    summaryTable_postRecept = table;
+    summaryTable_photoRecept = table;
     
     % Set the output directory which will be the same as input directory
-    experimentName = experiment{ii};
+    experimentName = experiment{ee};
     dataOutputDirRoot = fullfile(dropboxBaseDir,'LDOG_processing/Experiments/OLApproach_TrialSequenceMR', experimentName, 'ValidationSummary');
 
     % Find the folders in LDOG_processing
@@ -152,15 +156,62 @@ for ii = 1:length(experiment)
         
         % Average stuff
         averageLum = nanmean([preLuminance postLuminance], 2);
-        averageLCone = nanmean([(-1*preLConeNegative + preLConePositive)/2 (-1*postLConeNegative + postLConePositive)/2], 2);
-        averageSCone = nanmean([(-1*preSConeNegative + preSConePositive)/2 (-1*postSConeNegative + postSConePositive)/2], 2);
-        averageMel = nanmean([(-1*preMelNegative + preMelPositive)/2 (-1*postMelNegative + postMelPositive)/2], 2);        
-        averageRod = nanmean([(-1*preRodNegative + preRodPositive)/2 (-1*postRodNegative + postRodPositive)/2], 2);          
+        averageLCone = nanmean([nanmean([-1*preLConeNegative preLConePositive], 2) nanmean([-1*postLConeNegative postLConePositive], 2)], 2);
+        averageSCone = nanmean([nanmean([-1*preSConeNegative preSConePositive], 2) nanmean([-1*postSConeNegative postSConePositive], 2)], 2);
+        averageMel = nanmean([nanmean([-1*preMelNegative preMelPositive], 2) nanmean([-1*postMelNegative postMelPositive], 2)], 2);      
+        averageRod = nanmean([nanmean([-1*preRodNegative preRodPositive], 2) nanmean([-1*postRodNegative postRodPositive], 2)], 2);                
         
-        table = table(Names', Sessions', num2str(averageLum,'%.4f'), num2str(averageLCone,'%.4f'), num2str(averageSCone,'%.4f'), num2str(averageMel,'%.4f'), num2str(averageRod,'%.4f'));
-        table.Properties.VariableNames = {'Names','Sessions','Average Luminance','Average Lcone', ...
+        table1 = table(Names', Sessions', num2str(averageLum,'%.4f'), num2str(averageLCone,'%.4f'), num2str(averageSCone,'%.4f'), num2str(averageMel,'%.4f'), num2str(averageRod,'%.4f'));
+        table1.Properties.VariableNames = {'Names','Sessions','Average Luminance','Average Lcone', ...
                                           'Average Scone', 'Average Mel', 'Average Rod'};
-        writetable(table, fullfile(dataOutputDirRoot, [modulations{mod} '.xls']));
+        writetable(table1, fullfile(dataOutputDirRoot, [modulations{mod} '.xls']));
+        
+        % Drop the bad subject and make a new table for stimulus types
+        modulationName = modulations{mod};
+        averageLplusS = (averageLCone + averageSCone)/2;
+        averageLminusS = (averageLCone - averageSCone)/2;
+        averageLplusS(11) = [];
+        averageLminusS(11) = [];
+        averageMel(11) = [];
+        averageRod(11) = [];
+        averageLplusSMean = mean(averageLplusS);
+        averageLplusSSD = std(averageLplusS);
+        averageLminusSMean = mean(averageLminusS);
+        averageLminusSSD = std(averageLminusS); 
+        averageMelMean = mean(averageMel);
+        averageMelStd = std(averageMel);
+        averageRodMean = mean(averageRod);
+        averageRodStd = std(averageRod);
+        
+        table2 = table(convertCharsToStrings(modulationName), convertCharsToStrings(num2str(averageLplusSMean,'%.4f')), convertCharsToStrings(num2str(averageLplusSSD,'%.4f')), ...
+                       convertCharsToStrings(num2str(averageLminusSMean,'%.4f')), convertCharsToStrings(num2str(averageLminusSSD,'%.4f')), ...
+                       convertCharsToStrings(num2str(averageMelMean,'%.4f')), convertCharsToStrings(num2str(averageMelStd,'%.4f')), ...
+                       convertCharsToStrings(num2str(averageRodMean,'%.4f')), convertCharsToStrings(num2str(averageRodStd,'%.4f')));
+        table2.Properties.VariableNames = {'Modulation', 'LplusS Mean', 'LplusS SD', ...
+                                           'LminusS Mean', 'LminusS SD', ...
+                                           'Mel Mean', 'Mel SD', 'Rod Mean', 'Rod SD'};
+        
+        summaryTable_postRecept = [summaryTable_postRecept; table2];
+
+        meanLcone = mean(averageLCone);
+        stdLcone = std(averageLCone);
+        meanScone = mean(averageSCone);
+        stdScone = std(averageSCone);
+        
+        table3 = table(convertCharsToStrings(modulationName), convertCharsToStrings(num2str(meanLcone,'%.4f')), convertCharsToStrings(num2str(stdLcone,'%.4f')), ...
+                       convertCharsToStrings(num2str(meanScone,'%.4f')), convertCharsToStrings(num2str(stdScone,'%.4f')), ...
+                       convertCharsToStrings(num2str(averageMelMean,'%.4f')), convertCharsToStrings(num2str(averageMelStd,'%.4f')), ...
+                       convertCharsToStrings(num2str(averageRodMean,'%.4f')), convertCharsToStrings(num2str(averageRodStd,'%.4f')));
+        table3.Properties.VariableNames = {'Modulation', 'L Cone Mean', 'L Cone SD', ...
+                                           'S Cone Mean', 'S Cone SD', ...
+                                           'Mel Mean', 'Mel SD', 'Rod Mean', 'Rod SD'};
+        
+        summaryTable_photoRecept = [summaryTable_photoRecept; table3];
+        
         clear table
     end
+    writetable(summaryTable_postRecept, fullfile(dataOutputDirRoot, [experiment{ee}, '_modulationSummary_postRecept.xls']));
+    writetable(summaryTable_photoRecept, fullfile(dataOutputDirRoot, [experiment{ee}, '_modulationSummary_photoRecept.xls']));    
+    clear summaryTable_postRecept
+    clear summaryTable_photoRecept
 end
