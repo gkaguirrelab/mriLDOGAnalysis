@@ -1,0 +1,6 @@
+This is a cat atlas
+Please cite: https://onlinelibrary.wiley.com/doi/10.1002/cne.24271
+
+We reorient this atlas to the FOV we used with the canine data so the registrations work better. After you use this atlas
+you can apply the inverse of the registration located in catlasReorientation.mat which is an
+FSL matrix to get your data back into the original CATLAS space
