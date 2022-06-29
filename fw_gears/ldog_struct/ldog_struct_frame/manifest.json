@@ -60,7 +60,12 @@
 				"wholeMprage-skullStrippedTemplate",
 				"wholeMprage-wholeTemplate"
 			]
-		}
+		},
+		"brainExtractWithTemplate": {
+			"default":false,
+			"description": "Do skull stripping with the template. Works when you have a skull stripped template and your T1 image looks similar to the template. Can be used when the boundry based skull stripping fails",
+			"type": "boolean"
+		}		
 	},
 	"inputs": {
 		"MPRAGE_01": {
