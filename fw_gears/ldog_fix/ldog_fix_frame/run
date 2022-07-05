@@ -36,6 +36,8 @@ makePseudoHemisphere = config['makePseudoHemisphere']
 regressGlobalSignal  = config['regressGlobalSignal']
 voxelMADthresh = config['voxelMADthresh']
 meanMADthresh = config['meanMADthresh']
+lowPassFilter = config['lowPassFilter']
+highPassFilter = config['highPassFilter']
 
 ################### Run Algorithm ################################
 
@@ -114,7 +116,28 @@ for i in num_img:
         os.system('mkdir %s' % tmp_working_dir)
         os.system('cp %s %s' % (image_file, tmp_working_dir))
         new_image_location = os.path.join(tmp_working_dir, os.listdir(tmp_working_dir)[0])
-                    
+        
+        # Do filtering if requested get TR first
+        image = nb.load(new_image_location)
+        head = image.header
+        TR = head.get_zooms()[3]
+        
+        # Set values to negative if you want to skip a filter, otherwise
+        # convert to sigma
+        if lowPassFilter == 'NA':
+            lowPassFilter = '-1'
+        else:
+            lowPassfilter = str(1/(18*float(lowPassFilter)*TR))
+        
+        if highPassFilter == 'NA':
+            highPassFilter = '-1'
+        else:
+            highPassFilter = str(1/(2*float(highPassFilter)*TR))
+        
+        # If NA is not set for either filter, run the algorithm
+        if lowPassFilter != 'NA' or highPassFilter != 'NA':
+            os.system('%s %s -bptf %s %s %s' % (os.path.join(fsl_path, 'fslmaths'), new_image_location, highPassFilter, lowPassFilter, new_image_location))
+           
         if smoothingSigma != 'NA':                    
             # Get the zero indexes in the raw image                 
             image_raw = nb.load(new_image_location)

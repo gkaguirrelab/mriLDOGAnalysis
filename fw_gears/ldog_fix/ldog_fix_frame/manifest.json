@@ -54,6 +54,16 @@
 			"default": "25",
 			"description": "2nd part of spike detection is performed on the mean voxel image. This threshold decides how many MAD a TR should be above a threshold to be considered as an outlier.",
 			"type": "string"
+		},
+		"lowPassFilter": {
+			"default": "NA",
+			"description": "Low pass filter frequency. This value is converted to sigma with 1/(18*f*TR). If a highpass filter is specified, a bandpass filter is used to retain the range.",
+			"type": "string"
+		},
+		"highPassFilter": {
+			"default": "NA",
+			"description": "High pass filter frequency. This value is converted to sigma with 1/(2*f*TR). If a highpass filter is specified, a bandpass filter is used to retain the range.",
+			"type": "string"
 		}				
 	},
 	"inputs": {

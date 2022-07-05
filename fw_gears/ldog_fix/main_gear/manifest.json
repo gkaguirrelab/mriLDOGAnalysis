@@ -2,7 +2,7 @@
     "name": "ldogfix",
     "label": "ldogFix: archiving ldogfunc outputs",
     "description": "This gear packages multiple ldogfunc outputs into one archive, regresses out motion confounds and does smoothing(optional)",
-    "version": "0.3.6",
+    "version": "0.3.8",
     "inputs": {
         "EPI_01": {
             "base": "file",
@@ -201,16 +201,6 @@
             "type": {
                 "enum": [
                     "archive"
-                ]
-            }
-        },
-        "stimFile": {
-            "base": "file",
-            "description": "Stimulus File",
-            "optional": true,
-            "type": {
-                "enum": [
-                    "MATLAB archive"
                 ]
             }
         },
@@ -413,6 +403,16 @@
                     "nifti"
                 ]
             }
+        },
+        "stimFile": {
+            "base": "file",
+            "description": "Stimulus File",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "MATLAB archive"
+                ]
+            }
         }
     },
     "config": {
@@ -424,6 +424,16 @@
         "convertToPercentChangeSignal": {
             "default": "false",
             "description": "Converts signal to percentage change",
+            "type": "string"
+        },
+        "highPassFilter": {
+            "default": "NA",
+            "description": "High pass filter frequency. This value is converted to sigma with 1/(2*f*TR). If a highpass filter is specified, a bandpass filter is used to retain the range.",
+            "type": "string"
+        },
+        "lowPassFilter": {
+            "default": "NA",
+            "description": "Low pass filter frequency. This value is converted to sigma with 1/(18*f*TR). If a highpass filter is specified, a bandpass filter is used to retain the range.",
             "type": "string"
         },
         "makePseudoHemisphere": {
@@ -463,7 +473,7 @@
         },
         "gear-builder": {
             "category": "analysis",
-            "image": "gkaguirrelab/ldogfix:0.3.4"
+            "image": "gkaguirrelab/ldogfix:0.3.7"
         }
     }
 }
