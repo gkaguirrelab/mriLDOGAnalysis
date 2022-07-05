@@ -101,4 +101,6 @@ function restingState(ldogFixArchive, workdir, outputDir, parcellationsOne, parc
     colorbar; % enable colorbar
     set(gcf,'PaperPosition',[0 0 [1024 768]/100],'PaperUnits','inches'); %set paper size
     saveas(figureIm, fullfile(outputDir, 'correlationMat.jpg'));
+    save(fullfile(outputDir, 'correlationMatrix.mat'), 'correlationMatrix')
+    save(fullfile(outputDir, 'averageTimeseriesPerLabel.mat'), 'correlationCell')
 end
