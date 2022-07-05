@@ -136,7 +136,7 @@ def moco(subject_id, image_name, epi_image, output_folder, fsl_path=''):
 
     return (motion_corrected_image, confound_file)
 
-def registerToScout(image_name, epi_image, scout_image, output_folder, fsl_path = '', ants_path = ''):
+def registerToScout(image_name, epi_image, scout_image, output_folder, fsl_path = '', ants_path = '', useTheFirstTRforRegistration=False):
     
     scout_registered_epi_folder = os.path.join(output_folder, '3scout_registered_epi')   
     scout_registration_intermediate = os.path.join(output_folder, 'scout_registeration')
@@ -148,7 +148,10 @@ def registerToScout(image_name, epi_image, scout_image, output_folder, fsl_path 
     
     # get the mean TR for registration
     mean_tr = os.path.join(scout_registration_intermediate, 'inputMeanTR.nii.gz')
-    os.system('%s %s -Tmean %s' % (os.path.join(fsl_path, 'fslmaths'), epi_image, mean_tr))
+    if useTheFirstTRforRegistration == False:
+        os.system('%s %s -Tmean %s' % (os.path.join(fsl_path, 'fslmaths'), epi_image, mean_tr))
+    else:
+        os.system('%s %s %s 0 1' % (os.path.join(fsl_path, 'fslroi'), epi_image, mean_tr))
     
     # bias correct the mean TR and scout image and do a simple bet
     os.system('%s -i %s -o %s' % (os.path.join(ants_path, 'N4BiasFieldCorrection'), mean_tr, mean_tr))
@@ -184,10 +187,17 @@ def apply_warp(image_name, subject_id, epi_image, template_image, output_folder,
         os.system('mkdir %s' % warped_epi_folder)
     
     template_warp_applied = os.path.join(warped_epi_folder, subject_id + '_warped_epi_' + image_name + '.nii.gz')
-    os.system('%s -d 3 --float 0 --default-value 0 --input %s --input-image-type 3 --output %s --reference-image %s --transform %s --transform %s --transform %s -v 1' % (os.path.join(ants_path, 'antsApplyTransforms'), 
-                                                                                                                                                                epi_image, template_warp_applied,
-                                                                                                                                                                template_image,
-                                                                                                                                                                path_to_warp, path_to_generic_affine, scout_registration_affine))
+    if scout_registration_affine == True:
+        os.system('%s -d 3 --float 0 --default-value 0 --input %s --input-image-type 3 --output %s --reference-image %s --transform %s --transform %s --transform %s -v 1' % (os.path.join(ants_path, 'antsApplyTransforms'), 
+                                                                                                                                                                    epi_image, template_warp_applied,
+                                                                                                                                                                    template_image,
+                                                                                                                                                                    path_to_warp, path_to_generic_affine, scout_registration_affine))
+    else:
+         os.system('%s -d 3 --float 0 --default-value 0 --input %s --input-image-type 3 --output %s --reference-image %s --transform %s --transform %s -v 1' % (os.path.join(ants_path, 'antsApplyTransforms'), 
+                                                                                                                                                                     epi_image, template_warp_applied,
+                                                                                                                                                                     template_image,
+                                                                                                                                                                     path_to_warp, path_to_generic_affine))
+        
     return(template_warp_applied)
 
 def set_zero(data_path, template_path, output_path):
@@ -285,6 +295,10 @@ if os.path.exists(fMRIScoutPA_folder):
     fMRIScoutPA = os.path.join(fMRIScoutPA_folder, os.listdir(fMRIScoutPA_folder)[0])
     os.system('cp %s %s' % (fMRIScoutPA, scout_folder))
 
+interpolationTargetFolder = os.path.join(flywheel_base, 'input/interpolationTarget')
+if os.path.exists(interpolationTargetFolder):
+    interpolationTarget = os.path.join(interpolationTargetFolder, os.listdir(interpolationTargetFolder)[0])
+    resampled_template_path = interpolationTarget
 ###################Parse Config Here############################
 
 with open(config_path) as config_file:
@@ -295,6 +309,8 @@ total_readout_time_AP = config['totalReadoutTimeAP']
 total_readout_time_PA = config['totalReadoutTimePA']
 saveIntermediateFiles = config['saveIntermediateFiles']
 fMRIName = config['fMRIName']
+useTheFirstTRforRegistration = config['useTheFirstTRforRegistration']
+scoutRegistration = config['scoutRegistration']
 
 # Get the subject id and set some more paths
 with open ('%s' % os.path.join(struct_folder, 'subject_id.txt'), 'r') as idfile:
@@ -332,7 +348,11 @@ else:
 # Moco
 (motion_corrected_image, confound_file) = moco(subject_id, image_name, corrected_epi, first_output_dir, fsl_path=fsl_path)
 # register to topuped scout image
-(warped_to_scout, scout_affine_matrix) = registerToScout(subject_id, motion_corrected_image, scout_topuped, first_output_dir, fsl_path=fsl_path, ants_path=ants_path)
+if scoutRegistration == True:
+    (warped_to_scout, scout_affine_matrix) = registerToScout(subject_id, motion_corrected_image, scout_topuped, first_output_dir, fsl_path=fsl_path, ants_path=ants_path, useTheFirstTRforRegistration=useTheFirstTRforRegistration)
+else:
+    warped_to_scout = motion_corrected_image
+    scout_affine_matrix = 'NA'
 # Register to templagte
 warped_image = apply_warp(image_name, subject_id, motion_corrected_image, resampled_template_path, first_output_dir, scout_affine_matrix, generic_affine, path_to_warp, fsl_path=fsl_path, ants_path=ants_path)
 # Set zero outside the brain

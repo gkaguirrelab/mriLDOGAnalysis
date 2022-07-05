@@ -2,7 +2,7 @@
 	"name": "ldogfunc",
 	"label": "ldogFunc: functional pre-processing for the LDOG project",
 	"description": "This gear performs preprocessing of the functional scans for the LDOG project.",
-	"version": "0.3.6",
+	"version": "0.3.9",
 	"inputs": {
 		"StructZip": {
 			"base": "file",
@@ -27,6 +27,16 @@
 		"fMRIScoutPA": {
 			"base": "file",
 			"description": "Scout EPI with PA encoding direction",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"interpolationTarget": {
+			"base": "file",
+			"description": "Target for the fmri interpolation. Use this if you passed a custom template to ldogstruct",
 			"optional": true,
 			"type": {
 				"enum": [
@@ -65,6 +75,16 @@
 			"default": 0.0217349,
 			"description": "total readout time of the single-rep recon api in PA direction. Required for topup. Can be found in nifti header",
 			"type": "number"
+		},
+		"useTheFirstTRforRegistration": {
+			"default": false,
+			"description": "Use the first tr instead of mean image for the first level registration",
+			"type": "boolean"
+		},
+		"scoutRegistration": {
+			"default": true,
+			"description": "Do an initial rigid registration to the scout image. If both AP and PA scouts are passed, the target is the topuped scout image",
+			"type": "boolean"
 		}
 	},
 	"author": "Ozenc Taskin",

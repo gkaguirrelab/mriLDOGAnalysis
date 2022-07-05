@@ -9,7 +9,7 @@ import imageio
 ###################################### Define Fucntions #####################################
 
 os.system('FSLDIR=/usr/lib/fsl/5.0;PATH=$FSLDIR:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/bet')
-def prepare_mprage(subject_id, path_to_mprage, first_mprage_input, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, output_folder, num_threads, template_path, brainExtractWithTemplate=False):
+def prepare_mprage(subject_id, path_to_mprage, first_mprage_input, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, output_folder, template_path, brainExtractWithTemplate=False):
     
     # Create the output folder
     preprocessed_mprage_folder = os.path.join(output_folder, subject_id + '_preprocessed_mprage')
@@ -49,11 +49,10 @@ def prepare_mprage(subject_id, path_to_mprage, first_mprage_input, centre_of_gra
         for i in os.listdir(path_to_mprage):
             count += 1
             moving = os.path.join(path_to_mprage, i)
-            register_call = 'export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/antsRegistrationSyN.sh -d 3 -t %s -f %s -m %s -o %s -n %s' % (transform,
+            register_call = 'export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/antsRegistrationSyN.sh -d 3 -t %s -f %s -m %s -o %s -n 6' % (transform,
                                                                                                                                                                       fixed,
                                                                                                                                                                       moving,
-                                                                                                                                                                      os.path.join(registered_mprages, subject_id + '_%sregistered' % count),
-                                                                                                                                                                      num_threads)
+                                                                                                                                                                      os.path.join(registered_mprages, subject_id + '_%sregistered' % count))
             os.system(register_call)
         
         # Get rid of the files we don't want to store 
@@ -85,9 +84,8 @@ def prepare_mprage(subject_id, path_to_mprage, first_mprage_input, centre_of_gra
         os.system(call2)
         extracted_brain = os.path.join(preprocessed_mprage_folder, subject_id + '_finalExtractedBrain.nii.gz')
     else:
-        registered_template_name = os.path.join(preprocessed_mprage_folder, subject_id + '_registered_template')
-        os.system('export ANTSPATH=/usr/lib/ants/;export PATH=${ANTSPATH}:$PATH;/usr/lib/ants/antsRegistrationSyN.sh -m %s -f %s -t r -n %s -o %s' % (template_path, averaged_mprage, num_threads, registered_template_name))
-        registered_template = os.path.join(preprocessed_mprage_folder, subject_id + '_registered_templateWarped.nii.gz')
+        registered_template = os.path.join(preprocessed_mprage_folder, subject_id + '_registered_template.nii.gz')
+        os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/flirt -in %s -ref %s -dof 6 -usesqform -searchrx -180 180 -searchry -180 180 -searchrz -180 180 -v -out %s' % (template_path, averaged_mprage, registered_template))
         extraction_mask = os.path.join(preprocessed_mprage_folder, subject_id + '_extraction_mask.nii.gz')
         os.system('FSLDIR=/usr/lib/fsl/5.0;. /etc/fsl/5.0/fsl.sh;PATH=${FSLDIR}:${PATH};export FSLDIR PATH;/usr/lib/fsl/5.0/fslmaths %s -thr 0.05 -bin %s' % (registered_template,extraction_mask))
         extracted_brain = os.path.join(preprocessed_mprage_folder, subject_id + '_finalExtractedBrain.nii.gz')
@@ -259,7 +257,7 @@ text_open.close()
 ###################Run Algorithm################################
    
 # Bias corrects mprage images, registers, averages (normalized), skull strips and flips
-preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(subject_id, T1folder, first_mprage, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, first_output_dir, number_of_threads, Template, brainExtractWithTemplate=brainExtractWithTemplate)
+preprocessed_mprage_folder, averaged_mprage, extracted_brain = prepare_mprage(subject_id, T1folder, first_mprage, centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, struct_to_struct_transform, extraction_threshold, first_output_dir, Template, brainExtractWithTemplate=brainExtractWithTemplate)
 
 # Plot averaged structural
 make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], final_output_dir)
@@ -268,22 +266,22 @@ make_plot(subject_id, averaged_mprage, 'NA', 'MPRAGE Average', 'averaged_mprage.
 if transformationMethod == 'skullStrippedMprage-skullStrippedTemplate':
     make_plot(subject_id, averaged_mprage, extracted_brain, 'Brain Extraction Results', 'brain_extraction_qa.png', centre_of_gravity_x, centre_of_gravity_y, centre_of_gravity_z, [1,1,1,1,1,1], final_output_dir)
     
-# Warps the averaged mprage to the template 
-if transformationMethod == 'skullStrippedMprage-skullStrippedTemplate':
-    warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, extracted_brain, Template, first_output_dir, number_of_threads)
-elif transformationMethod == 'wholeMprage-skullStrippedTemplate':
-    warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, averaged_mprage, Template, first_output_dir, number_of_threads)
-elif transformationMethod == 'wholeMprage-wholeTemplate':
-    warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, averaged_mprage, Template_with_skull, first_output_dir, number_of_threads)
+# # Warps the averaged mprage to the template 
+# if transformationMethod == 'skullStrippedMprage-skullStrippedTemplate':
+#     warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, extracted_brain, Template, first_output_dir, number_of_threads)
+# elif transformationMethod == 'wholeMprage-skullStrippedTemplate':
+#     warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, averaged_mprage, Template, first_output_dir, number_of_threads)
+# elif transformationMethod == 'wholeMprage-wholeTemplate':
+#     warp_results_folder, warped_mprage, standard_generic = warp_to_invivo(subject_id, averaged_mprage, Template_with_skull, first_output_dir, number_of_threads)
     
-# Saves some more diagnostic images for registrations
-temporary = '/tempim/'
-os.system('mkdir %s' % temporary)
-make_plot(subject_id, Template, 'NA', 'Warp results', 'im1.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
-make_plot(subject_id, warped_mprage, 'NA', 'Warp results', 'im2.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
-make_gif(temporary, subject_id + '_' + 'mprage2template_qa', final_output_dir)
+# # Saves some more diagnostic images for registrations
+# temporary = '/tempim/'
+# os.system('mkdir %s' % temporary)
+# make_plot(subject_id, Template, 'NA', 'Warp results', 'im1.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
+# make_plot(subject_id, warped_mprage, 'NA', 'Warp results', 'im2.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
+# make_gif(temporary, subject_id + '_' + 'mprage2template_qa', final_output_dir)
 
-os.system('cp %s %s/' % (MPRAGE_01, T1folder))
+# os.system('cp %s %s/' % (MPRAGE_01, T1folder))
 
 ################## Zip everything and output ##################################
 
