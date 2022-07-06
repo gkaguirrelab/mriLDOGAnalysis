@@ -1,0 +1,79 @@
+{
+	"name": "ldogrest",
+	"label": "ldogRest: Resting state analysis of ldog data",
+	"description": "This gear works with ldogfix output archive and produces a resting state correlation matrix.",
+	"version": "0.1.1",
+	"inputs": {
+		"labelsOne": {
+			"base": "file",
+			"description": "CSV file containing label names in column one and label values to be extracted in column two",
+			"optional": false
+		},
+		"labelsTwo": {
+			"base": "file",
+			"description": "CSV file containing label names in column one and label values to be extracted in column two",
+			"optional": true
+		},
+		"ldogFixArchive": {
+			"base": "file",
+			"description": "ldogFixArchive containing preprocessed nifti images in subfolders",
+			"optional": false,
+			"type": {
+				"enum": [
+					"archive"
+				]
+			}
+		},
+		"parcellationsOne": {
+			"base": "file",
+			"description": "Nifti labels to be used for resting state analysis.",
+			"optional": false,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"templateImage": {
+			"base": "file",
+			"description": "Template image to be used for plotting the seed based correlations. Needs to be in the same coordinates as your input files",
+			"optional": false,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		},
+		"parcellationsTwo": {
+			"base": "file",
+			"description": "Nifti labels to be used for resting state analysis. This option is available in case you want to pass the same set of labels for left and right hemis separately.",
+			"optional": true,
+			"type": {
+				"enum": [
+					"nifti"
+				]
+			}
+		}
+	},
+	"config": {
+		"seedBasedLabelNames": {
+			"default": "NA",
+			"description": "If you want to perform seed based whole brain comparisons, enter the comma separated label names here and whole brain voxel correlation will be performed with these labels. Do not use spaces between labels before or after commas.",
+			"type": "string"
+		}
+	},
+	"author": "Ozenc Taskin",
+	"maintainer": "Ozenc Taskin",
+	"license": "Other",
+	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
+	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
+	"custom": {
+		"gear-builder": {
+			"category": "analysis",
+			"image": "gkaguirrelab/ldogrest:latest"
+		},
+		"flywheel": {
+			"suite":"GKAguirreLab"
+		}
+	}
+}

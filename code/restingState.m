@@ -1,4 +1,4 @@
-function restingState(ldogFixArchive, workdir, outputDir, parcellationsOne, parcellationsTwo, labelsOne, labelsTwo)
+function restingState(ldogFixArchive, workdir, outputDir, parcellationsOne, parcellationsTwo, labelsOne, labelsTwo, seedBasedLabelNames)
     
     % Inputs 
     %
@@ -18,9 +18,12 @@ function restingState(ldogFixArchive, workdir, outputDir, parcellationsOne, parc
     % labelsOne:        An exel or csv sheet containing label names on one
     %                   column and label numbers in the second column.
     % labelsTwo:        Second set of labels if you passed parcellationsTwo
+    % seedBasedLabelNames:   Comma separated label str names which will be 
+    %                        used for seed based whole brain comparisons. 
+    %                        Do not use spaces between commas. 
 
     % Create a temp folder
-    tmpFolder = fullfile(workdir, 'tmp');
+    tmpFolder = fullfile(workdir, 'temp');
     if ~isfolder(tmpFolder)
         mkdir(tmpFolder)
     end
@@ -36,10 +39,11 @@ function restingState(ldogFixArchive, workdir, outputDir, parcellationsOne, parc
     % Read the first image on the list. We will concatanate the others with
     % this one in a loop.
     firstImageDir = dir(fullfile(tmpFolder, imageDir(1).name));
-    firstImage = niftiread(fullfile(firstImageDir(3).folder, firstImageDir(3).name));
+    firstImageContainer = load_nifti(fullfile(firstImageDir(3).folder, firstImageDir(3).name));
+    firstImageForPlotting = firstImageContainer.vol;
+    firstImage = firstImageContainer.vol;
     sz = size(firstImage);
     firstImage = reshape(firstImage, [sz(1)*sz(2)*sz(3), sz(4)]);
-    firstImageHeader = niftiinfo(fullfile(firstImageDir(3).folder, firstImageDir(3).name));
     
     % Remove the first image from the image list as we already read it. 
     imageDir(1, :) = [];
@@ -103,4 +107,24 @@ function restingState(ldogFixArchive, workdir, outputDir, parcellationsOne, parc
     saveas(figureIm, fullfile(outputDir, 'correlationMat.jpg'));
     save(fullfile(outputDir, 'correlationMatrix.mat'), 'correlationMatrix')
     save(fullfile(outputDir, 'averageTimeseriesPerLabel.mat'), 'correlationCell')
+    
+    % Correlation 
+    if ~strcmp(seedBasedLabelNames, 'NA')
+        cellfind = @(string)(@(cell_contents)(strcmp(string,cell_contents)));
+        labels = strsplit(seedBasedLabelNames, ',');
+        for l = 1:length(labels)
+            labelName = labels{l};
+            idx = find(cellfun(cellfind(labelName),correlationCell));
+            emptyCorrelationMat = zeros(length(firstImage),1);
+            for ii = 1:length(firstImage)
+                r  = corrcoef(correlationCell{idx,2}, firstImage(ii,:), 'rows','pairwise');
+                r = r(2);
+                emptyCorrelationMat(ii) = r;
+            end
+            final_im = reshape(emptyCorrelationMat, [sz(1) sz(2) sz(3)]);
+            firstImageContainer.vol = final_im;   
+            save_name = fullfile(outputDir, [strrep(correlationCell{idx,1}{1}, ' ', '_') '_Rmap' '.nii.gz']);
+            save_nifti(firstImageContainer,save_name);
+        end
+    end
 end
