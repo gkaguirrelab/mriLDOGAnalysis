@@ -2,7 +2,7 @@
 	"name": "ldogrest",
 	"label": "ldogRest: Resting state analysis of ldog data",
 	"description": "This gear works with ldogfix output archive and produces a resting state correlation matrix.",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"inputs": {
 		"labelsOne": {
 			"base": "file",
@@ -58,7 +58,7 @@
 	"config": {
 		"seedBasedLabelNames": {
 			"default": "NA",
-			"description": "If you want to perform seed based whole brain comparisons, enter the comma separated label names here and whole brain voxel correlation will be performed with these labels. Do not use spaces between labels before or after commas.",
+			"description": "If you want to perform seed based whole brain comparisons, enter the comma separated label names here and whole brain voxel correlation will be performed with these labels. Do not use spaces between labels before or after commas. WARNING: If there are spaces in the xlsx labels, use a backslash to escape them",
 			"type": "string"
 		}
 	},
