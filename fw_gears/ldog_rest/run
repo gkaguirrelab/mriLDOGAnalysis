@@ -66,6 +66,8 @@ seedBasedLabelNames = config['seedBasedLabelNames']
 templateImageFolder = os.path.join(flywheel_base, 'input/templateImage/')
 if os.path.exists(templateImageFolder):
     templateImage = os.path.join(templateImageFolder, os.listdir(templateImageFolder)[0])
+else:
+    templateImage = 'NA'
 
 ldogFixArchiveFolder = os.path.join(flywheel_base, 'input/ldogFixArchive/')
 if os.path.exists(ldogFixArchiveFolder):
@@ -78,6 +80,8 @@ if os.path.exists(parcellationsOneFolder):
 parcellationsTwoFolder = os.path.join(flywheel_base, 'input/parcellationsTwo/')
 if os.path.exists(parcellationsTwoFolder):
     parcellationsTwo = os.path.join(parcellationsTwoFolder, os.listdir(parcellationsTwoFolder)[0])
+else:
+    parcellationsTwo = 'NA'
     
 labelsOneFolder = os.path.join(flywheel_base, 'input/labelsOne/')
 if os.path.exists(labelsOneFolder):
@@ -86,6 +90,8 @@ if os.path.exists(labelsOneFolder):
 labelsTwoFolder = os.path.join(flywheel_base, 'input/labelsTwo/')
 if os.path.exists(labelsTwoFolder):
     labelsTwo = os.path.join(labelsTwoFolder, os.listdir(labelsTwoFolder)[0])
+else:
+    labelsTwo = 'NA'
 
 os.system('mkdir %s' % (os.path.join(first_output_dir, 'temp')))
 # Run motion regression
@@ -96,14 +102,15 @@ os.system(cmd)
 
 ################### Plotting and saving ##################################
 # Get the first func space
-templateLoaded = nib.load(templateImage)
-templateData = templateLoaded.get_fdata()
-size = templateData.shape
-for i in os.listdir(final_output_dir):
-    if '.nii.gz' in i:
-        imageToPlot = os.path.join(final_output_dir, i)
-        make_plot('subject', templateImage, imageToPlot, i, i, i[:7] + '.png', int(round(size[0]/2)), int(round(size[1]/2)), int(round(size[2]/2)), 0.3, 0.7, final_output_dir)
+if seedBasedLabelNames != 'NA' and templateImage != 'NA':
+    templateLoaded = nib.load(templateImage)
+    templateData = templateLoaded.get_fdata()
+    size = templateData.shape
+    for i in os.listdir(final_output_dir):
+        if '.nii.gz' in i:
+            imageToPlot = os.path.join(final_output_dir, i)
+            make_plot('subject', templateImage, imageToPlot, i, i, i[:7] + '.png', int(round(size[0]/2)), int(round(size[1]/2)), int(round(size[2]/2)), 0.3, 0.7, final_output_dir)
     
-# Zip the files
-os.system('cd %s; zip %s/R2maps.zip *.gz' % (final_output_dir, final_output_dir))
-os.system('cd %s; rm *.gz' % (final_output_dir))
+    # Zip the files
+    os.system('cd %s; zip %s/R2maps.zip *.gz' % (final_output_dir, final_output_dir))
+    os.system('cd %s; rm *.gz' % (final_output_dir))
