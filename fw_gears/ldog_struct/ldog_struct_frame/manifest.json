@@ -1,202 +1,210 @@
 {
-	"name": "ldogstruct",
-	"label": "ldogStruct: anatomical pre-processing for the LDOG project",
-	"description": "This gear performs preprocessing for the LDOG project.",
-	"author": "Ozenc Taskin",
-	"maintainer": "Ozenc Taskin <huseyinozenc.taskin@pennmedicine.upenn.edu>",
-	"source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
-	"url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
-	"version": "0.2.1",
-	"custom": {
-		"flywheel": {
-			"suite": "GKAguirreLab"
-		},
-		"docker-image": ""
-	},
-	"license": "Other",
-	"config": {
-		"centreOfGravityX":  {
-  			"description": "x position of the center voxel. If two structurals are averaged, obtain the coordinates from the first structural input (MPRAGE_01). To derive the required coordinate form from the Flywheel viewer, user can first pick an approximate middle voxel on the coronal-axial-sagital slices using the viewer and substract the selected voxel coordinates from the total amount of voxels in each of these slice directions and finally reorganize these values in a way that centre_x will be saggital, centre_y will be axial, and centre_z will be coronal",
-  			"type": "number"
-		},
-		"centreOfGravityY":  {
-  			"description": "y position of the center voxel. If two structurals are averaged, obtain the coordinates from the first structural input (MPRAGE_01)",
-  			"type": "number"
-		},
-		"centreOfGravityZ":  {
-  			"description": "z position of the center voxel. If two structurals are averaged, obtain the coordinates from the first structural input (MPRAGE_01)",
-  			"type": "number"
-		},
-		"subjectId":  {
-  			"description": "Subject ID",
-  			"type": "string"
-		},
-		"extractionThreshold":  {
-			"default":0.2,
-  			"description": "Functional intensity threshold (BET).",
-  			"type": "number"
-		},
-		"numberOfThreads": {
-			"default":2,
-			"description": "Number of threads to use for registrations",
-			"type": "number"
-		},
-		"structToStructTransform": {
-			"default":"Affine",
-			"description": "This is the transformation type to use for registering MPRAGE images together before averaging. If a single image is used as input, this config option will not be obtained by the gear as no registration will take place. SyN deformation is used as the default method, but rigid and affine transformations are also available for registering within subject structurals ",
-			"type": "string",
-			"enum": [
-				"SyN",
-				"Rigid",
-				"Affine"
-			]
-		},
-		"transformationMethod": {
-			"default":"skullStrippedMprage-skullStrippedTemplate",
-			"description": "This specifies the image types used for mprage-template warps.",
-			"type": "string",
-			"enum": [
-				"skullStrippedMprage-skullStrippedTemplate",
-				"wholeMprage-skullStrippedTemplate",
-				"wholeMprage-wholeTemplate"
-			]
-		},
-		"brainExtractWithTemplate": {
-			"default":false,
-			"description": "Do skull stripping with the template. Works when you have a skull stripped template and your T1 image looks similar to the template. Can be used when the boundry based skull stripping fails",
-			"type": "boolean"
-		}		
-	},
-	"inputs": {
-		"MPRAGE_01": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": false,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_02": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_03": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_04": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_05": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_06": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_07": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_08": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_09": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_10": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_11": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"MPRAGE_12": {
-			"description": "MPRAGE image",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		},
-		"Template": {
-			"description": "Template image to use for warping. This is optional. If left empty, the gear uses the invivoTemplate",
-			"base": "file",
-			"optional": true,
-			"type": {
-				"enum": [
-					"nifti"
-				]
-			}
-		}
-	}
+    "name": "ldogstruct",
+    "label": "ldogStruct: anatomical pre-processing for the LDOG project",
+    "description": "This gear performs preprocessing for the LDOG project.",
+    "version": "0.2.9",
+    "inputs": {
+        "MPRAGE_01": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": false,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_02": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_03": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_04": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_05": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_06": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_07": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_08": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_09": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_10": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_11": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "MPRAGE_12": {
+            "base": "file",
+            "description": "MPRAGE image",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        },
+        "Template": {
+            "base": "file",
+            "description": "Template image to use for warping. This is optional. If left empty, the gear uses the invivoTemplate",
+            "optional": true,
+            "type": {
+                "enum": [
+                    "nifti"
+                ]
+            }
+        }
+    },
+    "config": {
+        "brainExtractWithTemplate": {
+            "default": false,
+            "description": "Do skull stripping with the template. Works when you have a skull stripped template and your T1 image looks similar to the template. Can be used when the boundry based skull stripping fails",
+            "type": "boolean"
+        },
+        "inputIsBrainExtracted": {
+            "default": false,
+            "description": "Skip skull stripping if the input is already skull stripped",
+            "type": "boolean"
+        },
+        "centreOfGravityX": {
+            "description": "x position of the center voxel. If two structurals are averaged, obtain the coordinates from the first structural input (MPRAGE_01). To derive the required coordinate form from the Flywheel viewer, user can first pick an approximate middle voxel on the coronal-axial-sagital slices using the viewer and substract the selected voxel coordinates from the total amount of voxels in each of these slice directions and finally reorganize these values in a way that centre_x will be saggital, centre_y will be axial, and centre_z will be coronal",
+            "type": "number"
+        },
+        "centreOfGravityY": {
+            "description": "y position of the center voxel. If two structurals are averaged, obtain the coordinates from the first structural input (MPRAGE_01)",
+            "type": "number"
+        },
+        "centreOfGravityZ": {
+            "description": "z position of the center voxel. If two structurals are averaged, obtain the coordinates from the first structural input (MPRAGE_01)",
+            "type": "number"
+        },
+        "extractionThreshold": {
+            "default": 0.2,
+            "description": "Functional intensity threshold (BET).",
+            "type": "number"
+        },
+        "numberOfThreads": {
+            "default": 2,
+            "description": "Number of threads to use for registrations",
+            "type": "number"
+        },
+        "structToStructTransform": {
+            "default": "Affine",
+            "description": "This is the transformation type to use for registering MPRAGE images together before averaging. If a single image is used as input, this config option will not be obtained by the gear as no registration will take place. SyN deformation is used as the default method, but rigid and affine transformations are also available for registering within subject structurals ",
+            "enum": [
+                "SyN",
+                "Rigid",
+                "Affine"
+            ],
+            "type": "string"
+        },
+        "subjectId": {
+            "description": "Subject ID",
+            "type": "string"
+        },
+        "transformationMethod": {
+            "default": "skullStrippedMprage-skullStrippedTemplate",
+            "description": "This specifies the image types used for mprage-template warps.",
+            "enum": [
+                "skullStrippedMprage-skullStrippedTemplate",
+                "wholeMprage-skullStrippedTemplate",
+                "wholeMprage-wholeTemplate"
+            ],
+            "type": "string"
+        }
+    },
+    "author": "Ozenc Taskin",
+    "maintainer": "Ozenc Taskin",
+    "license": "Other",
+    "source": "https://github.com/gkaguirrelab/mriLDOGAnalysis/fw_gears",
+    "url": "https://github.com/gkaguirrelab/mriLDOGAnalysis",
+    "custom": {
+        "flywheel": {
+            "suite": "GKAguirreLab"
+        },
+        "gear-builder": {
+            "category": "analysis",
+            "image": "gkaguirrelab/ldogstruct:0.2.8"
+        }
+    }
 }

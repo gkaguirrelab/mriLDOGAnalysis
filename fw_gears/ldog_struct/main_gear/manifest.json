@@ -2,7 +2,7 @@
     "name": "ldogstruct",
     "label": "ldogStruct: anatomical pre-processing for the LDOG project",
     "description": "This gear performs preprocessing for the LDOG project.",
-    "version": "0.2.7",
+    "version": "0.3.1",
     "inputs": {
         "MPRAGE_01": {
             "base": "file",
@@ -141,6 +141,11 @@
             "description": "Do skull stripping with the template. Works when you have a skull stripped template and your T1 image looks similar to the template. Can be used when the boundry based skull stripping fails",
             "type": "boolean"
         },
+        "inputIsBrainExtracted": {
+            "default": false,
+            "description": "Skip skull stripping if the input is already skull stripped",
+            "type": "boolean"
+        },
         "centreOfGravityX": {
             "description": "x position of the center voxel. If two structurals are averaged, obtain the coordinates from the first structural input (MPRAGE_01). To derive the required coordinate form from the Flywheel viewer, user can first pick an approximate middle voxel on the coronal-axial-sagital slices using the viewer and substract the selected voxel coordinates from the total amount of voxels in each of these slice directions and finally reorganize these values in a way that centre_x will be saggital, centre_y will be axial, and centre_z will be coronal",
             "type": "number"
@@ -199,7 +204,7 @@
         },
         "gear-builder": {
             "category": "analysis",
-            "image": "gkaguirrelab/ldogstruct:0.2.5"
+            "image": "gkaguirrelab/ldogstruct:0.2.8"
         }
     }
 }
