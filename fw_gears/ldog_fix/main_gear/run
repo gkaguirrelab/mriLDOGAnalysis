@@ -91,6 +91,10 @@ else:
 num_img = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', 
            '12', '13', '14', '15', '16', '17', '18', '19', '20']
 
+no_spike_dir = '/tmp/noSpikeDirectory'
+if not os.path.exists(no_spike_dir):
+    os.system('mkdir %s' % no_spike_dir)
+
 for i in num_img:   
     
     # Make the folders here
@@ -233,9 +237,6 @@ for i in num_img:
             os.system('%s %s -add %s -div 2 %s' % (os.path.join(fsl_path, 'fslmaths'), processed_image_path, registered_flipped, processed_image_path))          
 
         if os.path.exists(rawFmriDataPath):
-            no_spike_dir = '/tmp/noSpikeDirectory'
-            if not os.path.exists(no_spike_dir):
-                os.system('mkdir %s' % no_spike_dir)
             how_many_spiky = []
             for i in os.listdir(os.path.join(new_folder_path, 'spikeSlices')):
                 if 'TR' in i:
