@@ -33,12 +33,13 @@ RUN apt-get update \
     python3-pip \
     zip \
     unzip \
-    fsl-core \
-    ants
+    fsl-core 
 
 # Install python packages
 RUN python3.7 -m pip install --upgrade pip
-RUN python3.7 -m pip install nibabel==2.5.1 matplotlib imageio pandas numpy
+RUN python3.7 -m pip install nibabel==2.5.1 matplotlib imageio pandas numpy cmake
+
+RUN git clone https://github.com/cookpa/antsInstallExample.git; cd antsInstallExample; bash installANTs.sh
 
 # Set the entrypoint  
 ENTRYPOINT /flywheel/v0/run
