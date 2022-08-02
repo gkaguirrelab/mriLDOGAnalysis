@@ -4,6 +4,7 @@ import os, json
 import nibabel as nib
 os.system('pip3 install matplotlib')
 import matplotlib.pyplot as plt
+import numpy as np
 ###################### Define the Paths and parameters ###########################
 
 # Set paths and create some folders
@@ -109,7 +110,10 @@ if seedBasedLabelNames != 'NA' and templateImage != 'NA':
     for i in os.listdir(final_output_dir):
         if '.nii.gz' in i:
             imageToPlot = os.path.join(final_output_dir, i)
-            make_plot('subject', templateImage, imageToPlot, i, i, i[:7] + '.png', int(round(size[0]/2)), int(round(size[1]/2)), int(round(size[2]/2)), 0.3, 0.7, final_output_dir)
+            loadedImage = nib.load(imageToPlot)
+            data = loadedImage.get_fdata()
+            loc = np.where(data == np.max(data))
+            make_plot('subject', templateImage, imageToPlot, i, i, i[:7] + '.png', loc[0][0], loc[1][0], loc[2][0], 0.3, 0.7, final_output_dir)
     
     # Zip the files
     os.system('cd %s; zip %s/R2maps.zip *.gz' % (final_output_dir, final_output_dir))

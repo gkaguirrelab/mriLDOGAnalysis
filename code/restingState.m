@@ -51,14 +51,18 @@ function restingState(ldogFixArchive, workdir, outputDir, parcellationsOne, parc
     % Loop through images and append to the first image
     for ii = 1:length(imageDir)
         subfolderNameDir = dir(fullfile(imageDir(ii).folder, imageDir(ii).name));
-        image = niftiread(fullfile(subfolderNameDir(3).folder, subfolderNameDir(3).name));
+        image = load_nifti(fullfile(subfolderNameDir(3).folder, subfolderNameDir(3).name));
+        image = image.vol;
+        sz = size(image);
         image = reshape(image, [sz(1)*sz(2)*sz(3), sz(4)]);
         firstImage = [firstImage image];
     end
     
     % Read parcellations and the label list
     if ~strcmp(parcellationsOne, 'NA')
-        parcellationOne = niftiread(parcellationsOne);
+        parcellationOne = load_nifti(parcellationsOne);
+        parcellationOne = parcellationOne.vol;
+        sz = size(parcellationOne);
         parcellationOne = reshape(parcellationOne, [sz(1)*sz(2)*sz(3),1]);
         labelsOne = readtable(labelsOne);
         for ii = 1:height(labelsOne)
@@ -69,7 +73,9 @@ function restingState(ldogFixArchive, workdir, outputDir, parcellationsOne, parc
     
     % Read the second set of parcellations and list if exists 
     if ~strcmp(parcellationsTwo, 'NA')
-        parcellationsTwo = niftiread(parcellationsTwo);
+        parcellationsTwo = load_nifti(parcellationsTwo);
+        parcellationsTwo = parcellationsTwo.vol;
+        sz = size(parcellationsTwo);
         parcellationsTwo = reshape(parcellationsTwo, [sz(1)*sz(2)*sz(3),1]);
         labelsTwo = readtable(labelsTwo);
         for ii = 1:height(labelsTwo)

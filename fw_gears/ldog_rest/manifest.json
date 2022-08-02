@@ -2,7 +2,7 @@
 	"name": "ldogrest",
 	"label": "ldogRest: Resting state analysis of ldog data",
 	"description": "This gear works with ldogfix output archive and produces a resting state correlation matrix.",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"inputs": {
 		"labelsOne": {
 			"base": "file",

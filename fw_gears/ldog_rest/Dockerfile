@@ -38,7 +38,7 @@ RUN apt-get update \
     libxi6 libsm6 libxrender-dev \
     libfontconfig1
 
-RUN python3.7 -m pip install nibabel==2.5.1
+RUN python3.7 -m pip install nibabel==2.5.1 numpy
 
 # Download and install MCR on call
 RUN wget https://ssd.mathworks.com/supportfiles/downloads/R2020a/Release/5/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2020a_Update_5_glnxa64.zip
