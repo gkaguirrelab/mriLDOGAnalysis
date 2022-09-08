@@ -428,7 +428,7 @@ make_plot(subject_id, first_tr_warped, 'NA', subject_id + ' EPI_2_Template', 'wa
 make_gif(epi_to_scout, 'EPI_2_Scout', final_output_dir)
 make_gif(epi_to_template, 'EPI_2_Template', final_output_dir)
 os.system('cp %s/moco/*.png %s' % (first_output_dir, final_output_dir))
-os.system('zip -r -j %s %s/2motion_corrected_epi/*.txt %s' % (os.path.join(final_output_dir, subject_id + '_preprocessedFunc.zip'), first_output_dir, warped_image))
+os.system('zip -r -j %s %s/3motion_corrected_epi/*.txt %s' % (os.path.join(final_output_dir, subject_id + '_preprocessedFunc.zip'), first_output_dir, warped_image))
 if saveIntermediateFiles == True:
     os.system('cd %s; zip %s -r *' % (first_output_dir, os.path.join(final_output_dir, subject_id + '_intermediateFiles.zip')))
 
