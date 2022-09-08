@@ -58,7 +58,12 @@
 			"base": "file",
 			"description": "If supplied, use this file to transform fmri images instead of ldogstruct output.",
 			"optional": true
-		}
+		},
+		"sliceOrderFile": {
+			"base": "file",
+			"description": "Slice order file. If supplied, do a slice timing correction. It is a text file which contains a single column of values. The first value is the number of the slice which was acquired first, the second value is the slice which was acquired second, and so on.",
+			"optional": true
+		}		
 	},
 	"config": {
 		"fMRIName": {

@@ -88,6 +88,16 @@ def topup(path_to_epi, total_readout_time_AP, total_readout_time_PA, path_to_rec
     
     return (image_name, scout_topuped, corrected_epi)
 
+def sliceTimeCorrection(epi_image, image_name, slice_order_file, output_folder, fsl_path=''):
+    
+    slice_timing_folder = os.path.join(output_folder, '2sliceTime_corrected_epi')
+    if not os.path.exists(slice_timing_folder):
+        os.system('mkdir %s' % slice_timing_folder)    
+    slice_time_corrected_image = os.path.join(slice_timing_folder, '2sliceTime_' + image_name + '.nii.gz')
+    os.system('%s -i %s -o %s --ocustom=%s' % (os.path.join(fsl_path, 'slicetimer'), epi_image, slice_time_corrected_image, slice_order_file))
+
+    return slice_time_corrected_image
+
 def moco(subject_id, image_name, epi_image, output_folder, fsl_path=''): 
     
     # This function does motion correction and calculates time derivatives of
@@ -95,14 +105,14 @@ def moco(subject_id, image_name, epi_image, output_folder, fsl_path=''):
     
     # Motion Correction
     moco = os.path.join(output_folder, 'moco')
-    moco_epi_folder = os.path.join(output_folder, '2motion_corrected_epi')
+    moco_epi_folder = os.path.join(output_folder, '3motion_corrected_epi')
     
     if not os.path.exists(moco):
         os.system('mkdir %s' % moco)
     if not os.path.exists(moco_epi_folder):
         os.system('mkdir %s' % moco_epi_folder)
     
-    motion_corrected_image_name = os.path.join(moco, '2moco_' + image_name)
+    motion_corrected_image_name = os.path.join(moco, '3moco_' + image_name)
     mcflirt_call = '%s -in %s -o %s -dof 6 -mats -plots -rmsrel -rmsabs' % (os.path.join(fsl_path, 'mcflirt'),
                                                                             epi_image,
                                                                             motion_corrected_image_name)
@@ -132,13 +142,13 @@ def moco(subject_id, image_name, epi_image, output_folder, fsl_path=''):
     
     # Move files
     os.system('mv %s/*.nii.gz %s' % (moco, moco_epi_folder))
-    motion_corrected_image = os.path.join(moco_epi_folder, '2moco_' + image_name + '.nii.gz')
+    motion_corrected_image = os.path.join(moco_epi_folder, '3moco_' + image_name + '.nii.gz')
 
     return (motion_corrected_image, confound_file)
 
 def registerToScout(image_name, epi_image, scout_image, output_folder, fsl_path = '', ants_path = '', useTheFirstTRforRegistration=False):
     
-    scout_registered_epi_folder = os.path.join(output_folder, '3scout_registered_epi')   
+    scout_registered_epi_folder = os.path.join(output_folder, '4scout_registered_epi')   
     scout_registration_intermediate = os.path.join(output_folder, 'scout_registeration')
     
     if not os.path.exists(scout_registered_epi_folder):
@@ -173,7 +183,7 @@ def registerToScout(image_name, epi_image, scout_image, output_folder, fsl_path 
     # os.system('antsRegistrationSyN.sh -f %s -m %s -t r -n 6 -o %s' % (scout_image, mean_tr, os.path.join(scout_registration_intermediate,'toScout')))
 
     affine_matrix = os.path.join(scout_registration_intermediate, 'toScout0GenericAffine.mat')
-    warped_to_scout = os.path.join(scout_registered_epi_folder, '3scoutRegistered_' + image_name + '.nii.gz')
+    warped_to_scout = os.path.join(scout_registered_epi_folder, '4scoutRegistered_' + image_name + '.nii.gz')
     os.system('%s -d 3 --float 0 --default-value 0 --input %s --input-image-type 3 '
               '--output %s --reference-image %s --transform %s -v 1 ' % (os.path.join(ants_path, 'antsApplyTransforms'), epi_image, warped_to_scout, scout_image, affine_matrix))
   
@@ -182,7 +192,7 @@ def registerToScout(image_name, epi_image, scout_image, output_folder, fsl_path 
 def apply_warp(image_name, subject_id, epi_image, template_image, output_folder, scout_registration_affine, path_to_generic_affine, path_to_warp, fsl_path='', ants_path ='',compositeTransform='NA'):
         
     # Warp EPI images to invivo template
-    warped_epi_folder = os.path.join(output_folder, '4final_template_warped_epi')  
+    warped_epi_folder = os.path.join(output_folder, '5final_template_warped_epi')  
     if not os.path.exists(warped_epi_folder):
         os.system('mkdir %s' % warped_epi_folder)
     
@@ -313,6 +323,12 @@ if os.path.exists(compositeTransform_folder):
     compositeTransform = os.path.join(compositeTransform_folder, os.listdir(compositeTransform_folder)[0])
 else:
     compositeTransform = 'NA'
+    
+slice_order_folder = os.path.join(flywheel_base, 'input/sliceOrderFile')
+if os.path.exists(slice_order_folder):
+    slice_order_file = os.path.join(slice_order_folder, os.listdir(slice_order_folder)[0])
+else:
+    slice_order_file = 'NA'    
 ###################Parse Config Here############################
 
 with open(config_path) as config_file:
@@ -364,16 +380,25 @@ else:
     os.system('cp %s %s' % (single_target, scout_folder))
     scout_topuped = os.path.join(scout_folder, os.listdir(scout_folder)[0])
     
+# Slice timing correction
+if slice_order_file != 'NA':
+    slice_time_corrected_image = sliceTimeCorrection(corrected_epi, image_name, slice_order_file, first_output_dir, fsl_path=fsl_path)
+else:
+    slice_time_corrected_image = corrected_epi
+    
 # Moco
-(motion_corrected_image, confound_file) = moco(subject_id, image_name, corrected_epi, first_output_dir, fsl_path=fsl_path)
+(motion_corrected_image, confound_file) = moco(subject_id, image_name, slice_time_corrected_image, first_output_dir, fsl_path=fsl_path)
+
 # register to topuped scout image
 if scoutRegistration == True:
     (warped_to_scout, scout_affine_matrix) = registerToScout(subject_id, motion_corrected_image, scout_topuped, first_output_dir, fsl_path=fsl_path, ants_path=ants_path, useTheFirstTRforRegistration=useTheFirstTRforRegistration)
 else:
     warped_to_scout = motion_corrected_image
     scout_affine_matrix = 'NA'
+
 # Register to template
 warped_image = apply_warp(image_name, subject_id, motion_corrected_image, resampled_template_path, first_output_dir, scout_affine_matrix, generic_affine, path_to_warp, fsl_path=fsl_path, ants_path=ants_path,compositeTransform=compositeTransform)
+
 # Set zero outside the brain
 set_zero(warped_image, resampled_template_path, warped_image)
 
