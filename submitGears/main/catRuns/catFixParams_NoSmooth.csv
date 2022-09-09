@@ -1,4 +1,4 @@
-projectLabel,canineFovea,gearName,ldogFix,rootSession,EPI_01,ConfigKeys,"{'archiveName','smoothingSigma','convertToPercentChangeSignal','makePseudoHemisphere','regressGlobalSignal','highPassFilter','lowPassFilter'}",ConfigVals,"{archiveName,'NA','false','false','true','0.008','0.15'}",,,,,,,,,,,,,,,,,,,,,,
+projectLabel,canineFovea,gearName,ldogFix,rootSession,EPI_01,ConfigKeys,"{'archiveName','smoothingSigma','convertToPercentChangeSignal','makePseudoHemisphere','regressGlobalSignal','highPassFilter','lowPassFilter'}",ConfigVals,"{archiveName,'5','false','false','true','0.008','0.15'}",,,,,,,,,,,,,,,,,,,,,,
 Inputs,EPI_01,EPI_02,EPI_03,EPI_04,EPI_05,EPI_06,EPI_07,EPI_08,EPI_09,EPI_10,EPI_11,EPI_12,EPI_13,EPI_14,raw_EPI_01,raw_EPI_02,raw_EPI_03,raw_EPI_04,raw_EPI_05,raw_EPI_06,raw_EPI_07,raw_EPI_08,raw_EPI_09,raw_EPI_10,raw_EPI_11,raw_EPI_12,raw_EPI_13,raw_EPI_14,archiveName,analysisSubmissionTag,
 DefaultLabel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 FileSuffix,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,zip,nifti,nifti,nifti,nifti,nifti,nifti,nifti,nifti,nifti,nifti,nifti,nifti,nifti,nifti,,,
