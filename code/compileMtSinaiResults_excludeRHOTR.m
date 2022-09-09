@@ -32,7 +32,7 @@ subjectNames = {...
     'Z663','Z665','Z666'};
 
 groupIdx = {[1 2 3],[4 5 6],[7 8 9]};
-groupNames = {'WT','RCD1','XLPRA2'};
+groupNames = {'allV1','XLPRA2'};
 groupColors = {[0.5 0.5 0.5],[0 0 1],[1 0 0]};
 nGroups = length(groupNames);
 
@@ -43,7 +43,7 @@ paramSets = {[1:6],[7:12],[13:18]};
 % Some properties of the data and analyses
 stimulusDirections = {'L+S','L-S','LF'};
 nStimuli = length(stimulusDirections);
-ROIs = {'centV1','periphV1','LGN'};
+ROIs = {'allV1','LGN'};
 nROIs = length(ROIs);
 theModelUsed = 'mtSinai';
 analysisIDs = [];
@@ -119,13 +119,18 @@ for ss=1:nSessions
 end
 
 % Extract the data from the params
-dataMeans = []; dataSEMS = [];
+dataMeans = []; dataSEMs = [];
 for ss=1:nSessions
+    dataWorkMean = [];
+    dataWorkSEMs = [];
     for aa=1:nROIs
-        dataMeans(ss,(aa-1)*nROIs+1:aa*nROIs) = [mean(params{ss,aa}(paramSetsBySession{ss}{1})), mean(params{ss,aa}(paramSetsBySession{ss}{2})), mean(params{ss,aa}(paramSetsBySession{ss}{3})) ];
-        dataSEMs(ss,(aa-1)*nROIs+1:aa*nROIs) = [std(params{ss,aa}(paramSetsBySession{ss}{1}))/sqrt(length(paramSetsBySession{ss}{1})), std(params{ss,aa}(paramSetsBySession{ss}{2}))/sqrt(length(paramSetsBySession{ss}{2})), std(params{ss,aa}(paramSetsBySession{ss}{3}))/sqrt(length(paramSetsBySession{ss}{3})) ];
+        dataWorkMean = [dataWorkMean [mean(params{ss,aa}(paramSetsBySession{ss}{1})), mean(params{ss,aa}(paramSetsBySession{ss}{2})), mean(params{ss,aa}(paramSetsBySession{ss}{3})) ]];
+        dataWorkSEMs = [dataWorkSEMs [std(params{ss,aa}(paramSetsBySession{ss}{1}))/sqrt(length(paramSetsBySession{ss}{1})), std(params{ss,aa}(paramSetsBySession{ss}{2}))/sqrt(length(paramSetsBySession{ss}{2})), std(params{ss,aa}(paramSetsBySession{ss}{3}))/sqrt(length(paramSetsBySession{ss}{3})) ]];
     end
+    dataMeans = [dataMeans; dataWorkMean];
+    dataSEMs = [dataSEMs; dataWorkSEMs];
 end
+
 % Variable names for the table
 varNames =[];
 for xx=1:length(ROIs)
