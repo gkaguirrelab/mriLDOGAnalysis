@@ -32,7 +32,7 @@ subjectNames = {...
     'Z663','Z665','Z666'};
 
 groupIdx = {[1 2 3],[4 5 6],[7 8 9]};
-groupNames = {'allV1','XLPRA2'};
+groupNames = {'WT','RCD1','XLPRA2'};
 groupColors = {[0.5 0.5 0.5],[0 0 1],[1 0 0]};
 nGroups = length(groupNames);
 
@@ -48,11 +48,7 @@ nROIs = length(ROIs);
 theModelUsed = 'mtSinai';
 analysisIDs = [];
 
-yLimVals = {...
-    [-0.2 1],[-0.2,1],[-0.2 0.5];...
-    [-0.2 1],[-0.2,1],[-0.2 0.5];...
-    [-0.2 1],[-0.2,1],[-0.2 0.5]...
-    };
+yLimVals = {[-0.2 1],[-0.5 0.2]};
 
 % Obtain the list of mtSinai analysis IDs
 for ss = 1:length(sessionIDs)
@@ -144,25 +140,25 @@ figure
 for xx=1:nGroups
     for yy=1:nStimuli
         for zz=1:nROIs
-            plotIdx = (yy-1)*nStimuli+zz;
+            plotIdx = (yy-1)*nROIs+zz;
             subplot(nStimuli,nROIs,plotIdx);
             plot([0.5 nGroups+0.5],[0 0],':k')
             hold on
             rowIdx = groupIdx{xx};
             for ss=1:length(rowIdx)
-                thisMean = dataMeans(rowIdx(ss),(zz-1)*nROIs+yy);
-                thisSEM = dataSEMs(rowIdx(ss),(zz-1)*nROIs+yy);
+                thisMean = dataMeans(rowIdx(ss),(zz-1)*nStimuli+yy);
+                thisSEM = dataSEMs(rowIdx(ss),(zz-1)*nStimuli+yy);
                 if strcmp(ROIs(zz),'LGN')
-                    thisMean = -thisMean;
+                    set(gca, 'YDir','reverse')
                 end
-                plot([xx+(ss-1)*jitterFactor xx+(ss-1)*jitterFactor],[thisMean-thisSEM,thisMean+thisSEM],'-','Color',groupColors{xx},'LineWidth',1);
-                plot(xx+(ss-1)*jitterFactor,thisMean,'o','MarkerSize',4,'MarkerEdgeColor','k','MarkerFaceColor',groupColors{xx});
+                plot([xx+(ss-1)*jitterFactor xx+(ss-1)*jitterFactor],[thisMean-thisSEM,thisMean+thisSEM],'-','Color',groupColors{xx},'LineWidth',2);
+                plot(xx+(ss-1)*jitterFactor,thisMean,'o','MarkerSize',6,'MarkerEdgeColor','k','MarkerFaceColor',groupColors{xx});
             end
             xticks([1:nGroups]);
             xticklabels(groupNames);
             title([ROIs{zz} '.' stimulusDirections{yy}])
             xlim([0.5,nGroups+0.5]);
-            ylim(yLimVals{yy,zz});
+            ylim(yLimVals{zz});
             ylabel('BOLD response [%d]')
         end
     end
@@ -186,3 +182,5 @@ end
 T.Properties.RowNames = rowName;
 T.Properties.VariableNames = varNames;
 
+% Dump T
+T
