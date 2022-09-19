@@ -141,7 +141,7 @@ for xx=1:nGroups
     for yy=1:nStimuli
         for zz=1:nROIs
             plotIdx = (yy-1)*nROIs+zz;
-            subplot(nStimuli,nROIs,plotIdx);
+            subplot(nStimuli,nROIs,plotIdx);    
             plot([0.5 nGroups+0.5],[0 0],':k')
             hold on
             rowIdx = groupIdx{xx};
@@ -159,6 +159,9 @@ for xx=1:nGroups
             title([ROIs{zz} '.' stimulusDirections{yy}])
             xlim([0.5,nGroups+0.5]);
             ylim(yLimVals{zz});
+            if strcmp(ROIs(zz),'allV1')
+                ylim([-0.2, 0.6])      
+            end            
             ylabel('BOLD response [%d]')
         end
     end
