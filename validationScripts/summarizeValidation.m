@@ -1,9 +1,6 @@
 % This script makes validation tables from the folders in LDOG_processing
 % which are created by the visualizeValidation.m script.
-clear all
-
-% Set warning
-warning('Delete the csv files in LDOG processing if you already ran this script before or it will fail')
+clear all; clc
 
 % Set dropbox path
 dropboxBaseDir = getpref('pupilLDOGAnalysis','dropboxBaseDir');
@@ -11,6 +8,19 @@ dropboxBaseDir = getpref('pupilLDOGAnalysis','dropboxBaseDir');
 % We want to get the validations for MRI and pupil sessions. The pupil 
 % stimulus file sets path to MRScotoLDOG, so the sessions are in there
 experiment = {'MRFlickerLDOG', 'MRScotoLDOG'};
+
+% Subject and sessions to include in the table. This includes both pupil 
+% and fmri sessions
+subjectsMRI = {'2346', '2350', '2356', 'N344', 'N347', 'N349', 'Z663', ...
+               'Z665', 'Z666'};
+sessionsMRI = {'2022-05-19', '2020-11-23', '2021-01-11', '2021-04-08', ...
+               '2022-01-31', '2021-11-12', '2020-11-06', '2020-11-06', ...
+               '2020-11-19'};
+subjectsPupil = {'2350', '2353', '2356', 'N344', 'N349', ...
+                 'Z663', 'Z665', 'Z666'};
+sessionsPupil = {'2020-12-11', '2020-10-20', '2020-12-11', ...
+                 '2020-10-14', '2021-08-24', '2020-08-20', '2020-10-14', ...
+                 '2020-12-11'};
 
 % Loop through validation directionObjects and organize tables 
 for ee = 1:length(experiment)
@@ -25,6 +35,7 @@ for ee = 1:length(experiment)
 
     % Find the folders in LDOG_processing
     directory = dir(dataOutputDirRoot);
+    directory = directory([directory(:).isdir]);
     directory(1:2,:) = [];
 
     % Set modulation names and initiate a loop
@@ -65,31 +76,45 @@ for ee = 1:length(experiment)
                 folderName = subDir(aa).name;
                 filePath = fullfile(dataOutputDirRoot, subjectName, folderName, 'summaryTable.mat');
                 load(filePath)
+                
+                % If both subject and session names exist in the folder, 
+                if strcmp(experiment{ee}, 'MRFlickerLDOG')
+                    subjectList = subjectsMRI;
+                    sessionList = sessionsMRI;
+                elseif strcmp(experiment{ee}, 'MRScotoLDOG')
+                    subjectList = subjectsPupil;
+                    sessionList = sessionsPupil;
+                end
+                
+                if any(strcmp(subjectList,subjectName)) 
+                    index = find(contains(subjectList,subjectName));
+                    if strcmp(sessionList{index}, folderName)
+                        Names{end+1} = subjectName;
+                        Sessions{end+1} = folderName;
+                        preLuminance{end+1} = summary.(modulations{mod}).BackgroundLuminanceSummary{1,2};
+                        postLuminance{end+1} = summary.(modulations{mod}).BackgroundLuminanceSummary{1,3};
 
-                Names{end+1} = subjectName;
-                Sessions{end+1} = folderName;
-                preLuminance{end+1} = summary.(modulations{mod}).BackgroundLuminanceSummary{1,2};
-                postLuminance{end+1} = summary.(modulations{mod}).BackgroundLuminanceSummary{1,3};
+                        preLConeNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{2,2}(1); 
+                        preLConePositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{1,2}(1); 
+                        postLConeNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{2,3}(1); 
+                        postLConePositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{1,3}(1); 
 
-                preLConeNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{2,2}(1); 
-                preLConePositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{1,2}(1); 
-                postLConeNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{2,3}(1); 
-                postLConePositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{1,3}(1); 
+                        preSConeNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{4,2}(1); 
+                        preSConePositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{3,2}(1); 
+                        postSConeNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{4,3}(1);
+                        postSConePositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{3,3}(1);
 
-                preSConeNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{4,2}(1); 
-                preSConePositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{3,2}(1); 
-                postSConeNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{4,3}(1);
-                postSConePositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{3,3}(1);
+                        preMelNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{6,2}(1);
+                        preMelPositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{5,2}(1);
+                        postMelNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{6,3}(1);
+                        postMelPositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{5,3}(1);
 
-                preMelNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{6,2}(1);
-                preMelPositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{5,2}(1);
-                postMelNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{6,3}(1);
-                postMelPositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{5,3}(1);
-
-                preRodNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{8,2}(1);
-                preRodPositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{7,2}(1);
-                postRodNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{8,3}(1);
-                postRodPositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{7,3}(1);       
+                        preRodNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{8,2}(1);
+                        preRodPositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{7,2}(1);
+                        postRodNegative{end+1} = summary.(modulations{mod}).contrastSummaryTable{8,3}(1);
+                        postRodPositive{end+1} = summary.(modulations{mod}).contrastSummaryTable{7,3}(1);  
+                    end
+                end
             end
         end
         
@@ -166,14 +191,13 @@ for ee = 1:length(experiment)
                                           'Average Scone', 'Average Mel', 'Average Rod'};
         writetable(table1, fullfile(dataOutputDirRoot, [modulations{mod} '.xls']));
         
+        % Average luminance
+        luminanceVals{mod} = mean(averageLum);
+        
         % Drop the bad subject and make a new table for stimulus types
         modulationName = modulations{mod};
         averageLplusS = (averageLCone + averageSCone)/2;
         averageLminusS = (averageLCone - averageSCone)/2;
-        averageLplusS(11) = [];
-        averageLminusS(11) = [];
-        averageMel(11) = [];
-        averageRod(11) = [];
         averageLplusSMean = mean(averageLplusS);
         averageLplusSSD = std(averageLplusS);
         averageLminusSMean = mean(averageLminusS);
@@ -210,6 +234,9 @@ for ee = 1:length(experiment)
         
         clear table
     end
+    luminanceTable = cell2table([modulations' luminanceVals']);
+    luminanceTable.Properties.VariableNames = {'Modulation', 'Average Luminance'};
+    writetable(luminanceTable, fullfile(dataOutputDirRoot, [experiment{ee}, '_averageLuminance.xls']));
     writetable(summaryTable_postRecept, fullfile(dataOutputDirRoot, [experiment{ee}, '_modulationSummary_postRecept.xls']));
     writetable(summaryTable_photoRecept, fullfile(dataOutputDirRoot, [experiment{ee}, '_modulationSummary_photoRecept.xls']));    
     clear summaryTable_postRecept
