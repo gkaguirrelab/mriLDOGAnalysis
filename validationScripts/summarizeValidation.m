@@ -192,7 +192,8 @@ for ee = 1:length(experiment)
         writetable(table1, fullfile(dataOutputDirRoot, [modulations{mod} '.xls']));
         
         % Average luminance
-        luminanceVals{mod} = mean(averageLum);
+        luminanceValsMean{mod} = mean(averageLum);
+        luminanceValsStd{mod} = std(averageLum);
         
         % Drop the bad subject and make a new table for stimulus types
         modulationName = modulations{mod};
@@ -234,8 +235,8 @@ for ee = 1:length(experiment)
         
         clear table
     end
-    luminanceTable = cell2table([modulations' luminanceVals']);
-    luminanceTable.Properties.VariableNames = {'Modulation', 'Average Luminance'};
+    luminanceTable = cell2table([modulations' luminanceValsMean' luminanceValsStd']);
+    luminanceTable.Properties.VariableNames = {'Modulation', 'Average Luminance', 'Std Luminance'};
     writetable(luminanceTable, fullfile(dataOutputDirRoot, [experiment{ee}, '_averageLuminance.xls']));
     writetable(summaryTable_postRecept, fullfile(dataOutputDirRoot, [experiment{ee}, '_modulationSummary_postRecept.xls']));
     writetable(summaryTable_photoRecept, fullfile(dataOutputDirRoot, [experiment{ee}, '_modulationSummary_photoRecept.xls']));    
