@@ -9,7 +9,7 @@ if ~isdir(tempDir)
 end
 pythonFuncSurf = '/home/ozzy/Desktop/plot_surface.py';
 ldogSurfaceCalc = '/home/ozzy/Desktop/invivo2exvivo';
-threshold = '0.2';
+threshold = '0.1';
 resampledTempPath = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/2x2x2resampled_invivoTemplate.nii.gz';
 
 % Get Flywheel project 
@@ -25,8 +25,6 @@ subjectNames = [...
     'WM65','WM67', ...
     'LA7', ...
     'EM404', 'EM533', 'EM532', 'EM499', 'EM501'];
-
-subjectNames = ['EM404', 'EM533', 'EM532', 'EM499', 'EM501']
 
 subjects = project.subjects();
 for sub = 1:length(subjects)
@@ -44,50 +42,26 @@ for sub = 1:length(subjects)
             for aa = 1:length(analyses)
                 if contains(analyses{aa}.label, 'forwardmodel')
                     analyses{aa}.label
-                    if contains(analyses{aa}.label, 'leftHemi') && contains(analyses{aa}.label, 'allV1')
+                    if contains(analyses{aa}.label, 'photoFlicker') && ~contains(analyses{aa}.label, 'noPseudo') && ~contains(analyses{aa}.label, 'LGN') && ~contains(analyses{aa}.label, 'allV1') && ~contains(analyses{aa}.label, 'wholeBrain')
                         matrix = fullfile(tempDir, 'mtSinai_results.mat');
                         analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
                         region = 'V1';
-                        hemi = 'leftHemi';
+                        hemi = 'Pseudo';
                         sessionType = 'photoFlicker';
                         process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))
-                    elseif contains(analyses{aa}.label, 'rightHemi') && contains(analyses{aa}.label, 'allV1')
+                        region = 'LGN';
+                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))                        
+                    elseif contains(analyses{aa}.label, 'photoFlicker') && contains(analyses{aa}.label, 'noPseudo') && ~contains(analyses{aa}.label, 'LGN') && ~contains(analyses{aa}.label, 'allV1') && ~contains(analyses{aa}.label, 'wholeBrain')
                         matrix = fullfile(tempDir, 'mtSinai_results.mat');
                         analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
                         region = 'V1';
-                        hemi = 'rightHemi';
+                        hemi = 'noPseudo';
                         sessionType = 'photoFlicker';        
                         process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))
-                    elseif contains(analyses{aa}.label, 'leftHemi') && contains(analyses{aa}.label, 'LGN')
-                        matrix = fullfile(tempDir, 'mtSinai_results.mat');
-                        analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
                         region = 'LGN';
-                        hemi = 'leftHemi';
-                        sessionType = 'photoFlicker';
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))
-                    elseif contains(analyses{aa}.label, 'rightHemi') && contains(analyses{aa}.label, 'LGN')
-                        matrix = fullfile(tempDir, 'mtSinai_results.mat');
-                        analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
-                        region = 'LGN';
-                        hemi = 'rightHemi'; 
-                        sessionType = 'photoFlicker';    
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))
-                    elseif ~contains(analyses{aa}.label, 'rightHemi') && ~contains(analyses{aa}.label, 'leftHemi') && contains(analyses{aa}.label,'allV1')
-                        matrix = fullfile(tempDir, 'mtSinai_results.mat');
-                        analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
-                        region = 'V1';
-                        hemi = 'pseudoHemi';
-                        sessionType = 'photoFlicker';  
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))
-                    elseif ~contains(analyses{aa}.label, 'rightHemi') && ~contains(analyses{aa}.label, 'leftHemi') && contains(analyses{aa}.label,'LGN')
-                        matrix = fullfile(tempDir, 'mtSinai_results.mat');
-                        analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
-                        region = 'LGN';
-                        hemi = 'pseudoHemi';
-                        sessionType = 'photoFlicker';           
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))
+                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))                        
                     % Max FLicker
-                    elseif contains(analyses{aa}.label, 'maxFlicker') && contains(analyses{aa}.label, 'NoPseudo')
+                    elseif contains(analyses{aa}.label, 'maxFlicker') && contains(analyses{aa}.label, 'NoPseudo') && ~contains(analyses{aa}.label, 'LGN') && ~contains(analyses{aa}.label, 'allV1') && ~contains(analyses{aa}.label, 'wholeBrain')
                         matrix = fullfile(tempDir, 'maxFlicker_results.mat');
                         analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
                         sessionType = 'maxFlicker';
@@ -96,7 +70,7 @@ for sub = 1:length(subjects)
                         process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))
                         region = 'LGN';
                         process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))
-                    elseif contains(analyses{aa}.label, 'maxFlicker') && ~contains(analyses{aa}.label, 'NoPseudo')
+                    elseif contains(analyses{aa}.label, 'maxFlicker') && ~contains(analyses{aa}.label, 'NoPseudo') && ~contains(analyses{aa}.label, 'LGN') && ~contains(analyses{aa}.label, 'allV1') && ~contains(analyses{aa}.label, 'wholeBrain')
                         matrix = fullfile(tempDir, 'maxFlicker_results.mat');
                         analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
                         sessionType = 'maxFlicker';
@@ -105,8 +79,6 @@ for sub = 1:length(subjects)
                         process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))
                         region = 'LGN';
                         process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label))
-                    else
-                        error("Problem")
                     end
                     
                              
