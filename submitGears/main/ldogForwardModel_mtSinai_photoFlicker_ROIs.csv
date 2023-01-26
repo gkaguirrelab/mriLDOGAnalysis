@@ -1,4 +1,4 @@
-"projectLabel","canineFovea","gearName","forwardModel","versionNum",,"rootSession","funcZip01","ConfigKeys","{'averageAcquisitions','averageVoxels','pseudoHemiAnalysis','convertToPercentChange','dataFileType','dataSourceType','modelClass','modelOpts','tr'}","ConfigVals","{'0','0','0','0','volumetric','ldogfix','mtSinai',modelOpts,'3.0'}",,,,,,
+"projectLabel","canineFovea","gearName","forwardModel","versionNum",,"rootSession","funcZip01","ConfigKeys","{'averageAcquisitions','averageVoxels','pseudoHemiAnalysis','convertToPercentChange','dataFileType','dataSourceType','modelClass','modelOpts','tr'}","ConfigVals","{'0','1','0','0','volumetric','ldogfix','mtSinai',modelOpts,'3.0'}",,,,,,
 "Inputs","structZip","maskFile","funcZip01","funcZip02","funcZip03","funcZip04","funcZip05","funcZip06","funcZip07","funcZip08","funcZip09","funcZip10","funcZip11","stimFile","modelOpts","analysisSubmissionTag",
 "DefaultLabel",,,,,,,,,,,,,,,,,
 "FileSuffix","zip",,"zip",,,,,,,,,,,"mat",,,
