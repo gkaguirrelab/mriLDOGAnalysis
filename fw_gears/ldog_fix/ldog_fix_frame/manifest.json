@@ -39,7 +39,12 @@
 			"default": "false",
 			"description": "Save final images as pseudohemispheres by flipping and averaging",
 			"type": "string"
-		},		
+		},	
+		"flipOutput": {
+			"default": "false",
+			"description": "This option saves the output in flipped hemisphere. Warning: This is not a pseudo hemisphere averaging. Set the makePseudoHemisphere flag for that operation. Setting this true will also overrule pseudo hemi averaging.",
+			"type": "string"
+		},	
 		"regressGlobalSignal": {
 			"default": "false",
 			"description": "Regress globab signal from the  data",

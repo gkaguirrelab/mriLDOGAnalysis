@@ -38,6 +38,7 @@ voxelMADthresh = config['voxelMADthresh']
 meanMADthresh = config['meanMADthresh']
 lowPassFilter = config['lowPassFilter']
 highPassFilter = config['highPassFilter']
+flipOutput = config['flipOutput']
 
 ################### Run Algorithm ################################
 
@@ -177,7 +178,7 @@ for i in num_img:
             os.system(cmd)                    
         
         # Make pseudo hemispheres if requested
-        if makePseudoHemisphere == 'true':
+        if makePseudoHemisphere == 'true' or flipOutput == 'true':
             
             # Get registrations between flipped and original template
             affine_pseudo = '/opt/pseudoHemiRegistrations/flipped2Orig0GenericAffine.mat'
@@ -197,7 +198,7 @@ for i in num_img:
             # Take the first TR of raw image and plot it
             single_image = '/tmp/singleTR.nii.gz'
             os.system('%s %s %s 0 1' % (os.path.join(fsl_path, 'fslroi'), image_file, single_image))
-            make_plot(subject_id, single_image, 'NA', 'Original image and Pseudo hemi' , 'original', 'original.png', 26, 23, 26, plot_folder)
+            make_plot(subject_id, single_image, 'NA', 'Original image and pseudo or flipped hemi' , 'original', 'original.png', 26, 23, 26, plot_folder)
             
             # Flip the raw image
             plot_flipped = '/tmp/flipped.nii.gz'
@@ -207,13 +208,18 @@ for i in num_img:
             plot_registered = '/tmp/registered.nii.gz'
             os.system('%s -i %s -r %s -t %s -t %s -o %s -e 3' % (os.path.join(ants_path, 'antsApplyTransforms'), plot_flipped, resampled_template_path, warp_pseudo, affine_pseudo, plot_registered))   
             
-            # Average the raw and registered
-            plot_averaged = '/tmp/averaged.nii.gz'
-            os.system('%s %s -add %s -div 2 %s' % (os.path.join(fsl_path, 'fslmaths'), image_file, plot_registered, plot_averaged))
-            
+            if makePseudoHemisphere == 'true':
+                # Average the raw and registered
+                plot_averaged = '/tmp/averaged.nii.gz'
+                os.system('%s %s -add %s -div 2 %s' % (os.path.join(fsl_path, 'fslmaths'), image_file, plot_registered, plot_averaged))
+                image_label = 'pseudo'
+            elif flipOutput == 'true' and makePseudoHemisphere == 'false':
+                plot_averaged = plot_registered
+                image_label = 'flipped'
+                
             # Get a single TR and plot it
             os.system('%s %s %s 0 1' % (os.path.join(fsl_path, 'fslroi'), plot_averaged, single_image))
-            make_plot(subject_id, single_image, 'NA', 'riginal image and Pseudo hemi', 'pseudo', 'pseudo.png', 26, 23, 26, plot_folder)
+            make_plot(subject_id, single_image, 'NA', 'Original image and pseudo or flipped hemi',  image_label, image_label + '.png', 26, 23, 26, plot_folder)
             
             # Make a gif from raw and pseudo image
             make_gif(plot_folder, os.path.split(image_file)[1][:-7], final_output_dir, speed=0.9)
@@ -221,7 +227,7 @@ for i in num_img:
             ######## Do it for real now on the processed image ################
            
             # Create folder
-            pseudo_hemi_folder = os.path.join(tmp_working_dir, 'pseudoHemi')
+            pseudo_hemi_folder = os.path.join(tmp_working_dir, 'pseudoOrFlippedHemi')
             os.system('mkdir %s' % pseudo_hemi_folder)
             
             # Flip the image
@@ -234,8 +240,11 @@ for i in num_img:
             # Apply the flip to orig registration we calculated on the template
             registered_flipped = os.path.join(pseudo_hemi_folder, 'registered_flipped.nii.gz')
             os.system('%s -i %s -r %s -t %s -t %s -o %s -e 3' % (os.path.join(ants_path, 'antsApplyTransforms'), flipped_image, resampled_template_path, warp_pseudo, affine_pseudo, registered_flipped))   
-            os.system('%s %s -add %s -div 2 %s' % (os.path.join(fsl_path, 'fslmaths'), processed_image_path, registered_flipped, processed_image_path))          
-
+            if makePseudoHemisphere == 'true':
+                os.system('%s %s -add %s -div 2 %s' % (os.path.join(fsl_path, 'fslmaths'), processed_image_path, registered_flipped, processed_image_path))          
+            elif flipOutput == 'true' and makePseudoHemisphere == 'false':
+                os.system('cp %s %s' % (registered_flipped, processed_image_path))
+                
         if os.path.exists(rawFmriDataPath):
             how_many_spiky = []
             for i in os.listdir(os.path.join(new_folder_path, 'spikeSlices')):
