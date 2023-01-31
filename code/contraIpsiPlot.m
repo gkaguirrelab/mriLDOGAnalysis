@@ -1,8 +1,5 @@
 % A script to make contra-ipsi plots
 
-% Bootstrapping 
-rng('shuffle')
-
 % House keeping
 clear
 close all
@@ -24,10 +21,10 @@ projectID = '5bb4ade9e849c300150d0d99';
 
 leftHemiSaveName = fullfile(saveDir, 'leftV1.nii.gz');
 rightHemiSaveName = fullfile(saveDir, 'rightV1.nii.gz');
-leftHemi = niftiread(fw.downloadFileFromProject(projectID, 'left_canineV1all.nii.gz', leftHemiSaveName));
-rightHemi = niftiread(fw.downloadFileFromProject(projectID, 'right_canineV1all.nii.gz', rightHemiSaveName));
-leftHemi = find(leftHemi(:));
-rightHemi = find(rightHemi(:));
+leftHemi = MRIread(fw.downloadFileFromProject(projectID, 'left_canineV1all.nii.gz', leftHemiSaveName));
+rightHemi = MRIread(fw.downloadFileFromProject(projectID, 'right_canineV1all.nii.gz', rightHemiSaveName));
+leftHemi = find(leftHemi.vol(:));
+rightHemi = find(rightHemi.vol(:));
 
 % Get the session and download the results 
 sessionID = '61f8259d9c5e882ac6ff49da';
@@ -63,7 +60,7 @@ for ii = 1:3
     x = categorical({'contra', 'ipsi'});
     hold on 
     plot([jitterLeft jitterLeft],[leftHemiCI(1,ii) leftHemiCI(2,ii)], '-', 'LineWidth',2, 'Color', groupColors{ii})
-    plot(jitterLeft, leftHemiMeans(ii), 'o', 'MarkerFaceColor', groupColors{ii}, 'MarkerEdgeColor', groupColors{ii})
+    plt{ii} = plot(jitterLeft, leftHemiMeans(ii), 'o', 'MarkerFaceColor', groupColors{ii}, 'MarkerEdgeColor', groupColors{ii});
     jitterLeft = jitterLeft + 0.1;
     
     plot([jitterRight jitterRight],[rightHemiCI(1,ii) rightHemiCI(2,ii)], '-', 'LineWidth',2, 'Color', groupColors{ii})
@@ -71,6 +68,7 @@ for ii = 1:3
     jitterRight = jitterRight + 0.1;
 
 end
-ylim([-0.2 0.2])
+ylim([0 1])
 xticks([1:2]);
 xticklabels({'contra','ipsi'});
+legend([plt{:}], {'N347','N349','N344'}, 'location', 'best')
