@@ -7,7 +7,7 @@ tempDir = '/home/ozzy/Desktop/tmp';
 if ~isdir(tempDir)
     mkdir(tempDir)
 end
-pythonFuncSurf = '/home/ozzy/Desktop/plot_surface.py';
+pythonFuncSurf = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/code/plot_surface.py';
 ldogSurfaceCalc = '/home/ozzy/Desktop/invivo2exvivo';
 threshold = '0.1';
 resampledTempPath = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/2x2x2resampled_invivoTemplate.nii.gz';
