@@ -7,10 +7,7 @@ saveFolder = '/home/ozzy/Desktop/plots';
 if ~isdir(saveFolder)
     mkdir(saveFolder)
 end
-tempDir = '/home/ozzy/Desktop/tmp';
-if ~isdir(tempDir)
-    mkdir(tempDir)
-end
+
 pythonFuncSurf = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/code/plot_surface.py';
 ldogSurfaceCalc = '/home/ozzy/Desktop/invivo2exvivo';
 threshold = '0.2';
@@ -47,42 +44,42 @@ for sub = 1:length(subjects)
                 if contains(analyses{aa}.label, 'forwardmodel')
                     analyses{aa}.label
                     if contains(analyses{aa}.label, 'photoFlicker') && ~contains(analyses{aa}.label, 'noPseudo') && ~contains(analyses{aa}.label, 'LGN') && ~contains(analyses{aa}.label, 'allV1') && ~contains(analyses{aa}.label, 'wholeBrain')
-                        matrix = fullfile(tempDir, 'mtSinai_results.mat');
+                        matrix = fullfile(tempdir, 'mtSinai_results.mat');
                         analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
                         region = 'V1';
                         hemi = 'Pseudo';
                         sessionType = 'photoFlicker';
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
+                        process_matrices(matrix, resampledTempPath, region, hemi, tempdir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
                         region = 'LGN';
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)                        
+                        process_matrices(matrix, resampledTempPath, region, hemi, tempdir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)                        
                     elseif contains(analyses{aa}.label, 'photoFlicker') && contains(analyses{aa}.label, 'noPseudo') && ~contains(analyses{aa}.label, 'LGN') && ~contains(analyses{aa}.label, 'allV1') && ~contains(analyses{aa}.label, 'wholeBrain')
-                        matrix = fullfile(tempDir, 'mtSinai_results.mat');
+                        matrix = fullfile(tempdir, 'mtSinai_results.mat');
                         analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
                         region = 'V1';
                         hemi = 'noPseudo';
                         sessionType = 'photoFlicker';        
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
+                        process_matrices(matrix, resampledTempPath, region, hemi, tempdir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
                         region = 'LGN';
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)                        
+                        process_matrices(matrix, resampledTempPath, region, hemi, tempdir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)                        
                     % Max FLicker
                     elseif contains(analyses{aa}.label, 'maxFlicker') && contains(analyses{aa}.label, 'NoPseudo') && ~contains(analyses{aa}.label, 'LGN') && ~contains(analyses{aa}.label, 'allV1') && ~contains(analyses{aa}.label, 'wholeBrain')
-                        matrix = fullfile(tempDir, 'maxFlicker_results.mat');
+                        matrix = fullfile(tempdir, 'maxFlicker_results.mat');
                         analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
                         sessionType = 'maxFlicker';
                         hemi = 'noPseudoHemi';                      
                         region = 'V1';
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
+                        process_matrices(matrix, resampledTempPath, region, hemi, tempdir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
                         region = 'LGN';
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
+                        process_matrices(matrix, resampledTempPath, region, hemi, tempdir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
                     elseif contains(analyses{aa}.label, 'maxFlicker') && ~contains(analyses{aa}.label, 'NoPseudo') && ~contains(analyses{aa}.label, 'LGN') && ~contains(analyses{aa}.label, 'allV1') && ~contains(analyses{aa}.label, 'wholeBrain')
-                        matrix = fullfile(tempDir, 'maxFlicker_results.mat');
+                        matrix = fullfile(tempdir, 'maxFlicker_results.mat');
                         analyses{aa}.downloadFile([subjects{sub}.label '_mtSinai_results.mat'], matrix);
                         sessionType = 'maxFlicker';
                         hemi = 'pseudoHemi';                      
                         region = 'V1';
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
+                        process_matrices(matrix, resampledTempPath, region, hemi, tempdir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
                         region = 'LGN';
-                        process_matrices(matrix, resampledTempPath, region, hemi, tempDir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
+                        process_matrices(matrix, resampledTempPath, region, hemi, tempdir, pythonFuncSurf, ldogSurfaceCalc, threshold, sessionType, fullfile(saveFolder, subjects{sub}.label, sessions{ses}.label), plotFlat)
                     end
                     
                              
