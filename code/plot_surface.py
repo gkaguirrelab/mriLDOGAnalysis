@@ -59,21 +59,22 @@ def plot_surface(subject_id, invivoTemp, path_to_R2_map, ldog_surface_and_calcul
         loaded_rh_map = nilearn.surface.load_surf_data(rh_map_path)
         left_save_name = os.path.join(output,'%s_left_medial.png' % subject_id)
         right_save_name = os.path.join(output,'%s_right_lateral.png' % subject_id)
+        left_save_name_flattened = os.path.join(output,'%s_left_medial_flattened.png' % subject_id)
+        right_save_name_flattened  = os.path.join(output,'%s_right_lateral_flattened.png' % subject_id)
         
-        if flattenMap == 'True':
-            os.system('freeview --surface %s:patch=%s:curvature_method=binary:overlay=%s:overlay_threshold=%s,1 --cam Elevation 100 --screenshot %s' % (lh_inf,lh_cut,lh_map_path,threshold,left_save_name))
-            os.system('freeview --surface %s:patch=%s:curvature_method=binary:overlay=%s:overlay_threshold=%s,1 --cam Elevation 100 --screenshot %s' % (rh_inf,rh_cut,rh_map_path,threshold,right_save_name))            
-        else:
-            loaded_inflated_left = nilearn.surface.load_surf_mesh(lh_inf)
-            loaded_inflated_right = nilearn.surface.load_surf_mesh(rh_inf)  
-            fig1 = plt.figure(figsize=[11,6])
-            fig2 = plt.figure(figsize=[11,6])
-            fig3 = plt.figure(figsize=[11,6])
-            fig4 = plt.figure(figsize=[11,6])
-            plotting.plot_surf_stat_map(loaded_inflated_left, loaded_lh_map, bg_map=sulc_map_lh,
-                                        threshold=threshold, view='medial', figure=fig1, output_file=left_save_name, vmax=1) 
-            plotting.plot_surf_stat_map(loaded_inflated_right, loaded_rh_map, bg_map=sulc_map_rh,
-                                        threshold=threshold, view='lateral', figure=fig4, output_file=right_save_name, vmax=1)     
+        os.system('freeview --surface %s:patch=%s:curvature_method=binary:overlay=%s:overlay_threshold=%s,1 --cam Elevation 100 --screenshot %s' % (lh_inf,lh_cut,lh_map_path,threshold,left_save_name_flattened))
+        os.system('freeview --surface %s:patch=%s:curvature_method=binary:overlay=%s:overlay_threshold=%s,1 --cam Elevation 100 --screenshot %s' % (rh_inf,rh_cut,rh_map_path,threshold,right_save_name_flattened))            
+
+        loaded_inflated_left = nilearn.surface.load_surf_mesh(lh_inf)
+        loaded_inflated_right = nilearn.surface.load_surf_mesh(rh_inf)  
+        fig1 = plt.figure(figsize=[11,6])
+        fig2 = plt.figure(figsize=[11,6])
+        fig3 = plt.figure(figsize=[11,6])
+        fig4 = plt.figure(figsize=[11,6])
+        plotting.plot_surf_stat_map(loaded_inflated_left, loaded_lh_map, bg_map=sulc_map_lh,
+                                    threshold=threshold, view='medial', figure=fig1, output_file=left_save_name, vmax=1) 
+        plotting.plot_surf_stat_map(loaded_inflated_right, loaded_rh_map, bg_map=sulc_map_rh,
+                                    threshold=threshold, view='lateral', figure=fig4, output_file=right_save_name, vmax=1)     
     elif 'LGN' in subject_id:
         plotting.plot_stat_map(path_to_R2_map, invivoTemp, threshold=threshold, title=subject_id, cut_coords=(7.8, -3.5, -13.5), output_file=os.path.join(output,'%s_LGN.png' % subject_id), vmax=1)
     
