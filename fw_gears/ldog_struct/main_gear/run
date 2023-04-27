@@ -283,8 +283,13 @@ elif transformationMethod == 'wholeMprage-wholeTemplate':
 # Saves some more diagnostic images for registrations
 temporary = '/tempim/'
 os.system('mkdir %s' % temporary)
-make_plot(subject_id, Template, 'NA', 'Warp results', 'im1.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
-make_plot(subject_id, warped_mprage, 'NA', 'Warp results', 'im2.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
+if not os.path.exists(Template_folder):
+    make_plot(subject_id, Template, 'NA', 'Warp results', 'im1.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
+    make_plot(subject_id, warped_mprage, 'NA', 'Warp results', 'im2.png', 131, 105, 45, [0.6, 0.6, 1.4, 0.6, 0.6, 1.4], temporary)
+else:
+    loaded_template = nib.load(Template)
+    make_plot(subject_id, Template, 'NA', 'Warp results', 'im1.png', round(loaded_template.shape[0]//2), round(loaded_template.shape[1]//2), round(loaded_template.shape[2]//2), [1,1,1,1,1,1], temporary)
+    make_plot(subject_id, warped_mprage, 'NA', 'Warp results', 'im2.png', round(loaded_template.shape[0]//2), round(loaded_template.shape[1]//2), round(loaded_template.shape[2]//2), [1,1,1,1,1,1], temporary)    
 make_gif(temporary, subject_id + '_' + 'mprage2template_qa', final_output_dir)
 
 os.system('cp %s %s/' % (MPRAGE_01, T1folder))
