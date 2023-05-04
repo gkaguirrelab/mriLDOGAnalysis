@@ -3,7 +3,8 @@ clear all
 clc
 
 % Set threshold and output dir
-threshold = '0.1,0.5'; % Lower and higher threshold
+thresholdV1 = '0.2,0.5'; % Lower and higher threshold for V1
+thresholdLGN = '0.1,0.5'; % Threshold for LGN
 outputDir = '/home/ozzy/Desktop/averagePlots';
 if ~isdir(outputDir)
     mkdir(outputDir)
@@ -34,7 +35,8 @@ rightSurface = fullfile(ldogSurfaceCalculationFolder, 'Woofsurfer', 'surf', 'rh.
 leftPatch = fullfile(ldogSurfaceCalculationFolder, 'Woofsurfer', 'surf', 'lh.flattened_cut');
 rightPatch = fullfile(ldogSurfaceCalculationFolder, 'Woofsurfer', 'surf', 'rh.flattened_cut');
 invivoTemplate = fullfile('/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/invivoTemplate.nii.gz');
-binaryTemplate = fullfile('/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/binaryTemplate.nii.gz');
+binaryTemplate = fullfile('/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/binaryTemplate_eroded.nii.gz');
+erodedBinaryForLGN = fullfile('/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/binaryTemplate_erodedForLGN.nii.gz');
 identityMatrix = fullfile('/home/ozzy/fsl/etc/flirtsch/ident.mat');
 
 % tempdir 
@@ -99,14 +101,19 @@ for ii = 1:length(analysesIDs)
             system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'rh' ' --o ' rightHemiFile]);
             leftHemiFlattened = fullfile(flattenedOutput, [modelNames{ii} '_' modulationNames{ii} '_left_flattened.png']);
             rightHemiFlattened = fullfile(flattenedOutput,  [modelNames{ii} '_' modulationNames{ii} '_right_flattened.png']);
-            system(['freeview --surface ' leftSurface ':patch=' leftPatch ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' leftHemiFlattened]);
-            system(['freeview --surface ' rightSurface ':patch=' rightPatch ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' rightHemiFlattened]);
+            system(['freeview --surface ' leftSurface ':patch=' leftPatch ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' thresholdV1 ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' leftHemiFlattened]);
+            system(['freeview --surface ' rightSurface ':patch=' rightPatch ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' thresholdV1 ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' rightHemiFlattened]);
             leftHemiInflated = fullfile(inflatedOutput, [modelNames{ii} '_' modulationNames{ii} '_left_inflated.png']);
             rightHemiInflated = fullfile(inflatedOutput,  [modelNames{ii} '_' modulationNames{ii} '_right_inflated.png']);
-            system(['freeview --surface ' leftSurface ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Azimuth 180 --viewport 3d --colorscale --screenshot ' leftHemiInflated]);
-            system(['freeview --surface ' rightSurface ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --viewport 3d --colorscale --screenshot ' rightHemiInflated]); 
+            system(['freeview --surface ' leftSurface ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' thresholdV1 ' --cam Azimuth 180 --viewport 3d --colorscale --screenshot ' leftHemiInflated]);
+            system(['freeview --surface ' rightSurface ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' thresholdV1 ' --viewport 3d --colorscale --screenshot ' rightHemiInflated]); 
+            erodedResample = fullfile(tempdir, ['eroded_resampled_' modelNames{ii} '_' modulationNames{ii} '.nii.gz']);
+            binaryForLGN = MRIread(erodedBinaryForLGN);
+            binaryForLGN = binaryForLGN.vol;
+            resampledImageLoaded.vol(find(binaryForLGN == 0)) = 0;
+            MRIwrite(resampledImageLoaded, erodedResample);
             lgnVolume = fullfile(lgnOutput,  [modelNames{ii} '_' modulationNames{ii} '_LGN.png']);
-            system(['freeview --volume ' invivoTemplate ' --volume ' resampledImage ':colormap=heat:heatscale=' threshold ' --slice 154 124 43 --viewport y --colorscale --screenshot ' lgnVolume])
+            system(['freeview --volume ' invivoTemplate ':grayscale=70,310' ' --volume ' erodedResample ':colormap=heat:opacity=1:heatscale=' thresholdLGN ' --slice 154 124 43 --viewport y --colorscale --screenshot ' lgnVolume])
         end
     end
 end
