@@ -57,7 +57,6 @@ jitterLeft = 0.9;
 jitterRight = 1.9;
 groupColors = {[1 0 0],[0 1 0],[0 0 1]};
 for ii = 1:3
-    x = categorical({'contra', 'ipsi'});
     hold on 
     plot([jitterLeft jitterLeft],[leftHemiCI(1,ii) leftHemiCI(2,ii)], '-', 'LineWidth',2, 'Color', groupColors{ii})
     plt{ii} = plot(jitterLeft, leftHemiMeans(ii), 'o', 'MarkerFaceColor', groupColors{ii}, 'MarkerEdgeColor', groupColors{ii});
