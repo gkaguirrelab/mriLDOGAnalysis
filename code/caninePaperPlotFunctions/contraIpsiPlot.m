@@ -30,44 +30,97 @@ rightHemi = find(rightHemi.vol(:));
 sessionID = '61f8259d9c5e882ac6ff49da';
 analysisList = fw.getSessionAnalyses(sessionID);
 analysisSaveName = fullfile(saveDir, 'N344_mtSinai_results.mat');
+volumeSaveName = fullfile(saveDir, 'N344_maps_volumetric.zip');
+
+% surface calculation folder
+ldogSurfaceCalculationFolder = '/home/ozzy/Desktop/invivo2exvivo/';
+origImage = fullfile(ldogSurfaceCalculationFolder, 'Woofsurfer', 'mri', 'T1.nii');
+warp = fullfile(ldogSurfaceCalculationFolder,'exvivo_warp_files', 'toEx1Warp.nii.gz');
+secondaryLinear = fullfile(ldogSurfaceCalculationFolder,'exvivo_warp_files', 'secondLinearAnts.mat');
+primaryLinear = fullfile(ldogSurfaceCalculationFolder,'exvivo_warp_files', 'initialLinearAnts.mat');
+registerDat = fullfile(ldogSurfaceCalculationFolder, 'exvivo_warp_files', 'register.dat');
+leftSurface = fullfile(ldogSurfaceCalculationFolder, 'Woofsurfer', 'surf', 'lh.inflated');
+rightSurface = fullfile(ldogSurfaceCalculationFolder, 'Woofsurfer', 'surf', 'rh.inflated');
+leftPatch = fullfile(ldogSurfaceCalculationFolder, 'Woofsurfer', 'surf', 'lh.flattened_cut');
+rightPatch = fullfile(ldogSurfaceCalculationFolder, 'Woofsurfer', 'surf', 'rh.flattened_cut');
+invivoTemplate = fullfile('/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/invivoTemplate.nii.gz');
+binaryTemplate = fullfile('/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/binaryTemplate_eroded.nii.gz');
+erodedBinaryForLGN = fullfile('/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/invivo/binaryTemplate_erodedForLGN.nii.gz');
+identityMatrix = fullfile('/home/ozzy/fsl/etc/flirtsch/ident.mat');
 
 for ii = 1:length(analysisList)
     if contains(analysisList{ii}.label, 'IpsiContra')
         analysis = analysisList{ii};
         fw.downloadOutputFromAnalysis(analysis.id,"N344_mtSinai_results.mat",analysisSaveName);
+        fw.downloadOutputFromAnalysis(analysis.id,"N344_maps_volumetric.zip",volumeSaveName);
+        unzip(volumeSaveName, saveDir)
     end
 end
 load(analysisSaveName)
 
 % Mask the results
-leftHemiMasked = results.params(leftHemi, 1:18);
-rightHemiMasked = results.params(rightHemi, 1:18);
+leftHemiMaskedVertexMean = nanmean(results.params(leftHemi, 1:18));
+rightHemiMaskedVertexMean = nanmean(results.params(rightHemi, 1:18));
 
-leftHemiData = [nanmean(leftHemiMasked(:,[1:3, 10:12]),2), nanmean(leftHemiMasked(:,[4:6, 13:15]),2), nanmean(leftHemiMasked(:,[7:9, 16:18]),2)];
-rightHemiData = [nanmean(rightHemiMasked(:,[1:3, 10:12]),2), nanmean(rightHemiMasked(:,[4:6, 13:15]),2), nanmean(rightHemiMasked(:,[7:9, 16:18]),2)];
+leftHemiMeans = [nanmean(leftHemiMaskedVertexMean([1:3, 10:12])), nanmean(leftHemiMaskedVertexMean([4:6, 13:15])), nanmean(leftHemiMaskedVertexMean([7:9, 16:18]))];
+rightHemiMeans = [nanmean(rightHemiMaskedVertexMean([1:3, 10:12])), nanmean(rightHemiMaskedVertexMean([4:6, 13:15])), nanmean(rightHemiMaskedVertexMean([7:9, 16:18]))];
 
-% Get bootstrapped means and confidence intervals 
-[leftHemiCI,leftHemiMeans] = bootci(1000,{@(x)mean(x,'omitnan'),leftHemiData});
-[rightHemiCI,rightHemiMeans] = bootci(1000,{@(x)mean(x,'omitnan'),rightHemiData});
-leftHemiMeans = mean(leftHemiMeans);
-rightHemiMeans = mean(rightHemiMeans);
+leftHemiSE = [std(leftHemiMaskedVertexMean([1:3, 10:12]))/sqrt(length(leftHemiMaskedVertexMean([1:3, 10:12]))), std(leftHemiMaskedVertexMean([4:6, 13:15]))/sqrt(length(leftHemiMaskedVertexMean([4:6, 13:15]))), std(leftHemiMaskedVertexMean([7:9, 16:18]))/sqrt(length(leftHemiMaskedVertexMean([7:9, 16:18])))];
+rightHemiSE = [std(rightHemiMaskedVertexMean([1:3, 10:12]))/sqrt(length(rightHemiMaskedVertexMean([1:3, 10:12]))), std(rightHemiMaskedVertexMean([4:6, 13:15]))/sqrt(length(rightHemiMaskedVertexMean([4:6, 13:15]))), std(rightHemiMaskedVertexMean([7:9, 16:18]))/sqrt(length(rightHemiMaskedVertexMean([7:9, 16:18])))];
 
 % Plot
-jitterLeft = 0.9;
-jitterRight = 1.9;
-groupColors = {[1 0 0],[0 1 0],[0 0 1]};
+jitterWithin = 0.2;
+jitterBetween = 2;
+colors = [0.5 0.5 0.5];
+figure
 for ii = 1:3
     hold on 
-    plot([jitterLeft jitterLeft],[leftHemiCI(1,ii) leftHemiCI(2,ii)], '-', 'LineWidth',2, 'Color', groupColors{ii})
-    plt{ii} = plot(jitterLeft, leftHemiMeans(ii), 'o', 'MarkerFaceColor', groupColors{ii}, 'MarkerEdgeColor', groupColors{ii});
-    jitterLeft = jitterLeft + 0.1;
+    plt{ii} = plot(jitterBetween, leftHemiMeans(ii), 'o', 'MarkerFaceColor', colors, 'MarkerEdgeColor', colors);
+    plot([jitterBetween jitterBetween],[leftHemiMeans(ii)+leftHemiSE(ii) leftHemiMeans(ii)+leftHemiSE(ii)], '-', 'LineWidth',2, 'Color', colors)
     
-    plot([jitterRight jitterRight],[rightHemiCI(1,ii) rightHemiCI(2,ii)], '-', 'LineWidth',2, 'Color', groupColors{ii})
-    plot(jitterRight, rightHemiMeans(ii), 'o', 'MarkerFaceColor', groupColors{ii}, 'MarkerEdgeColor', groupColors{ii}) 
-    jitterRight = jitterRight + 0.1;
-
+    plt{ii+3} = plot(jitterBetween+jitterWithin, rightHemiMeans(ii), 's', 'MarkerFaceColor', colors, 'MarkerEdgeColor', colors);
+    plot([jitterBetween+jitterWithin jitterBetween+jitterWithin],[rightHemiMeans(ii)+rightHemiSE(ii) rightHemiMeans(ii)+rightHemiSE(ii)], '-', 'LineWidth',2, 'Color', [0.5 0.5 0.5])
+    
+    jitterBetween = jitterBetween+1;
 end
 ylim([0 1])
-xticks([1:2]);
-xticklabels({'contra','ipsi'});
-legend([plt{:}], {'N347','N349','N344'}, 'location', 'best')
+xticks([2.1:4.1]);
+xlim([1.8,4.5])
+xticklabels({'N347','N349','N344'});
+legend([plt{1}, plt{4}], {'contra','ipsi'}, 'location', 'best')
+ylabel('beta')
+
+% Get the flatten maps
+output = '/home/ozzy/Desktop/ipsiContraSave';
+if ~isfolder(output)
+    mkdir(output)
+end
+
+% Save surface plots
+setenv('LD_LIBRARY_PATH', ['/usr/lib/x86_64-linux-gnu:',getenv('LD_LIBRARY_PATH')]);
+threshold = '0.2,0.5';
+r2Results = fullfile(saveDir, 'N344_R2_map.nii.gz');
+resampledImage = fullfile(saveDir, ['resampled_R2.nii.gz']);
+system(['flirt -in ' r2Results ' -ref ' invivoTemplate ' -interp nearestneighbour -applyxfm -init ' identityMatrix ' -o ' resampledImage])
+resampledImageLoaded = MRIread(resampledImage);
+binaryImage = MRIread(binaryTemplate);
+binaryImage = binaryImage.vol;
+resampledImageLoaded.vol(find(binaryImage == 0)) = 0;
+MRIwrite(resampledImageLoaded, resampledImage);
+interpolatedMap = fullfile(saveDir, 'interpolatedMap.nii.gz');
+system(['antsApplyTransforms -d 3 -i ' r2Results ' -r ' origImage ' -o ' interpolatedMap ' -t ' warp ' -t ' secondaryLinear ' -t ' primaryLinear])
+leftHemiFile = fullfile(saveDir, 'lh.mgz');
+rightHemiFile = fullfile(saveDir, 'rh.mgz');
+system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'lh' ' --o ' leftHemiFile]);
+system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'rh' ' --o ' rightHemiFile]);
+leftHemiFlattened = fullfile(output, 'left_flattened.png');
+rightHemiFlattened = fullfile(output,  'right_flattened.png');
+system(['freeview --surface ' leftSurface ':patch=' leftPatch ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' leftHemiFlattened ' 2']);
+system(['freeview --surface ' rightSurface ':patch=' rightPatch ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' rightHemiFlattened ' 2']);
+leftHemiInflated = fullfile(output, 'left_inflated.png');
+rightHemiInflated = fullfile(output,  'right_inflated.png');
+system(['freeview --surface ' leftSurface ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Azimuth 180 --viewport 3d --colorscale --screenshot ' leftHemiInflated ' 2']);
+system(['freeview --surface ' rightSurface ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --viewport 3d --colorscale --screenshot ' rightHemiInflated ' 2']);
+
+
+
