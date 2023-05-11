@@ -76,10 +76,10 @@ figure
 for ii = 1:3
     hold on 
     plt{ii} = plot(jitterBetween, leftHemiMeans(ii), 'o', 'MarkerFaceColor', colors, 'MarkerEdgeColor', colors);
-    plot([jitterBetween jitterBetween],[leftHemiMeans(ii)+leftHemiSE(ii) leftHemiMeans(ii)+leftHemiSE(ii)], '-', 'LineWidth',2, 'Color', colors)
+    plot([jitterBetween jitterBetween],[leftHemiMeans(ii)-leftHemiSE(ii) leftHemiMeans(ii)+leftHemiSE(ii)], '-', 'LineWidth',2, 'Color', colors)
     
     plt{ii+3} = plot(jitterBetween+jitterWithin, rightHemiMeans(ii), 's', 'MarkerFaceColor', colors, 'MarkerEdgeColor', colors);
-    plot([jitterBetween+jitterWithin jitterBetween+jitterWithin],[rightHemiMeans(ii)+rightHemiSE(ii) rightHemiMeans(ii)+rightHemiSE(ii)], '-', 'LineWidth',2, 'Color', [0.5 0.5 0.5])
+    plot([jitterBetween+jitterWithin jitterBetween+jitterWithin],[rightHemiMeans(ii)-rightHemiSE(ii) rightHemiMeans(ii)+rightHemiSE(ii)], '-', 'LineWidth',2, 'Color', [0.5 0.5 0.5])
     
     jitterBetween = jitterBetween+1;
 end
@@ -121,6 +121,3 @@ leftHemiInflated = fullfile(output, 'left_inflated.png');
 rightHemiInflated = fullfile(output,  'right_inflated.png');
 system(['freeview --surface ' leftSurface ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Azimuth 180 --viewport 3d --colorscale --screenshot ' leftHemiInflated ' 2']);
 system(['freeview --surface ' rightSurface ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --viewport 3d --colorscale --screenshot ' rightHemiInflated ' 2']);
-
-
-
