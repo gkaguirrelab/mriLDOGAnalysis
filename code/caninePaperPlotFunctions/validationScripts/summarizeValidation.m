@@ -208,38 +208,39 @@ for ee = 1:length(experiment)
         luminanceValsMean{mod} = mean(averageLum);
         luminanceValsStd{mod} = std(averageLum);
         
-        % Drop the bad subject and make a new table for stimulus types
+        % Drop the bad subject and make a new table for stimulus types. 
+        % Multiply those by 100 
         modulationName = modulations{mod};
         averageLplusS = (averageLCone + averageSCone)/2;
         averageLminusS = (averageLCone - averageSCone)/2;
-        averageLplusSMean = mean(averageLplusS);
-        averageLplusSSD = std(averageLplusS);
-        averageLminusSMean = mean(averageLminusS);
-        averageLminusSSD = std(averageLminusS); 
-        averageMelMean = mean(averageMel);
-        averageMelStd = std(averageMel);
-        averageRodMean = mean(averageRod);
-        averageRodStd = std(averageRod);
+        averageLplusSMean = mean(averageLplusS)*100;
+        averageLplusSSD = std(averageLplusS)*100;
+        averageLminusSMean = mean(averageLminusS)*100;
+        averageLminusSSD = std(averageLminusS)*100; 
+        averageMelMean = mean(averageMel)*100;
+        averageMelStd = std(averageMel)*100;
+        averageRodMean = mean(averageRod)*100;
+        averageRodStd = std(averageRod)*100;
         
-        table2 = table(convertCharsToStrings(modulationName), convertCharsToStrings(num2str(averageLplusSMean,'%.4f')), convertCharsToStrings(num2str(averageLplusSSD,'%.4f')), ...
-                       convertCharsToStrings(num2str(averageLminusSMean,'%.4f')), convertCharsToStrings(num2str(averageLminusSSD,'%.4f')), ...
-                       convertCharsToStrings(num2str(averageMelMean,'%.4f')), convertCharsToStrings(num2str(averageMelStd,'%.4f')), ...
-                       convertCharsToStrings(num2str(averageRodMean,'%.4f')), convertCharsToStrings(num2str(averageRodStd,'%.4f')));
+        table2 = table(convertCharsToStrings(modulationName), convertCharsToStrings(num2str(averageLplusSMean,'%.1f')), convertCharsToStrings(num2str(averageLplusSSD,'%.1f')), ...
+                       convertCharsToStrings(num2str(averageLminusSMean,'%.1f')), convertCharsToStrings(num2str(averageLminusSSD,'%.1f')), ...
+                       convertCharsToStrings(num2str(averageMelMean,'%.1f')), convertCharsToStrings(num2str(averageMelStd,'%.1f')), ...
+                       convertCharsToStrings(num2str(averageRodMean,'%.1f')), convertCharsToStrings(num2str(averageRodStd,'%.1f')));
         table2.Properties.VariableNames = {'Modulation', 'LplusS Mean', 'LplusS SD', ...
                                            'LminusS Mean', 'LminusS SD', ...
                                            'Mel Mean', 'Mel SD', 'Rod Mean', 'Rod SD'};
         
         summaryTable_postRecept = [summaryTable_postRecept; table2];
 
-        meanLcone = mean(averageLCone);
-        stdLcone = std(averageLCone);
-        meanScone = mean(averageSCone);
-        stdScone = std(averageSCone);
+        meanLcone = mean(averageLCone)*100;
+        stdLcone = std(averageLCone)*100;
+        meanScone = mean(averageSCone)*100;
+        stdScone = std(averageSCone)*100;
         
-        table3 = table(convertCharsToStrings(modulationName), convertCharsToStrings(num2str(meanLcone,'%.4f')), convertCharsToStrings(num2str(stdLcone,'%.4f')), ...
-                       convertCharsToStrings(num2str(meanScone,'%.4f')), convertCharsToStrings(num2str(stdScone,'%.4f')), ...
-                       convertCharsToStrings(num2str(averageMelMean,'%.4f')), convertCharsToStrings(num2str(averageMelStd,'%.4f')), ...
-                       convertCharsToStrings(num2str(averageRodMean,'%.4f')), convertCharsToStrings(num2str(averageRodStd,'%.4f')));
+        table3 = table(convertCharsToStrings(modulationName), convertCharsToStrings(num2str(meanLcone,'%.1f')), convertCharsToStrings(num2str(stdLcone,'%.1f')), ...
+                       convertCharsToStrings(num2str(meanScone,'%.1f')), convertCharsToStrings(num2str(stdScone,'%.1f')), ...
+                       convertCharsToStrings(num2str(averageMelMean,'%.1f')), convertCharsToStrings(num2str(averageMelStd,'%.1f')), ...
+                       convertCharsToStrings(num2str(averageRodMean,'%.1f')), convertCharsToStrings(num2str(averageRodStd,'%.1f')));
         table3.Properties.VariableNames = {'Modulation', 'L Cone Mean', 'L Cone SD', ...
                                            'S Cone Mean', 'S Cone SD', ...
                                            'Mel Mean', 'Mel SD', 'Rod Mean', 'Rod SD'};
