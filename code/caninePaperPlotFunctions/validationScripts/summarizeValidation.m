@@ -1,26 +1,37 @@
+% NOTE THAT THE SCRIPT IS ONLY ANALYSING THE SUBJECTS WE ARE USING IN THE 
+% PAPER AND EVEN THEN MISSING A FEW OF THEM AS THEY DIDN'T HAVE VALIDATIONS
+% DONE.
+
 % This script makes validation tables from the folders in LDOG_processing
 % which are created by the visualizeValidation.m script.
 clear all; clc
 
 % Set dropbox path
-dropboxBaseDir = getpref('pupilLDOGAnalysis','dropboxBaseDir');
+dropboxBaseDir = '/home/ozzy/Aguirre-Brainard Lab Dropbox/Ozenc Taskin';
 
 % We want to get the validations for MRI and pupil sessions. The pupil 
 % stimulus file sets path to MRScotoLDOG, so the sessions are in there
 experiment = {'MRFlickerLDOG', 'MRScotoLDOG'};
 
 % Subject and sessions to include in the table. This includes both pupil 
-% and fmri sessions
-subjectsMRI = {'2346', '2350', '2356', 'N344', 'N347', 'N349', 'Z663', ...
-               'Z665', 'Z666'};
-sessionsMRI = {'2022-05-19', '2020-11-23', '2021-01-11', '2021-04-08', ...
-               '2022-01-31', '2021-11-12', '2020-11-06', '2020-11-06', ...
-               '2020-11-19'};
-subjectsPupil = {'2350', '2353', '2356', 'N344', 'N349', ...
-                 'Z663', 'Z665', 'Z666'};
-sessionsPupil = {'2020-12-11', '2020-10-20', '2020-12-11', ...
-                 '2020-10-14', '2021-08-24', '2020-08-20', '2020-10-14', ...
-                 '2020-12-11'};
+% and fmri sessions   
+subjectsMRI = {'2346', '2350', '2353', ...
+            'N344', 'N347', 'N349', ...
+            'Z663', 'Z665', 'Z666', 'Z710', 'Z709', ...
+            'WM65', 'AS2454', 'AS2451'};
+sessionsMRI = {'2022-05-19', '2020-11-23', '2021-01-08', ...
+                '2021-04-08', '2022-01-31', '2021-11-12', ...
+                '2020-11-06', '2020-11-06', '2020-11-19', '2023-01-04', '2023-01-05', ...
+                '2022-09-09', '2023-03-30', '2023-04-19'};           
+                
+         
+% Subject list
+subjectsPupil = {'N344', 'N349', ...
+                '2350', '2353', 'Z663'};
+
+sessionsPupil = {'2020-10-14', '2021-08-24', ...
+                '2020-12-11', '2020-10-20', '2020-08-20'};            
+             
 
 % Loop through validation directionObjects and organize tables 
 for ee = 1:length(experiment)
