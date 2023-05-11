@@ -54,7 +54,7 @@ p.parse(pathParams, varargin{:})
 % Load the directionObject if pathParams is specified, construct the paths
 if isstruct(pathParams)
     % set common path params
-    dropboxBaseDir = getpref('pupilLDOGAnalysis','dropboxBaseDir');
+    dropboxBaseDir = '/home/ozzy/Aguirre-Brainard Lab Dropbox/Ozenc Taskin';
     pathParams.dataSourceDirRoot = fullfile(dropboxBaseDir,'LDOG_data');
     pathParams.dataOutputDirRoot = fullfile(dropboxBaseDir,'LDOG_processing');
     
@@ -132,10 +132,26 @@ else
     % Loop through directions and save the validation summary for each
     % condition
     for ii = 1:fieldlength
+
+        % If SPD error is zero that means we skipped the validation
+        if isequal(ii,1)
+            indexToDrop = [];
+            for tt = 1:length(AllDirections.(fn{1,ii}).describe.validation)
+                if isequal(mean(AllDirections.(fn{1,ii}).describe.validation(tt).SPDcombined(1).error), 0) 
+                    indexToDrop = [indexToDrop tt];
+                end
+            end
+        end
+
+        % Drop the indices       
+        if ~isempty(indexToDrop)
+            AllDirections.(fn{1,ii}).describe.validation([indexToDrop]) = [];
+            indexToDrop = [];
+        end
         
         % Get the number of validations
-        validationNum = size(LightFluxDirection.describe.validation,2);
-
+        validationNum = size(LightFluxDirection.describe.validation,2);        
+        
         % Get the pre and post val cells
         if isequal(validationNum, 10)
             precellGotValidation = {AllDirections.(fn{1,ii}).describe.validation(1:(validationNum/2)).luminanceActual};
@@ -143,7 +159,7 @@ else
         elseif isequal(validationNum, 5)
             precellGotValidation = {AllDirections.(fn{1,ii}).describe.validation(1:end).luminanceActual};
             postcellGotValidation = [];
-        else
+        else            
             error('There are usually 5 or 10 validations depending on whether there is a post validation or not. You have a different amount. Check if everything is okay with your validation')
         end
         
