@@ -69,26 +69,29 @@ leftHemiSE = [std(leftHemiMaskedVertexMean([1:3, 10:12]))/sqrt(length(leftHemiMa
 rightHemiSE = [std(rightHemiMaskedVertexMean([1:3, 10:12]))/sqrt(length(rightHemiMaskedVertexMean([1:3, 10:12]))), std(rightHemiMaskedVertexMean([4:6, 13:15]))/sqrt(length(rightHemiMaskedVertexMean([4:6, 13:15]))), std(rightHemiMaskedVertexMean([7:9, 16:18]))/sqrt(length(rightHemiMaskedVertexMean([7:9, 16:18])))];
 
 % Plot
-jitterWithin = 0.2;
+jitterWithin = 0.1;
 jitterBetween = 2;
-colors = [0.5 0.5 0.5];
+colors = {[1 0 0], [0.5 0.5 0.5]};
 figure
 for ii = 1:3
     hold on 
-    plt{ii} = plot(jitterBetween, leftHemiMeans(ii), 'o', 'MarkerFaceColor', colors, 'MarkerEdgeColor', colors);
-    plot([jitterBetween jitterBetween],[leftHemiMeans(ii)-leftHemiSE(ii) leftHemiMeans(ii)+leftHemiSE(ii)], '-', 'LineWidth',2, 'Color', colors)
+    plot([jitterBetween jitterBetween],[leftHemiMeans(ii)-leftHemiSE(ii) leftHemiMeans(ii)+leftHemiSE(ii)], '-', 'LineWidth',2, 'Color', colors{1})
+    plt{ii} = plot(jitterBetween, leftHemiMeans(ii), 'o', 'MarkerFaceColor', colors{1}, 'MarkerEdgeColor', colors{1}, 'MarkerSize', 6, 'MarkerEdgeColor','k');    
     
-    plt{ii+3} = plot(jitterBetween+jitterWithin, rightHemiMeans(ii), 's', 'MarkerFaceColor', colors, 'MarkerEdgeColor', colors);
-    plot([jitterBetween+jitterWithin jitterBetween+jitterWithin],[rightHemiMeans(ii)-rightHemiSE(ii) rightHemiMeans(ii)+rightHemiSE(ii)], '-', 'LineWidth',2, 'Color', [0.5 0.5 0.5])
+    plot([jitterBetween+jitterWithin jitterBetween+jitterWithin],[rightHemiMeans(ii)-rightHemiSE(ii) rightHemiMeans(ii)+rightHemiSE(ii)], '-', 'LineWidth',2, 'Color', colors{2})
+    plt{ii+3} = plot(jitterBetween+jitterWithin, rightHemiMeans(ii), 's', 'MarkerFaceColor', colors{2}, 'MarkerEdgeColor', colors{2}, 'MarkerSize', 6, 'MarkerEdgeColor','k');
+
     
     jitterBetween = jitterBetween+1;
 end
-ylim([0 1])
-xticks([2.1:4.1]);
+ylim([0 0.8])
+yticks([0:0.2:0.8])
+xticks([2.05:4.05]);
 xlim([1.8,4.5])
 xticklabels({'N347','N349','N344'});
+plot([1.8,4.5],[0 0],':k')
 legend([plt{1}, plt{4}], {'contra','ipsi'}, 'location', 'best')
-ylabel('beta')
+ylabel('BOLD response [%d]')
 
 % Get the flatten maps
 output = '/home/ozzy/Desktop/ipsiContraSave';
