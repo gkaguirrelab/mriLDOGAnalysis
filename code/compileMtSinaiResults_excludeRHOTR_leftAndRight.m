@@ -63,7 +63,7 @@ for ss = 1:length(sessionIDs)
         idx = length(analysisList);
         while any(stillSearching)
             thisLabel = analysisList{idx}.label;
-            roiMatches = cellfun(@(x) and(contains(thisLabel,x),contains(thisLabel,theModelUsed)),ROIs);
+            roiMatches = cellfun(@(x) all([contains(thisLabel,x),contains(thisLabel,theModelUsed),~contains(thisLabel,'noPseudo')]),ROIs);
             if any(roiMatches)
                 analysisIDs{ss,find(roiMatches)}{rr} = analysisList{idx}.id;
                 stillSearching(find(roiMatches)) = false;

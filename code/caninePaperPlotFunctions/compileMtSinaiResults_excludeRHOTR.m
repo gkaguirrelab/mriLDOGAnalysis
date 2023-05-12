@@ -60,7 +60,7 @@ for ss = 1:length(sessionIDs)
         idx = length(analysisList);
         while any(stillSearching)
             thisLabel = analysisList{idx}.label;
-            roiMatches = cellfun(@(x) and(contains(thisLabel,x),contains(thisLabel,theModelUsed)),ROIs);
+            roiMatches = cellfun(@(x) all([contains(thisLabel,x),contains(thisLabel,theModelUsed),~contains(thisLabel,'noPseudo')]),ROIs);
             if any(roiMatches)
                 analysisIDs{ss,find(roiMatches)}{rr} = analysisList{idx}.id;
                 stillSearching(find(roiMatches)) = false;
@@ -164,7 +164,7 @@ for xx=1:nGroups
             if strcmp(ROIs(zz),'allV1')
                 ylim([-0.2, 0.6])      
             end            
-            ylabel('BOLD response [%d]')
+            ylabel('BOLD response [%△]')
         end
     end
 end
