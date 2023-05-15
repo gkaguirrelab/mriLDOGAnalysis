@@ -62,11 +62,11 @@ load(analysisSaveName)
 leftHemiMaskedVertexMean = nanmean(results.params(leftHemi, 1:18));
 rightHemiMaskedVertexMean = nanmean(results.params(rightHemi, 1:18));
 
-leftHemiMeans = [nanmean(leftHemiMaskedVertexMean([1:3, 10:12])), nanmean(leftHemiMaskedVertexMean([4:6, 13:15])), nanmean(leftHemiMaskedVertexMean([7:9, 16:18]))];
-rightHemiMeans = [nanmean(rightHemiMaskedVertexMean([1:3, 10:12])), nanmean(rightHemiMaskedVertexMean([4:6, 13:15])), nanmean(rightHemiMaskedVertexMean([7:9, 16:18]))];
+leftHemiMeans = [nanmean(leftHemiMaskedVertexMean([4:6, 13:15])), nanmean(leftHemiMaskedVertexMean([1:3, 10:12])), nanmean(leftHemiMaskedVertexMean([7:9, 16:18]))];
+rightHemiMeans = [nanmean(rightHemiMaskedVertexMean([4:6, 13:15])), nanmean(rightHemiMaskedVertexMean([1:3, 10:12])), nanmean(rightHemiMaskedVertexMean([7:9, 16:18]))];
 
-leftHemiSE = [std(leftHemiMaskedVertexMean([1:3, 10:12]))/sqrt(length(leftHemiMaskedVertexMean([1:3, 10:12]))), std(leftHemiMaskedVertexMean([4:6, 13:15]))/sqrt(length(leftHemiMaskedVertexMean([4:6, 13:15]))), std(leftHemiMaskedVertexMean([7:9, 16:18]))/sqrt(length(leftHemiMaskedVertexMean([7:9, 16:18])))];
-rightHemiSE = [std(rightHemiMaskedVertexMean([1:3, 10:12]))/sqrt(length(rightHemiMaskedVertexMean([1:3, 10:12]))), std(rightHemiMaskedVertexMean([4:6, 13:15]))/sqrt(length(rightHemiMaskedVertexMean([4:6, 13:15]))), std(rightHemiMaskedVertexMean([7:9, 16:18]))/sqrt(length(rightHemiMaskedVertexMean([7:9, 16:18])))];
+leftHemiSE = [std(leftHemiMaskedVertexMean([4:6, 13:15]))/sqrt(length(leftHemiMaskedVertexMean([4:6, 13:15]))), std(leftHemiMaskedVertexMean([1:3, 10:12]))/sqrt(length(leftHemiMaskedVertexMean([1:3, 10:12]))), std(leftHemiMaskedVertexMean([7:9, 16:18]))/sqrt(length(leftHemiMaskedVertexMean([7:9, 16:18])))];
+rightHemiSE = [std(rightHemiMaskedVertexMean([4:6, 13:15]))/sqrt(length(rightHemiMaskedVertexMean([4:6, 13:15]))), std(rightHemiMaskedVertexMean([1:3, 10:12]))/sqrt(length(rightHemiMaskedVertexMean([1:3, 10:12]))), std(rightHemiMaskedVertexMean([7:9, 16:18]))/sqrt(length(rightHemiMaskedVertexMean([7:9, 16:18])))];
 
 % Plot
 jitterWithin = 0.1;
@@ -88,7 +88,7 @@ ylim([0 0.8])
 yticks([0:0.2:0.8])
 xticks([2.05:4.05]);
 xlim([1.8,4.5])
-xticklabels({'N347','N349','N344'});
+xticklabels({'N349','N347','N344'});
 plot([1.8,4.5],[0 0],':k')
 legend([plt{1}, plt{4}], {'contra','ipsi'}, 'location', 'best')
 ylabel('BOLD response [%d]')
@@ -98,29 +98,29 @@ output = '/home/ozzy/Desktop/ipsiContraSave';
 if ~isfolder(output)
     mkdir(output)
 end
-
-% Save surface plots
-setenv('LD_LIBRARY_PATH', ['/usr/lib/x86_64-linux-gnu:',getenv('LD_LIBRARY_PATH')]);
-threshold = '0.2,0.5';
-r2Results = fullfile(saveDir, 'N344_R2_map.nii.gz');
-resampledImage = fullfile(saveDir, ['resampled_R2.nii.gz']);
-system(['flirt -in ' r2Results ' -ref ' invivoTemplate ' -interp nearestneighbour -applyxfm -init ' identityMatrix ' -o ' resampledImage])
-resampledImageLoaded = MRIread(resampledImage);
-binaryImage = MRIread(binaryTemplate);
-binaryImage = binaryImage.vol;
-resampledImageLoaded.vol(find(binaryImage == 0)) = 0;
-MRIwrite(resampledImageLoaded, resampledImage);
-interpolatedMap = fullfile(saveDir, 'interpolatedMap.nii.gz');
-system(['antsApplyTransforms -d 3 -i ' r2Results ' -r ' origImage ' -o ' interpolatedMap ' -t ' warp ' -t ' secondaryLinear ' -t ' primaryLinear])
-leftHemiFile = fullfile(saveDir, 'lh.mgz');
-rightHemiFile = fullfile(saveDir, 'rh.mgz');
-system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'lh' ' --o ' leftHemiFile]);
-system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'rh' ' --o ' rightHemiFile]);
-leftHemiFlattened = fullfile(output, 'left_flattened.png');
-rightHemiFlattened = fullfile(output,  'right_flattened.png');
-system(['freeview --surface ' leftSurface ':patch=' leftPatch ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' leftHemiFlattened ' 2']);
-system(['freeview --surface ' rightSurface ':patch=' rightPatch ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' rightHemiFlattened ' 2']);
-leftHemiInflated = fullfile(output, 'left_inflated.png');
-rightHemiInflated = fullfile(output,  'right_inflated.png');
-system(['freeview --surface ' leftSurface ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Azimuth 180 --viewport 3d --colorscale --screenshot ' leftHemiInflated ' 2']);
-system(['freeview --surface ' rightSurface ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --viewport 3d --colorscale --screenshot ' rightHemiInflated ' 2']);
+% 
+% % Save surface plots
+% setenv('LD_LIBRARY_PATH', ['/usr/lib/x86_64-linux-gnu:',getenv('LD_LIBRARY_PATH')]);
+% threshold = '0.2,0.5';
+% r2Results = fullfile(saveDir, 'N344_R2_map.nii.gz');
+% resampledImage = fullfile(saveDir, ['resampled_R2.nii.gz']);
+% system(['flirt -in ' r2Results ' -ref ' invivoTemplate ' -interp nearestneighbour -applyxfm -init ' identityMatrix ' -o ' resampledImage])
+% resampledImageLoaded = MRIread(resampledImage);
+% binaryImage = MRIread(binaryTemplate);
+% binaryImage = binaryImage.vol;
+% resampledImageLoaded.vol(find(binaryImage == 0)) = 0;
+% MRIwrite(resampledImageLoaded, resampledImage);
+% interpolatedMap = fullfile(saveDir, 'interpolatedMap.nii.gz');
+% system(['antsApplyTransforms -d 3 -i ' r2Results ' -r ' origImage ' -o ' interpolatedMap ' -t ' warp ' -t ' secondaryLinear ' -t ' primaryLinear])
+% leftHemiFile = fullfile(saveDir, 'lh.mgz');
+% rightHemiFile = fullfile(saveDir, 'rh.mgz');
+% system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'lh' ' --o ' leftHemiFile]);
+% system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'rh' ' --o ' rightHemiFile]);
+% leftHemiFlattened = fullfile(output, 'left_flattened.png');
+% rightHemiFlattened = fullfile(output,  'right_flattened.png');
+% system(['freeview --surface ' leftSurface ':patch=' leftPatch ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' leftHemiFlattened ' 2']);
+% system(['freeview --surface ' rightSurface ':patch=' rightPatch ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' rightHemiFlattened ' 2']);
+% leftHemiInflated = fullfile(output, 'left_inflated.png');
+% rightHemiInflated = fullfile(output,  'right_inflated.png');
+% system(['freeview --surface ' leftSurface ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Azimuth 180 --viewport 3d --colorscale --screenshot ' leftHemiInflated ' 2']);
+% system(['freeview --surface ' rightSurface ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --viewport 3d --colorscale --screenshot ' rightHemiInflated ' 2']);
