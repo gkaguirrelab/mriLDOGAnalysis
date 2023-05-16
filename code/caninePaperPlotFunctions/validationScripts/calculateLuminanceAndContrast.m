@@ -2,7 +2,7 @@
 clear all; clc;
 
 % Path to the dropbox files 
-dropboxBaseDir = 'C:/Users/ozenc/Aguirre-Brainard Lab Dropbox/Ozenc Taskin';
+dropboxBaseDir = '/home/ozzy/Aguirre-Brainard Lab Dropbox/Ozenc Taskin';
 dataSource = fullfile(dropboxBaseDir,'LDOG_data','Experiments','OLApproach_TrialSequenceMR');
 
 % Initiate subjects and session cells 
@@ -22,7 +22,7 @@ sessions{1} = {'2022-05-19', '2020-11-23', '2021-01-08', ...
                '2020-11-06', '2020-11-06', '2020-11-19', '2023-01-04', '2023-01-05', ...
                '2022-09-09', '2023-03-30', '2023-04-19', ...
                '2022-11-29'};   
-
+           
 % List of pupillometry subjects we want to analyze
 % We remote N347 as we are not using the data for that subject 
 subjects{2} = {'2350', '2353', '2356', 'N344', 'N349', ...
@@ -53,7 +53,9 @@ for ii = 1:length(subjects)
     sessionList = sessions{ii};
     
     % Now loop through each subject in the experiment 
+    subjectCounter = 0;
     for ss = 1:length(subjectList)
+        subjectCounter = subjectCounter + 1;
         % Get path to the direction object
         directionFile = fullfile(dataSource, dataFolder, 'DirectionObjects', ...
                                  subjectList{ss}, sessionList{ss}, ... 
@@ -90,6 +92,7 @@ for ii = 1:length(subjects)
         % performed for that subject. Skip the rest of the loop.
         if isequal(length(indicesToDrop), length(LightFluxDirection.describe.validation))
             warning(['Skipping ' subjectName ' because it has no validation performed'])
+            subjectCounter = subjectCounter - 1;
             continue
         end
         
@@ -161,19 +164,53 @@ for ii = 1:length(subjects)
         for lum = 1:length(subjectLuminance)
             irradiance = calculateIrradiance(subjectLuminance(lum), calibrationFile, calibrationIndex);
             subjectIrradiance = [subjectIrradiance; irradiance];
-        end
-    
+        end    
+        
     % Save averages to a main cell
     if isequal(ii,1)
-        subjectMRIResults{ss,1} = subjectName;
-        subjectMRIResults{ss,2} = mean(subjectLuminance);
-        subjectMRIResults{ss,3} = mean(subjectIrradiance);
-        subjectMRIResults{ss,4} = subjectContrast;
+        subjectMRIResults{subjectCounter,1} = subjectName;
+        subjectMRIResults{subjectCounter,2} = mean(subjectLuminance);
+        subjectMRIResults{subjectCounter,3} = mean(subjectIrradiance);
+        subjectMRIResults{subjectCounter,4} = subjectContrast;
     elseif isequal(ii,2)
-        subjectPupilResults{ss,1} = subjectName;
-        subjectPupilResults{ss,2} = mean(subjectLuminance);
-        subjectPupilResults{ss,3} = mean(subjectIrradiance);
-        subjectPupilResults{ss,4} = subjectContrast;        
-    end    
-    end          
+        subjectPupilResults{subjectCounter,1} = subjectName;
+        subjectPupilResults{subjectCounter,2} = mean(subjectLuminance);
+        subjectPupilResults{subjectCounter,3} = mean(subjectIrradiance);
+        subjectPupilResults{subjectCounter,4} = subjectContrast;        
+    end
+    
+    end % End of subject loop
+    
+    % Now calculate the mean contrast for across subjects for each
+    % modulation and class    
+    contrasts = cell(1,length(directionNames));
+    if isequal(ii,1)
+        for subj = 1:size(subjectMRIResults,1)
+            for conds = 1:length(directionNames)
+                contrasts{conds} = [contrasts{conds} subjectMRIResults{subj,4}{conds}];
+            end
+        end
+        % Now report mean and SE of all subjects
+        fprintf(['\n For MRI, mean luminance across subjects: ' num2str(mean(cell2mat(subjectMRIResults(:,2)))) ' SE: ±' num2str(std(cell2mat(subjectMRIResults(:,2)))/sqrt(length(cell2mat(subjectMRIResults(:,2))))) '\n'])
+        fprintf(['\n For MRI, mean irradiance across subjects: ' num2str(mean(cell2mat(subjectMRIResults(:,3)))) ' SE: ±' num2str(std(cell2mat(subjectMRIResults(:,3)))/sqrt(length(cell2mat(subjectMRIResults(:,2))))) '\n'])
+    elseif isequal(ii,2)
+        for subj = 1:size(subjectPupilResults,1)
+            for conds = 1:length(directionNames)
+                contrasts{conds} = [contrasts{conds} subjectPupilResults{subj,4}{conds}];
+            end
+        end
+        % Now report mean and SE of all subjects
+        fprintf(['\n For MRI, mean luminance across subjects: ' num2str(mean(cell2mat(subjectPupilResults(:,2)))) ' SE: ±' num2str(std(cell2mat(subjectPupilResults(:,2)))/sqrt(length(cell2mat(subjectPupilResults(:,2))))) '\n'])
+        fprintf(['\n For MRI, mean irradiance across subjects: ' num2str(mean(cell2mat(subjectPupilResults(:,3)))) ' SE: ±' num2str(std(cell2mat(subjectPupilResults(:,3)))/sqrt(length(cell2mat(subjectPupilResults(:,2))))) '\n'])
+    end
+
+    for pr = 1:length(contrasts)      
+        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' L+S across subjects: ' num2str(100*mean(contrasts{pr}(5,:))) ' SE: ±' num2str(100*(std(contrasts{pr}(5,:))/sqrt(length(contrasts{pr}(5,:))))) '\n'])
+        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' L-S across subjects: ' num2str(100*mean(contrasts{pr}(6,:))) ' SE: ±' num2str(100*(std(contrasts{pr}(6,:))/sqrt(length(contrasts{pr}(6,:))))) '\n'])    
+        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' Mel across subjects: ' num2str(100*mean(contrasts{pr}(3,:))) ' SE: ±' num2str(100*(std(contrasts{pr}(3,:))/sqrt(length(contrasts{pr}(3,:))))) '\n'])
+        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' Rod across subjects: ' num2str(100*mean(contrasts{pr}(4,:))) ' SE: ±' num2str(100*(std(contrasts{pr}(4,:))/sqrt(length(contrasts{pr}(4,:))))) '\n'])      
+    end
+
+    fprintf('\n\n')
+    
 end
