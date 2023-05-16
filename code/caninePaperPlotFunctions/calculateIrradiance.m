@@ -1,4 +1,4 @@
-function cornIrradianceWattsPerArea = calculateIrradiance(luminance, calibration, calibrationDate)
+function cornIrradianceWattsPerArea = calculateIrradiance(luminance, calibration, calIndex)
 
 % Define wavelength spacing.  Use 1 nm spacing
 % so that values per nm.
@@ -8,8 +8,7 @@ S = [380 1 401];
 load(calibration)
 
 % Get the raw SPD for the full-on background
-whichCal = length(cals);
-theRawSpd = SplineSpd(cals{whichCal}.describe.S,cals{whichCal}.raw.fullOn,S);
+theRawSpd = SplineSpd(cals{calIndex}.describe.S,cals{calIndex}.raw.fullOn,S);
 
 % Load CIE 1931 CMFs
 %
@@ -26,7 +25,6 @@ theSpd = desiredLum*theRawSpd/(T_xyz(2,:)*theRawSpd);
 % Compute effective luminous efficiency
 theSpd_1 = theRawSpd/sum(theRawSpd);
 theLuminance_1 = T_xyz(2,:)*theSpd_1;
-fprintf('Luminous efficiency is %d Lumens/Watt\n',theLuminance_1);
 
 % Stimulus size deg
 theDegs = 30;
@@ -37,8 +35,6 @@ cornealIrradiance_PowerPerAreaNm = RadianceAndDegrees2ToCornIrradiance(theSpd,th
 
 % Total corneal irradiance
 cornIrradianceWattsPerArea = sum(cornealIrradiance_PowerPerAreaNm);
-fprintf('Corneal irradiance corresponding to %d deg diameter, %d cd/m2 Box D: %0.2g Watts/m2\n', ...
-        theDegs,desiredLum,cornIrradianceWattsPerArea);
     
 % Check by going the other way
 checkRadiance = CornIrradianceAndDegrees2ToRadiance(cornealIrradiance_PowerPerAreaNm,theDegs2);
