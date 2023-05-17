@@ -65,7 +65,7 @@ for ii = 1:length(subjects)
         % cell. Load the direction file. 
         subjectName = subjectList{ss};
         subjectDate = sessionList{ss}; 
-        fprintf(['Processing ' subjectName ' for ' dataFolder '\n'])
+        fprintf(['Processing ' subjectName ' for ' experiment ' '])
         load(directionFile)
         
         % Put all directions in a cell so we can loop through them 
@@ -151,6 +151,7 @@ for ii = 1:length(subjects)
         % calculate the irradiance for each value
         calName = LightFluxDirection.calibration.describe.calType;
         calDate = LightFluxDirection.calibration.describe.date;
+        fprintf(['- Calibration name/date ' calName ' - ' calDate '\n'])
         calibrationFile = fullfile(dropboxBaseDir, 'LDOG_materials', ...
                                    'Experiments', 'OLApproach_TrialSequenceMR', ...
                                    'OneLightCalData', ['OL' calName]);
@@ -191,8 +192,8 @@ for ii = 1:length(subjects)
             end
         end
         % Now report mean and SE luminance of all subjects
-        fprintf(['\n For MRI, mean luminance across subjects: ' num2str(mean(cell2mat(subjectMRIResults(:,2))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectMRIResults(:,2)))/sqrt(length(cell2mat(subjectMRIResults(:,2)))),'%.2f') '\n'])
-        fprintf(['\n For MRI, mean irradiance across subjects: ' num2str(mean(cell2mat(subjectMRIResults(:,3))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectMRIResults(:,3)))/sqrt(length(cell2mat(subjectMRIResults(:,2)))),'%.2f') '\n'])
+        fprintf(['\n For ' experiment ', mean luminance across subjects: ' num2str(mean(cell2mat(subjectMRIResults(:,2))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectMRIResults(:,2)))/sqrt(length(cell2mat(subjectMRIResults(:,2)))),'%.2f') '\n'])
+        fprintf(['\n For ' experiment ', mean irradiance across subjects: ' num2str(mean(cell2mat(subjectMRIResults(:,3))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectMRIResults(:,3)))/sqrt(length(cell2mat(subjectMRIResults(:,2)))),'%.2f') '\n'])
     elseif isequal(ii,2)
         for subj = 1:size(subjectPupilResults,1)
             for conds = 1:length(directionNames)
@@ -200,8 +201,8 @@ for ii = 1:length(subjects)
             end
         end
         % Now report mean and SE luminance of all subjects
-        fprintf(['\n For MRI, mean luminance across subjects: ' num2str(mean(cell2mat(subjectPupilResults(:,2))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectPupilResults(:,2)))/sqrt(length(cell2mat(subjectPupilResults(:,2)))),'%.2f') '\n'])
-        fprintf(['\n For MRI, mean irradiance across subjects: ' num2str(mean(cell2mat(subjectPupilResults(:,3))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectPupilResults(:,3)))/sqrt(length(cell2mat(subjectPupilResults(:,2)))),'%.2f') '\n'])
+        fprintf(['\n For ' experiment ', mean luminance across subjects: ' num2str(mean(cell2mat(subjectPupilResults(:,2))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectPupilResults(:,2)))/sqrt(length(cell2mat(subjectPupilResults(:,2)))),'%.2f') '\n'])
+        fprintf(['\n For ' experiment ', mean irradiance across subjects: ' num2str(mean(cell2mat(subjectPupilResults(:,3))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectPupilResults(:,3)))/sqrt(length(cell2mat(subjectPupilResults(:,2)))),'%.2f') '\n'])
     end
 
     % Print mean and SE contrast values
