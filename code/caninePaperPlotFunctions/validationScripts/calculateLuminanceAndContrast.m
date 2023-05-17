@@ -192,8 +192,8 @@ for ii = 1:length(subjects)
             end
         end
         % Now report mean and SE luminance of all subjects
-        fprintf(['\n For ' experiment ', mean luminance across subjects: ' num2str(mean(cell2mat(subjectMRIResults(:,2))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectMRIResults(:,2)))/sqrt(length(cell2mat(subjectMRIResults(:,2)))),'%.2f') '\n'])
-        fprintf(['\n For ' experiment ', mean irradiance across subjects: ' num2str(mean(cell2mat(subjectMRIResults(:,3))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectMRIResults(:,3)))/sqrt(length(cell2mat(subjectMRIResults(:,2)))),'%.2f') '\n'])
+        fprintf(['\n For ' experiment ', mean luminance across subjects: ' num2str(mean(cell2mat(subjectMRIResults(:,2))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectMRIResults(:,2))),'%.2f') '\n'])
+        fprintf(['\n For ' experiment ', mean irradiance across subjects: ' num2str(mean(cell2mat(subjectMRIResults(:,3))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectMRIResults(:,3))),'%.2f') '\n'])
     elseif isequal(ii,2)
         for subj = 1:size(subjectPupilResults,1)
             for conds = 1:length(directionNames)
@@ -201,16 +201,16 @@ for ii = 1:length(subjects)
             end
         end
         % Now report mean and SE luminance of all subjects
-        fprintf(['\n For ' experiment ', mean luminance across subjects: ' num2str(mean(cell2mat(subjectPupilResults(:,2))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectPupilResults(:,2)))/sqrt(length(cell2mat(subjectPupilResults(:,2)))),'%.2f') '\n'])
-        fprintf(['\n For ' experiment ', mean irradiance across subjects: ' num2str(mean(cell2mat(subjectPupilResults(:,3))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectPupilResults(:,3)))/sqrt(length(cell2mat(subjectPupilResults(:,2)))),'%.2f') '\n'])
+        fprintf(['\n For ' experiment ', mean luminance across subjects: ' num2str(mean(cell2mat(subjectPupilResults(:,2))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectPupilResults(:,2))),'%.2f') '\n'])
+        fprintf(['\n For ' experiment ', mean irradiance across subjects: ' num2str(mean(cell2mat(subjectPupilResults(:,3))),'%.2f') ' SE: ±' num2str(std(cell2mat(subjectPupilResults(:,3))),'%.2f') '\n'])
     end
 
     % Print mean and SE contrast values
     for pr = 1:length(contrasts)      
-        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' L+S across subjects: ' num2str(100*mean(contrasts{pr}(5,:)),'%.1f') ' SE: ±' num2str(100*(std(contrasts{pr}(5,:))/sqrt(length(contrasts{pr}(5,:)))),'%.1f') '\n'])
-        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' L-S across subjects: ' num2str(100*mean(contrasts{pr}(6,:)),'%.1f') ' SE: ±' num2str(100*(std(contrasts{pr}(6,:))/sqrt(length(contrasts{pr}(6,:)))),'%.1f') '\n'])    
-        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' Mel across subjects: ' num2str(100*mean(contrasts{pr}(3,:)),'%.1f') ' SE: ±' num2str(100*(std(contrasts{pr}(3,:))/sqrt(length(contrasts{pr}(3,:)))),'%.1f') '\n'])
-        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' Rod across subjects: ' num2str(100*mean(contrasts{pr}(4,:)),'%.1f') ' SE: ±' num2str(100*(std(contrasts{pr}(4,:))/sqrt(length(contrasts{pr}(4,:)))),'%.1f') '\n'])      
+        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' L+S across subjects: ' num2str(100*mean(contrasts{pr}(5,:)),'%.1f') ' SE: ±' num2str(100*(std(contrasts{pr}(5,:))),'%.1f') '\n'])
+        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' L-S across subjects: ' num2str(100*mean(contrasts{pr}(6,:)),'%.1f') ' SE: ±' num2str(100*(std(contrasts{pr}(6,:))),'%.1f') '\n'])    
+        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' Mel across subjects: ' num2str(100*mean(contrasts{pr}(3,:)),'%.1f') ' SE: ±' num2str(100*(std(contrasts{pr}(3,:))),'%.1f') '\n'])
+        fprintf(['\n For ' experiment ', mean ' directionNames{pr} ' Rod across subjects: ' num2str(100*mean(contrasts{pr}(4,:)),'%.1f') ' SE: ±' num2str(100*(std(contrasts{pr}(4,:))),'%.1f') '\n'])      
     end
 
     fprintf('\n\n')
