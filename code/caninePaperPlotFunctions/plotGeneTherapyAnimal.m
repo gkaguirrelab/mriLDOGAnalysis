@@ -86,39 +86,39 @@ fulldata{4} = reshape(mean(results.params(:,4:6),2), [53 53 54]);
 fulldata{5} = reshape(mean(results.params(:,7:9),2), [53 53 54]);
 fulldata{6} = reshape(mean(results.params(:,10:12),2), [53 53 54]);
 
-% for ii = 1:length(label)
-%     imageSaveName = fullfile(tempdir, [label{ii} '.nii.gz']);
-%     template.vol = fulldata{ii};
-%     MRIwrite(template, imageSaveName)
-%     resampledImage = fullfile(tempdir, ['resampled_' label{ii} '.nii.gz']);
-%     system(['flirt -in ' imageSaveName ' -ref ' invivoTemplate ' -interp nearestneighbour -applyxfm -init ' identityMatrix ' -o ' resampledImage])
-%     resampledImageLoaded = MRIread(resampledImage);
-%     binaryImage = MRIread(binaryTemplate);
-%     binaryImage = binaryImage.vol;
-%     resampledImageLoaded.vol(find(binaryImage == 0)) = 0;
-%     MRIwrite(resampledImageLoaded, resampledImage);
-%     interpolatedMap = fullfile(tempdir, 'interpolatedMap.nii.gz');
-%     system(['antsApplyTransforms -d 3 -i ' imageSaveName ' -r ' origImage ' -o ' interpolatedMap ' -t ' warp ' -t ' secondaryLinear ' -t ' primaryLinear])
-%     leftHemiFile = fullfile(tempdir, 'lh.mgz');
-%     rightHemiFile = fullfile(tempdir, 'rh.mgz');
-%     system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'lh' ' --o ' leftHemiFile]);
-%     system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'rh' ' --o ' rightHemiFile]);
-%     leftHemiFlattened = fullfile(flattenedOutput, [label{ii} '_left_flattened.png']);
-%     rightHemiFlattened = fullfile(flattenedOutput,  [label{ii} '_right_flattened.png']);
-%     system(['freeview --surface ' leftSurface ':patch=' leftPatch ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' leftHemiFlattened]);
-%     system(['freeview --surface ' rightSurface ':patch=' rightPatch ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' rightHemiFlattened]);
-%     leftHemiInflated = fullfile(inflatedOutput, [label{ii} '_left_inflated.png']);
-%     rightHemiInflated = fullfile(inflatedOutput,  [label{ii} '_right_inflated.png']);
-%     system(['freeview --surface ' leftSurface ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Azimuth 180 --viewport 3d --colorscale --screenshot ' leftHemiInflated]);
-%     system(['freeview --surface ' rightSurface ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --viewport 3d --colorscale --screenshot ' rightHemiInflated]);
-%     erodedResample = fullfile(tempdir, ['eroded_resampled_' label{ii} '.nii.gz']);
-%     binaryForLGN = MRIread(erodedBinaryForLGN);
-%     binaryForLGN = binaryForLGN.vol;
-%     resampledImageLoaded.vol(find(binaryForLGN == 0)) = 0;
-%     MRIwrite(resampledImageLoaded, erodedResample);
-%     lgnVolume = fullfile(lgnOutput,  [label{ii} '_LGN.png']);
-%     system(['freeview --volume ' invivoTemplate ' --volume ' erodedResample ':colormap=heat:heatscale=' threshold ' --slice 154 124 43 --viewport y --colorscale --screenshot ' lgnVolume])
-% end
+for ii = 1:length(label)
+    imageSaveName = fullfile(tempdir, [label{ii} '.nii.gz']);
+    template.vol = fulldata{ii};
+    MRIwrite(template, imageSaveName)
+    resampledImage = fullfile(tempdir, ['resampled_' label{ii} '.nii.gz']);
+    system(['flirt -in ' imageSaveName ' -ref ' invivoTemplate ' -interp nearestneighbour -applyxfm -init ' identityMatrix ' -o ' resampledImage])
+    resampledImageLoaded = MRIread(resampledImage);
+    binaryImage = MRIread(binaryTemplate);
+    binaryImage = binaryImage.vol;
+    resampledImageLoaded.vol(find(binaryImage == 0)) = 0;
+    MRIwrite(resampledImageLoaded, resampledImage);
+    interpolatedMap = fullfile(tempdir, 'interpolatedMap.nii.gz');
+    system(['antsApplyTransforms -d 3 -i ' imageSaveName ' -r ' origImage ' -o ' interpolatedMap ' -t ' warp ' -t ' secondaryLinear ' -t ' primaryLinear])
+    leftHemiFile = fullfile(tempdir, 'lh.mgz');
+    rightHemiFile = fullfile(tempdir, 'rh.mgz');
+    system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'lh' ' --o ' leftHemiFile]);
+    system(['mri_vol2surf --mov ' interpolatedMap ' --ref ' interpolatedMap  ' --reg ' registerDat ' --srcsubject Woofsurfer ' '--hemi ' 'rh' ' --o ' rightHemiFile]);
+    leftHemiFlattened = fullfile(flattenedOutput, [label{ii} '_left_flattened.png']);
+    rightHemiFlattened = fullfile(flattenedOutput,  [label{ii} '_right_flattened.png']);
+    system(['freeview --surface ' leftSurface ':patch=' leftPatch ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' leftHemiFlattened]);
+    system(['freeview --surface ' rightSurface ':patch=' rightPatch ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --cam Elevation 100 --viewport 3d --colorscale --screenshot ' rightHemiFlattened]);
+    leftHemiInflated = fullfile(inflatedOutput, [label{ii} '_left_inflated.png']);
+    rightHemiInflated = fullfile(inflatedOutput,  [label{ii} '_right_inflated.png']);
+    system(['freeview --surface ' leftSurface ':curvature_method=binary:overlay=' leftHemiFile ':overlay_threshold=' threshold ' --cam Azimuth 180 --viewport 3d --colorscale --screenshot ' leftHemiInflated]);
+    system(['freeview --surface ' rightSurface ':curvature_method=binary:overlay=' rightHemiFile ':overlay_threshold=' threshold ' --viewport 3d --colorscale --screenshot ' rightHemiInflated]);
+    erodedResample = fullfile(tempdir, ['eroded_resampled_' label{ii} '.nii.gz']);
+    binaryForLGN = MRIread(erodedBinaryForLGN);
+    binaryForLGN = binaryForLGN.vol;
+    resampledImageLoaded.vol(find(binaryForLGN == 0)) = 0;
+    MRIwrite(resampledImageLoaded, erodedResample);
+    lgnVolume = fullfile(lgnOutput,  [label{ii} '_LGN.png']);
+    system(['freeview --volume ' invivoTemplate ' --volume ' erodedResample ':colormap=heat:heatscale=' threshold ' --slice 154 124 43 --viewport y --colorscale --screenshot ' lgnVolume])
+end
 
 % Plot left and right eye for V1 and 
 for ii = 1:length(project.files)
