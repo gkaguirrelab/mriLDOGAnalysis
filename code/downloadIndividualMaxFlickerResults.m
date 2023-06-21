@@ -42,7 +42,7 @@ resampledTempPath = '/home/ozzy/Documents/MATLAB/projects/mriLDOGAnalysis/Atlas/
 template = MRIread(resampledTempPath);
 
 % Get all subjects 
-subjectNames = ['EM404', 'EM533', 'EM532', 'EM499', 'EM501'];
+subjectNames = ['EM404', 'EM533', 'EM532', 'EM499', 'EM501', 'M662'];
 
 % Get maxFlicker results
 subjects = project.subjects();
@@ -80,10 +80,26 @@ for sub = 1:length(subjects)
                             
                             eyes = {'left','right'};
                             for eye = 1:length(eyes)
-                                if strcmp(eyes{eye}, 'left')
-                                    beta = nanmean(results.params(:,1:9), 2);
-                                elseif strcmp(eyes{eye}, 'right')
-                                    beta = nanmean(results.params(:,10:18), 2);
+                                if ~strcmp(subjects{sub}.label, 'M662')
+                                    if strcmp(eyes{eye}, 'left')    
+                                        beta = nanmean(results.params(:,1:9), 2);
+                                    elseif strcmp(eyes{eye}, 'right')
+                                        beta = nanmean(results.params(:,10:18), 2);
+                                    end
+                                elseif strcmp(subjects{sub}.label, 'M662')
+                                    if strcmp(sessions{ses}.label, 'foveaLocalizer_2.1')
+                                        if strcmp(eyes{eye}, 'left')    
+                                            beta = nanmean(results.params(:,1:8), 2);
+                                        elseif strcmp(eyes{eye}, 'right')
+                                            beta = nanmean(results.params(:,9:12), 2);
+                                        end
+                                    else
+                                        if strcmp(eyes{eye}, 'left')    
+                                            beta = nanmean(results.params(:,1:8), 2);
+                                        elseif strcmp(eyes{eye}, 'right')
+                                            beta = nanmean(results.params(:,9:16), 2);
+                                        end
+                                    end
                                 end
                             
                                 beta(isnan(beta)) = 0;
