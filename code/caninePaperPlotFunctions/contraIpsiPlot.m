@@ -91,7 +91,7 @@ xlim([1.8,4.5])
 xticklabels({'N349','N347','N344'});
 plot([1.8,4.5],[0 0],':k')
 legend([plt{1}, plt{4}], {'contra','ipsi'}, 'location', 'best')
-ylabel('BOLD response [%d]')
+ylabel('BOLD response [%△]')
 
 % Get the flatten maps
 output = '/home/ozzy/Desktop/ipsiContraSave';
