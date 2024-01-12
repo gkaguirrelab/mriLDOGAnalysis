@@ -1,0 +1,8 @@
+projectLabel,canineFovea,gearName,ldogStruct,rootSession,MPRAGE_01,ConfigKeys,"{'centreOfGravityX','centreOfGravityY','centreOfGravityZ','subjectId','transformationMethod','extractionThreshold','structToStructTransform'}",ConfigVals,"{centreOfGravityX,centreOfGravityY,centreOfGravityZ,subjectName,transformationMethod,extractionThreshold,'Affine'}",,,
+Inputs,MPRAGE_01,MPRAGE_02,MPRAGE_03,MPRAGE_04,MPRAGE_05,centreOfGravityX,centreOfGravityY,centreOfGravityZ,transformationMethod,extractionThreshold,analysisSubmissionTag,
+DefaultLabel,MPRAGE_0.7mm_1avg01,MPRAGE_0.7mm_1avg02,MPRAGE_0.7mm_1avg03,MPRAGE_0.7mm_1avg04,MPRAGE_0.7mm_1avg05,,,,,,,
+FileSuffix,nifti,nifti,nifti,nifti,nifti,,,,,,,
+ContainerType,acquisition,acquisition,acquisition,acquisition,acquisition,config,config,config,config,config,,Notes
+ExactStringMatch,0,0,0,0,0,,,,,,,
+,,,,,,,,,,,,
+AS2451,LA7/photoFlicker_1,LA7/photoFlicker_1,,,,95,61,82,'skullStrippedMprage-skullStrippedTemplate',0.2,AS2451_photoFlicker_1,
