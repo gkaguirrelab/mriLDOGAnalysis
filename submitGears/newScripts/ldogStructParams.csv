@@ -6,4 +6,6 @@ ContainerType,acquisition,acquisition,acquisition,acquisition,acquisition,config
 ExactStringMatch,0,0,0,0,0,,,,,,,
 ,,,,,,,,,,,,
 LA7,LA7/photoFlicker_1,LA7/photoFlicker_1,,,,101,61,84,'skullStrippedMprage-skullStrippedTemplate',0.4,LA7_photoFlicker_1,
-LA7,LA7/photoFlicker_2,LA7/photoFlicker_2,,,,90,53,100,'wholeMprage-wholeTemplate',0.2,LA7_photoFlicker_2,
+LA7,LA7/photoFlicker_2,LA7/photoFlicker_2,,,,90,53,100,'wholeMprage-wholeTemplate',0.8,LA7_photoFlicker_2,
+LA7,LA7/photoFlicker_3,LA7/photoFlicker_3,,,,98,55,97,'skullStrippedMprage-skullStrippedTemplate',0.2,LA7_photoFlicker_3,
+LA8,LA8/photoFlicker_1,LA8/photoFlicker_1,,,,94,61,95,'skullStrippedMprage-skullStrippedTemplate',0.6,LA7_photoFlicker_1,
